@@ -9,5 +9,5 @@
 
 ### Linux
 
-[Apache支持HTTPS](../)
+[Apache支持HTTPS](./blob/master/notes/apache-self-ssl.md)
 
