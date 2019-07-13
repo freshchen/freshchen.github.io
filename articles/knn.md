@@ -126,4 +126,4 @@ print('训练数据：[%s,%s] k值：%s 结果：%s' % (old_x[0], old_x[1], k, k
 
 训练数据：[3,5] k值：15 结果：1
 
-![](https://github.com/freshchen/freshchen.github.io/blob/master/images/post/KNN.png?raw=true)
+![](../images/post/KNN.png?raw=true)

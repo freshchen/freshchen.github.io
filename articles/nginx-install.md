@@ -56,4 +56,4 @@ $ make && make install
 
 正常启动了Nginx之后，访问自己服务器的ip，看到如下页面就成功了，至此安装成功
 
-![](https://github.com/freshchen/freshchen.github.io/blob/master/images/post/nginx-install.png?raw=true)
+![](../resource/images/nginx-install.png?raw=true)
