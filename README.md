@@ -1,9 +1,13 @@
 # fresh-notes
-主要记录一些博客，笔记，链接以及随笔。
+博客    笔记    随笔
 
-## 链接
+## 笔记
 
-[好文链接收藏](./notes/links.md)
+[阅读链接收藏](./notes/links.md)
+
+[Linux服务器常用命令](./notes/linux-command.md)
+
+[Trouble Shooting](./notes/troubleshooting.md)
 
 ## 博客
 
@@ -12,6 +16,10 @@
 [Redis学习笔记](./notes/redis.md)
 
 [Apache支持HTTPS](./notes/apache-self-ssl.md)
+
+[Python标准库：CLI(命令行)参数解析工具argparse](./notes/notes/argparse.md)
+
+[Python远程调用 Openstack 主要服务（keystone,nova,glance,neutron,heat）](./notes/python-openstack.md)
 
 [Openstack-cinder服务](./notes/openstack-cinder.md)
 
@@ -32,12 +40,6 @@
 [自签的SSL证书创建与验证过程](./notes/self-ssl-signing.md)
 
 [自己制作Yum源](./notes/yumsource.md)
-
-### Script
-
-[Python标准库：CLI(命令行)参数解析工具argparse](./notes/notes/argparse.md)
-
-[Python远程调用 Openstack 主要服务（keystone,nova,glance,neutron,heat）](./notes/python-openstack.md)
 
 ### JAVA
 
@@ -60,5 +62,3 @@
 ### Others
 
 [markdown语法简介](./notes/markdown.md)
-
-## 笔记
