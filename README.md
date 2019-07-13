@@ -5,7 +5,7 @@
 
 [好文链接收藏](./notes/links.md)
 
-## 笔记
+## 博客
 
 ### Linux
 
@@ -60,3 +60,5 @@
 ### Others
 
 [markdown语法简介](./notes/markdown.md)
+
+## 笔记
