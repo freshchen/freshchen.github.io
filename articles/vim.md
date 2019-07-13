@@ -7,7 +7,7 @@ top:
 
 ## 按键图
 
-![](https://github.com/freshchen/freshchen.github.io/blob/master/images/post/vim.gif?raw=true)
+![](../resource/images/vim.gif?raw=true)
 
 ## 用法记录
 

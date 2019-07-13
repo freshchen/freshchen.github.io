@@ -116,4 +116,4 @@ def _init_():
 
 ### 3效果图
 
-![](https://github.com/freshchen/freshchen.github.io/blob/master/images/post/OldPLA.png?raw=true)
+![](../resource/images/OldPLA.png?raw=true)
