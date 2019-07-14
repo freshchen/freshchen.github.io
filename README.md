@@ -2,11 +2,9 @@
 
 ## 笔记
 
-[阅读链接收藏](./notes/links.md)
+[Links](./notes/links.md)
 
-[服务器常用命令](./notes/linux-command.md)
-
-[服务器Trouble Shooting](./notes/troubleshooting.md)
+[Common Commands & Trouble Shooting](notes/linux-notes.md)
 
 ## 博客
 
