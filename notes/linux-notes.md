@@ -28,15 +28,31 @@ cat file | grep -Ev '^$|^#'
 ### openssl
 
  ```bash
-# 获取端口证书的过期时间
+# 查看证书过期时间
+openssl x509 -noout -enddate -in <crt_path>
+# 获取端口证书过期时间
 echo 'Q' | timeout 5 openssl s_client -connect <host:port> 2>/dev/null | openssl x509 -noout -enddate
+# 自签根证书
+
+# 根证书签发子证书
  ```
 
 ### keytool
 
 ```bash
-查看keystore
+# 查看keystore
 ${JAVA_HOME}/bin/keytool -v -list -storepass <password> -keystore <keystore_path>
+```
+
+### mysql
+
+```bash
+# 查配置
+show variables like '%';
+# 放开用户的远程操作权限
+GRANT ALL PRIVILEGES ON *.* TO '<user>'@'%' IDENTIFIED BY '<password>' WITH GRANT OPTION;
+# 刷新权限规则生效
+flush privileges;
 ```
 
 
@@ -96,9 +112,5 @@ mysql> set global validate_password_policy=0;
 mysql> set password for 'root'@'localhost' = password('123456');
 mysql> GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '123456' WITH GRANT OPTION;
 mysql> flush privileges;
-
-
-
-
 ```
 
