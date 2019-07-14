@@ -4,9 +4,9 @@
 
 [阅读链接收藏](./notes/links.md)
 
-[Linux服务器常用命令](./notes/linux-command.md)
+[服务器常用命令](./notes/linux-command.md)
 
-[Trouble Shooting](./notes/troubleshooting.md)
+[服务器Trouble Shooting](./notes/troubleshooting.md)
 
 ## 博客
 
