@@ -2,9 +2,9 @@
 
 ## 笔记
 
-[Links](./notes/links.md)
+[Linux Common Commands & Trouble Shooting](notes/linux-notes.md)
 
-[Common Commands & Trouble Shooting](notes/linux-notes.md)
+[Reading Links](./notes/links.md)
 
 ## 博客
 
