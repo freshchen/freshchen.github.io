@@ -34,7 +34,10 @@ echo 'Q' | timeout 5 openssl s_client -connect <host:port> 2>/dev/null | openssl
 
 ### keytool
 
-
+```bash
+查看keystore
+${JAVA_HOME}/bin/keytool -v -list -storepass <password> -keystore <keystore_path>
+```
 
 
 
