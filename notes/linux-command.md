@@ -1,6 +1,6 @@
 # Linux服务器常用命令
 
-### Docker 
+### docker 
 
 ```bash
 # 删除tag和name为none的坏掉的image
@@ -20,4 +20,13 @@ docker rmi --force $(docker images -q)
 cat file | grep -v ^# | grep .
 cat file | grep -Ev '^$|^#'
 ```
+
+### openssl
+
+ ```bash
+# 获取端口证书的过期时间
+echo 'Q' | timeout 5 openssl s_client -connect ${port} 2>/dev/null | openssl x509 -noout -enddate
+ ```
+
+### keytool
 
