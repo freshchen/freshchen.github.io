@@ -33,9 +33,14 @@ openssl x509 -noout -enddate -in <crt_path>
 # 获取端口证书过期时间
 echo 'Q' | timeout 5 openssl s_client -connect <host:port> 2>/dev/null | openssl x509 -noout -enddate
 # 自签根证书
-openssl genrsa -aes256 -out <私钥位置> 2048
-
+openssl genrsa -aes256 -out <ca私钥位置> 2048
+openssl req -new -key <ca私钥位置> -out <ca签发流程位置> -subj "/C=/ST=/L=/O=/OU=/CN=/emailAddress="
+openssl x509 -req -sha256 -days <过期天数> -in <ca签发流程位置> -out <ca证书位置> -signkey <ca私钥位置> -CAcreateserial
 # 根证书签发子证书
+openssl genrsa -aes256 -out <私钥位置> 2048
+openssl req -new -key <私钥位置> -out <签发流程位置> -subj "/C=/ST=/L=/O=/OU=/CN=/emailAddress=" 
+openssl x509 -req -sha256 -days <过期天数> -in <签发流程位置> -out <证书位置> -signkey <私钥位置> -CAkey <ca私钥> -CA <ca证书位置> -CAcreateserial
+openssl pkcs12 -export -clcerts -in <证书位置> -inkey <私钥位置> -out <p12证书位置> -name <别名>
  ```
 
 ### keytool
@@ -43,6 +48,10 @@ openssl genrsa -aes256 -out <私钥位置> 2048
 ```bash
 # 查看keystore
 ${JAVA_HOME}/bin/keytool -v -list -storepass <password> -keystore <keystore_path>
+# 导入trust keystore
+${JAVA_HOME}/bin/keytool -import -trustcacerts -noprompt -alias <别名> -file <证书位置> -keystore <Keystore位置>
+# 导入keystore
+${JAVA_HOME}/bin/keytool -importkeystore -trustcacerts -noprompt -alias <别名> -deststoretype pkcs12 -srcstoretype pkcs12 -srckeystore <p12证书位置> -destkeystore <Keystore位置>
 ```
 
 ### mysql
