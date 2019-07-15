@@ -33,6 +33,7 @@ openssl x509 -noout -enddate -in <crt_path>
 # 获取端口证书过期时间
 echo 'Q' | timeout 5 openssl s_client -connect <host:port> 2>/dev/null | openssl x509 -noout -enddate
 # 自签根证书
+openssl genrsa -aes256 -out <私钥位置> 2048
 
 # 根证书签发子证书
  ```
