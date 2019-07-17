@@ -4,6 +4,30 @@
 
 ## Common Commands
 
+### grep 
+
+```bash
+# 删除空白行和注释行
+cat file | grep -v ^# | grep .
+cat file | grep -Ev '^$|^#'
+```
+
+### ps
+
+```bash
+# 查看后台job
+jobs
+# 后台运行
+( cmd ) &
+# 唤醒
+fg %<job_num>
+# 暂停放入后台
+ctrl z
+# 唤醒stop的job
+bg %<job_num>
+
+```
+
 ### docker 
 
 ```bash
@@ -15,14 +39,6 @@ docker kill $(docker ps -qa)
 docker rm $(docker ps -qa)
 # 删除所有镜像
 docker rmi --force $(docker images -q)
-```
-
-### grep 
-
-```bash
-# 删除空白行和注释行
-cat file | grep -v ^# | grep .
-cat file | grep -Ev '^$|^#'
 ```
 
 ### openssl
@@ -52,6 +68,14 @@ ${JAVA_HOME}/bin/keytool -v -list -storepass <password> -keystore <keystore_path
 ${JAVA_HOME}/bin/keytool -import -trustcacerts -noprompt -alias <别名> -file <证书位置> -keystore <Keystore位置>
 # 导入keystore
 ${JAVA_HOME}/bin/keytool -importkeystore -trustcacerts -noprompt -alias <别名> -deststoretype pkcs12 -srcstoretype pkcs12 -srckeystore <p12证书位置> -destkeystore <Keystore位置>
+```
+
+### chown
+
+```bash
+chown -R <user> <dir>
+chown -R :<group> <dir>
+chown -R <user>:<group> <dir>
 ```
 
 ### mysql
