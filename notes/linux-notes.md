@@ -12,21 +12,6 @@ cat file | grep -v ^# | grep .
 cat file | grep -Ev '^$|^#'
 ```
 
-### ps
-
-```bash
-# 查看后台job
-jobs
-# 后台运行
-( cmd ) &
-# 唤醒
-fg %<job_num>
-# 暂停放入后台
-ctrl z
-# 唤醒stop的job
-bg %<job_num>
-
-```
 
 ### docker 
 
@@ -68,6 +53,29 @@ ${JAVA_HOME}/bin/keytool -v -list -storepass <password> -keystore <keystore_path
 ${JAVA_HOME}/bin/keytool -import -trustcacerts -noprompt -alias <别名> -file <证书位置> -keystore <Keystore位置>
 # 导入keystore
 ${JAVA_HOME}/bin/keytool -importkeystore -trustcacerts -noprompt -alias <别名> -deststoretype pkcs12 -srcstoretype pkcs12 -srckeystore <p12证书位置> -destkeystore <Keystore位置>
+```
+
+### ps
+
+```bash
+# 查看后台job
+jobs
+# 后台运行
+( cmd ) &
+# 唤醒
+fg %<job_num>
+# 暂停放入后台
+ctrl z
+# 唤醒stop的job
+bg %<job_num>
+# 发送信号，优先15SIGTERM，不行再9SIGKILL
+kill -SIGTERM <PID>
+# 杀用户所有进程
+pkill -SIGTERM -u <user_name>
+# 杀父进程
+pkill -P <PID>
+# 杀终端
+pkill -SIGTERM -u <tty_name>
 ```
 
 ### chown
