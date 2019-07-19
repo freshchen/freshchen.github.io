@@ -9,6 +9,14 @@
 ```bash
 # 变量要保留其原来的换行符要加双引号，建议所有变量引用都用双引号加大括号圈上
 echo "${var}"
+# 变量长度
+echo "${#var}"
+# 接受所有参数
+$@
+# 查看数组中所有元素
+${list[@]}
+# 查看数组长度
+${#list[@]}
 ```
 
 ### =
@@ -24,9 +32,17 @@ declare -A map=(["1"]="name" ["2"]="age")
 
 ```bash
 # 删除空白行和注释行
-cat file | grep -v ^# | grep .
-cat file | grep -Ev '^$|^#'
+cat <file> | grep -v ^# | grep .
+cat <file> | grep -Ev '^$|^#'
 ```
+
+### tr 
+
+```bash
+# 大写转小写
+echo ${var} | tr 'A-Z' 'a-z'
+```
+
 
 
 ### docker 
