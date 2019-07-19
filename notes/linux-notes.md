@@ -4,6 +4,22 @@
 
 ## Common Commands
 
+### $
+
+```bash
+# 变量要保留其原来的换行符要加双引号，建议所有变量引用都用双引号加大括号圈上
+echo "${var}"
+```
+
+### =
+
+```bash
+# 定义list
+list=("1" "2" "3")
+# 定义map
+declare -A map=(["1"]="name" ["2"]="age")
+```
+
 ### grep 
 
 ```bash
