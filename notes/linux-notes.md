@@ -2,6 +2,8 @@
 
 服务器常用命令，以及问题解决记录
 
+[Shell常用工具脚本](https://github.com/freshchen/fresh-script-practice/blob/master/shell-scripts/utils.sh)
+
 ## Common Commands
 
 ### $
