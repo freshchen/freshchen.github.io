@@ -6,7 +6,7 @@
 
 [Reading Links](./notes/links.md)
 
-[个人常用工具脚本模板](./utils/README.md)
+[个人常用工具脚本模板](./utils)
 
 ## 博客
 
