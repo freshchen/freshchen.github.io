@@ -22,7 +22,7 @@ ${#list[@]}
 ### =
 
 ```bash
-# 定义list
+# 定义数组
 list=("1" "2" "3")
 # 定义map
 declare -A map=(["1"]="name" ["2"]="age")
