@@ -4,9 +4,11 @@
 
 ## Common Commands
 
-### $
+### 文本处理
 
 ```bash
+########################      $      ########################
+
 # 变量要保留其原来的换行符要加双引号，建议所有变量引用都用双引号加大括号圈上
 echo "${var}"
 # 变量长度
@@ -17,77 +19,28 @@ $@
 ${list[@]}
 # 查看数组长度
 ${#list[@]}
-```
 
-### =
+########################      =      ########################
 
-```bash
 # 定义数组
 list=("1" "2" "3")
 # 定义map
 declare -A map=(["1"]="name" ["2"]="age")
-```
 
-### grep 
+########################     grep      ########################
 
-```bash
 # 删除空白行和注释行
 cat <file> | grep -v ^# | grep .
 cat <file> | grep -Ev '^$|^#'
-```
 
-### tr 
+########################      tr       ########################
 
-```bash
 # 大写转小写
 echo ${var} | tr 'A-Z' 'a-z'
+
 ```
 
-
-
-### docker 
-
-```bash
-# 删除tag和name为none的坏掉的image
-docker rmi $(docker images -f "dangling=true" -q)
-# 删掉所有容器
-docker stop $(docker ps -qa)
-docker kill $(docker ps -qa)
-docker rm $(docker ps -qa)
-# 删除所有镜像
-docker rmi --force $(docker images -q)
-```
-
-### openssl
-
- ```bash
-# 查看证书过期时间
-openssl x509 -noout -enddate -in <crt_path>
-# 获取端口证书过期时间
-echo 'Q' | timeout 5 openssl s_client -connect <host:port> 2>/dev/null | openssl x509 -noout -enddate
-# 自签根证书
-openssl genrsa -aes256 -out <ca私钥位置> 2048
-openssl req -new -key <ca私钥位置> -out <ca签发流程位置> -subj "/C=/ST=/L=/O=/OU=/CN=/emailAddress="
-openssl x509 -req -sha256 -days <过期天数> -in <ca签发流程位置> -out <ca证书位置> -signkey <ca私钥位置> -CAcreateserial
-# 根证书签发子证书
-openssl genrsa -aes256 -out <私钥位置> 2048
-openssl req -new -key <私钥位置> -out <签发流程位置> -subj "/C=/ST=/L=/O=/OU=/CN=/emailAddress=" 
-openssl x509 -req -sha256 -days <过期天数> -in <签发流程位置> -out <证书位置> -signkey <私钥位置> -CAkey <ca私钥> -CA <ca证书位置> -CAcreateserial
-openssl pkcs12 -export -clcerts -in <证书位置> -inkey <私钥位置> -out <p12证书位置> -name <别名>
- ```
-
-### keytool
-
-```bash
-# 查看keystore
-${JAVA_HOME}/bin/keytool -v -list -storepass <password> -keystore <keystore_path>
-# 导入trust keystore
-${JAVA_HOME}/bin/keytool -import -trustcacerts -noprompt -alias <别名> -file <证书位置> -keystore <Keystore位置>
-# 导入keystore
-${JAVA_HOME}/bin/keytool -importkeystore -trustcacerts -noprompt -alias <别名> -deststoretype pkcs12 -srcstoretype pkcs12 -srckeystore <p12证书位置> -destkeystore <Keystore位置>
-```
-
-### ps
+### 系统监控
 
 ```bash
 # 查看后台job
@@ -108,19 +61,150 @@ pkill -SIGTERM -u <user_name>
 pkill -P <PID>
 # 杀终端
 pkill -SIGTERM -u <tty_name>
+# 查看cpu信息
+cat /proc/cpuinfo
+# 查看服务单元
+systemctl
+systemctl --type service
+systemctl list-units
+# 判断状态
+systemctl <is-active|is-enabled|is-failed|isolate|is-system-running> <unit_name>
+# 看错误信息
+systemctl --failed
+systemctl status <unit_name> -l
+# 看enable disable static的单元
+systemctl list-unit-files
+
+########################     journalctl      ########################
+
+# 查看systemd日志
+journalctl
+# 指定级别
+journalctl -p <err|debug|info|warning...>
+# 持续打印
+journalctl -f
+# 指定单元
+journalctl -u
+
+########################     timedatectl      ########################
+
+# 当前时钟时区
+timedatectl
+# 设置
+timedatectl <set-ntp|set-time|set-timezone|set-local-rtc> 
 ```
 
-### chown
+### 网络管理
 
 ```bash
+########################     ip      ########################
+
+# 检查网络设备
+ip addr show <eno>
+# 查看网络性能
+ip -s link <eno>
+# 跟踪请求路径
+tracepath
+tracepath6
+
+########################     nmcli      ########################
+
+# 查看网络连接
+nmcli con show
+# 查看网络设备信息
+nmcli dev show <eno>
+# 修改网络接口
+nmcli con add
+nmcli con mod
+# 激活/取消连接
+nmcli con up "<id>"
+nmcli con down "<id>"
+# 网络配置文件位置
+ls /etc/sysconfig/network-scripts/
+
+########################     hostname      ########################
+
+# 查看hostname信息
+hostnamectl status
+# 本地域名解析位置
+cat /etc/hosts
+cat /etc/resolv.conf
+```
+
+
+
+### 安全管理
+
+```bash
+########################     user:group      ########################
+
+# 用户信息
+cat /etc/passwd
+# 组信息
+cat /etc/group
+# 更改用户或组
 chown -R <user> <dir>
 chown -R :<group> <dir>
 chown -R <user>:<group> <dir>
+# 改权限
+chmod -R 750 <file>
+
+########################     ssh      ########################
+
+# 显示当前登录信息
+w -f
+# 公钥存放位置
+cat ~/.ssh/known_hosts
+# 私钥位置
+ls /etc/ssh/ssh_host_*
+# 创建私钥公钥对
+ssh-keygen
+# 将公钥复制到远程机器实现互信
+ssh-copy-id <user>@<host>
+
+########################      openssl        ########################
+
+# 查看证书过期时间
+openssl x509 -noout -enddate -in <crt_path>
+# 获取端口证书过期时间
+echo 'Q' | timeout 5 openssl s_client -connect <host:port> 2>/dev/null | openssl x509 -noout -enddate
+# 自签根证书
+openssl genrsa -aes256 -out <ca私钥位置> 2048
+openssl req -new -key <ca私钥位置> -out <ca签发流程位置> -subj "/C=/ST=/L=/O=/OU=/CN=/emailAddress="
+openssl x509 -req -sha256 -days <过期天数> -in <ca签发流程位置> -out <ca证书位置> -signkey <ca私钥位置> -CAcreateserial
+# 根证书签发子证书
+openssl genrsa -aes256 -out <私钥位置> 2048
+openssl req -new -key <私钥位置> -out <签发流程位置> -subj "/C=/ST=/L=/O=/OU=/CN=/emailAddress=" 
+openssl x509 -req -sha256 -days <过期天数> -in <签发流程位置> -out <证书位置> -signkey <私钥位置> -CAkey <ca私钥> -CA <ca证书位置> -CAcreateserial
+openssl pkcs12 -export -clcerts -in <证书位置> -inkey <私钥位置> -out <p12证书位置> -name <别名>
+
+########################      keytool        ########################
+
+# 查看keystore
+${JAVA_HOME}/bin/keytool -v -list -storepass <password> -keystore <keystore_path>
+# 导入trust keystore
+${JAVA_HOME}/bin/keytool -import -trustcacerts -noprompt -alias <别名> -file <证书位置> -keystore <Keystore位置>
+# 导入keystore
+${JAVA_HOME}/bin/keytool -importkeystore -trustcacerts -noprompt -alias <别名> -deststoretype pkcs12 -srcstoretype pkcs12 -srckeystore <p12证书位置> -destkeystore <Keystore位置>
+
 ```
 
-### mysql
+### 其他软件
 
 ```bash
+########################      docker        ########################
+
+# 删除tag和name为none的坏掉的image
+docker rmi $(docker images -f "dangling=true" -q)
+# 删掉所有容器
+docker stop $(docker ps -qa)
+docker kill $(docker ps -qa)
+docker rm $(docker ps -qa)
+# 删除所有镜像
+docker rmi --force $(docker images -q)
+
+########################      mysql        ########################
+
 # 查配置
 show variables like '%';
 # 放开用户的远程操作权限
