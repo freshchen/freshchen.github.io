@@ -40,9 +40,11 @@ echo ${var} | tr 'A-Z' 'a-z'
 
 ```
 
-### 系统监控
+### 系统管理
 
 ```bash
+########################     process      ########################
+
 # 查看后台job
 jobs
 # 后台运行
@@ -92,11 +94,7 @@ journalctl -u
 timedatectl
 # 设置
 timedatectl <set-ntp|set-time|set-timezone|set-local-rtc> 
-```
 
-### 网络管理
-
-```bash
 ########################     ip      ########################
 
 # 检查网络设备
@@ -129,13 +127,20 @@ hostnamectl status
 # 本地域名解析位置
 cat /etc/hosts
 cat /etc/resolv.conf
-```
 
+########################      yum        ########################
 
+yum <repolist|list|search|install|remove|update>
 
-### 安全管理
+########################      rpm        ########################
 
-```bash
+# 查找rpm包
+rpm -qa | grep <name>
+# 查看rpm信息
+rpm -qi <name>
+# 解压rpm包
+rpm2cpio <rpm> | cpio -id
+
 ########################     user:group      ########################
 
 # 用户信息
@@ -161,6 +166,31 @@ ls /etc/ssh/ssh_host_*
 ssh-keygen
 # 将公钥复制到远程机器实现互信
 ssh-copy-id <user>@<host>
+```
+
+
+### 应用
+
+```bash
+########################      docker        ########################
+
+# 删除tag和name为none的坏掉的image
+docker rmi $(docker images -f "dangling=true" -q)
+# 删掉所有容器
+docker stop $(docker ps -qa)
+docker kill $(docker ps -qa)
+docker rm $(docker ps -qa)
+# 删除所有镜像
+docker rmi --force $(docker images -q)
+
+########################      mysql        ########################
+
+# 查配置
+show variables like '%';
+# 放开用户的远程操作权限
+GRANT ALL PRIVILEGES ON *.* TO '<user>'@'%' IDENTIFIED BY '<password>' WITH GRANT OPTION;
+# 刷新权限规则生效
+flush privileges;
 
 ########################      openssl        ########################
 
@@ -188,32 +218,6 @@ ${JAVA_HOME}/bin/keytool -import -trustcacerts -noprompt -alias <别名> -file <
 ${JAVA_HOME}/bin/keytool -importkeystore -trustcacerts -noprompt -alias <别名> -deststoretype pkcs12 -srcstoretype pkcs12 -srckeystore <p12证书位置> -destkeystore <Keystore位置>
 
 ```
-
-### 其他软件
-
-```bash
-########################      docker        ########################
-
-# 删除tag和name为none的坏掉的image
-docker rmi $(docker images -f "dangling=true" -q)
-# 删掉所有容器
-docker stop $(docker ps -qa)
-docker kill $(docker ps -qa)
-docker rm $(docker ps -qa)
-# 删除所有镜像
-docker rmi --force $(docker images -q)
-
-########################      mysql        ########################
-
-# 查配置
-show variables like '%';
-# 放开用户的远程操作权限
-GRANT ALL PRIVILEGES ON *.* TO '<user>'@'%' IDENTIFIED BY '<password>' WITH GRANT OPTION;
-# 刷新权限规则生效
-flush privileges;
-```
-
-
 
 ## Trouble Shooting
 
