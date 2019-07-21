@@ -65,6 +65,9 @@ pkill -P <PID>
 pkill -SIGTERM -u <tty_name>
 # 查看cpu信息
 cat /proc/cpuinfo
+
+########################     systemctl      ########################
+
 # 查看服务单元
 systemctl
 systemctl --type service
@@ -88,12 +91,38 @@ journalctl -f
 # 指定单元
 journalctl -u
 
+########################     find      ########################
+
+# 根据名字找
+find <dir> -name <org>
+# 根据用户找
+find <dir> -user <org>
+# 根据组找
+find <dir> -group <org>
+# 根据权限找
+find <dir> -perm <org>
+# 根据大小找
+find <dir> -size <org>
+# 根据更改找
+find <dir> -mmin <org>
+# 根据类型找
+find <dir> -type <l|b|f>
+
+
 ########################     timedatectl      ########################
 
 # 当前时钟时区
 timedatectl
 # 设置
 timedatectl <set-ntp|set-time|set-timezone|set-local-rtc> 
+
+########################     hostname      ########################
+
+# 查看hostname信息
+hostnamectl status
+# 本地域名解析位置
+cat /etc/hosts
+cat /etc/resolv.conf
 
 ########################     ip      ########################
 
@@ -120,13 +149,6 @@ nmcli con down "<id>"
 # 网络配置文件位置
 ls /etc/sysconfig/network-scripts/
 
-########################     hostname      ########################
-
-# 查看hostname信息
-hostnamectl status
-# 本地域名解析位置
-cat /etc/hosts
-cat /etc/resolv.conf
 
 ########################      yum        ########################
 
@@ -166,6 +188,26 @@ ls /etc/ssh/ssh_host_*
 ssh-keygen
 # 将公钥复制到远程机器实现互信
 ssh-copy-id <user>@<host>
+
+########################     fs      ########################
+
+# 检测文件挂载点
+df -h
+# 检测目录使用空间信息
+du -h <dir>
+# 文件系统挂在
+mount <dir> <dir>
+# 查看目录中所有打开的文件和正在运行的进程
+lsof <dir>
+# 取消挂载
+umount <dir>
+
+########################     ln      ########################
+
+# 创建硬连接
+ln <exist_path> <path>
+# 创建软连接
+ln -s <exist_path> <path>
 ```
 
 
