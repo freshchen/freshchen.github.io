@@ -6,7 +6,7 @@
 
 [Reading Links](./notes/links.md)
 
-[个人常用工具脚本模板](./utils)
+[个人常用工具脚本模板](https://github.com/freshchen/fresh-tools)
 
 ## 博客
 

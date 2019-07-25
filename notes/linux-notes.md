@@ -242,6 +242,8 @@ show variables like '%';
 GRANT ALL PRIVILEGES ON *.* TO '<user>'@'%' IDENTIFIED BY '<password>' WITH GRANT OPTION;
 # 刷新权限规则生效
 flush privileges;
+# 在线改配置
+set <global|session>
 
 ########################      openssl        ########################
 
