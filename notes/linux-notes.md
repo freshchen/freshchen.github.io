@@ -9,7 +9,7 @@
 ```bash
 
 # 目录dos2unix转换格式
-find . -type f -exec dos2unix {} 
+find . -type f -exec dos2unix {} \;
 
 ########################      $      ########################
 
