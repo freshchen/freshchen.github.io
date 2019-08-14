@@ -14,7 +14,7 @@
 
 []()
 
-[]()
+[深入理解JVM-内存模型（jmm）和GC](https://www.jianshu.com/p/76959115d486)
 
 [震惊了！原来这才是kafka！](https://www.jianshu.com/p/d3e963ff8b70)
 
