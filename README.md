@@ -2,13 +2,15 @@
 
 ## 博客
 
-### Linux
+[Reading Links](./notes/common/links.md)
 
-[Reading Links & Trouble Shooting](https://www.notion.so/freshchen-fa2c206a54724b0eb7cfb134013d47a9)
+[Trouble Shooting](./notes/common/troubleshooting.md)
 
-[Quick Note](./notes/quick.md)
+[Quick Note](./notes/common/quick.md)
 
 [个人常用工具脚本模板](https://github.com/freshchen/fresh-tools)
+
+### Linux
 
 [Linux Common Commands](./notes/linux-notes.md)
 

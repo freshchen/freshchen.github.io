@@ -20,17 +20,9 @@
 
 [这可能是把ZooKeeper概念讲的最清楚的一篇文章](http://developer.51cto.com/art/201809/583184.htm)
 
-[Unable to start kubernetes on docker desktop win 10 pro](https://github.com/docker/for-win/issues/3799)
-
-[Running Kubernetes Minikube on Windows 10 with WSL](https://www.jamessturtevant.com/posts/Running-Kubernetes-Minikube-on-Windows-10-with-WSL/)
-
-[Installing the Docker client on Windows Subsystem for Linux (Ubuntu)](https://medium.com/@sebagomez/installing-the-docker-client-on-ubuntus-windows-subsystem-for-linux-612b392a44c4)
-
 [OpenSSL生成根证书CA及签发子证书](https://yq.aliyun.com/articles/40398)
 
 [OpenSSL Examples to Help You in Real](https://geekflare.com/openssl-commands-certificates/)
-
-[Running Kubernetes CLI on Windows Subsystem for Linux (WSL)]( https://devkimchi.com/2018/06/05/running-kubernetes-on-wsl/)
 
 [Numpy官方文档中文版](https://www.numpy.org.cn/index.html)
 
@@ -45,7 +37,6 @@
 [argparse详解](http://blog.xiayf.cn/2013/03/30/argparse/)
 
 [python-novaclient官方文档](https://pypi.org/project/python-novaclient/)      
-
 
 [台大林轩天机器学习基石笔记](https://github.com/RedstoneWill/NTU-HsuanTienLin-MachineLearning/tree/master/Machine%20Learning%20Foundations/pdf%20files)
 
