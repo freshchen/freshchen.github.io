@@ -4,11 +4,13 @@
 
 ### Linux
 
-[Reading Links & Trouble Shooting & Quick Note](https://www.notion.so/freshchen-fa2c206a54724b0eb7cfb134013d47a9)
+[Reading Links & Trouble Shooting](https://www.notion.so/freshchen-fa2c206a54724b0eb7cfb134013d47a9)
+
+[Quick Note](./notes/quick.md)
 
 [个人常用工具脚本模板](https://github.com/freshchen/fresh-tools)
 
-[Linux Common Commands](notes/linux-notes.md)
+[Linux Common Commands](./notes/linux-notes.md)
 
 [Redis学习笔记](./notes/redis.md)
 
