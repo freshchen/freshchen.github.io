@@ -1,16 +1,14 @@
 # fresh-notes
 
-## 笔记
-
-[Reading Links & Trouble Shooting & Quick Note](https://www.notion.so/freshchen-fa2c206a54724b0eb7cfb134013d47a9)
-
-[Linux Common Commands](notes/linux-notes.md)
-
-[个人常用工具脚本模板](https://github.com/freshchen/fresh-tools)
-
 ## 博客
 
 ### Linux
+
+[Reading Links & Trouble Shooting & Quick Note](https://www.notion.so/freshchen-fa2c206a54724b0eb7cfb134013d47a9)
+
+[个人常用工具脚本模板](https://github.com/freshchen/fresh-tools)
+
+[Linux Common Commands](notes/linux-notes.md)
 
 [Redis学习笔记](./notes/redis.md)
 
