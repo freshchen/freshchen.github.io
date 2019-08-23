@@ -1,10 +1,10 @@
 # 目录
 
-[Reading Links](notes/common/links.md)
-
 [Trouble Shooting](notes/common/troubleshooting.md)
 
 [Quick Note](notes/common/quick.md)
+
+[Reading Links](notes/common/links.md)
 
 [个人常用工具脚本模板](https://github.com/freshchen/fresh-tools)
 
