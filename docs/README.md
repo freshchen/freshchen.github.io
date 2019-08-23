@@ -18,7 +18,7 @@
 
 [Apache支持HTTPS](notes/apache-self-ssl.md)
 
-[Python标准库：CLI(命令行)参数解析工具argparse](docs/notes/notes/argparse.md)
+[Python标准库：CLI(命令行)参数解析工具argparse](docs/notes/argparse.md)
 
 [Python远程调用 Openstack 主要服务（keystone,nova,glance,neutron,heat）](notes/python-openstack.md)
 
