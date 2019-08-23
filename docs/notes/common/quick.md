@@ -18,12 +18,12 @@
 
 ### Mysql事务隔离级别
 
-隔离级别	|更新丢失|脏读（Dirty Read）|不可重复读（NonRepeatable Read）|幻读（Phantom Read）
-|---|---|---|---|---
-未提交读（Read uncommitted） |不可能 |可能	|可能	|可能
-已提交读（Read committed）	|不可能 |不可能	|可能	|可能
-可重复读（Repeatable read）	|不可能 |不可能	|不可能	|可能
-可串行化（Serializable）	|不可能 |不可能	|不可能	|不可能
+|隔离级别|更新丢失|脏读|不可重复读|幻读|
+|---|---|---|---|---|
+|未提交读（Read uncommitted） |不可能 |可能	|可能	|可能|
+|已提交读（Read committed）	|不可能 |不可能	|可能	|可能|
+|可重复读（Repeatable read）	|不可能 |不可能	|不可能	|可能|
+|可串行化（Serializable）	|不可能 |不可能	|不可能	|不可能|
 
 ```sql
 查看隔离级别
