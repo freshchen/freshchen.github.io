@@ -1,9 +1,4 @@
----
-title: J.U.C 源码初体验
-date: 2019-06-19
-categories: java
-top: 30
----
+# J.U.C 源码初体验
 
 # 前言
 

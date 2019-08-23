@@ -1,9 +1,4 @@
----
-title: Python可视化高级库seaborn
-date: 2019-02-02 15:32:48
-categories: python
-top: 1
----
+# Python可视化高级库seaborn
 
 图片乱了，仅用作记录
 

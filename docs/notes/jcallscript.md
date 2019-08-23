@@ -1,9 +1,5 @@
----
-title: Java调用本地脚本
-date: 2019-02-02 15:49:57
-categories: java
-top: 4
----
+# Java调用本地脚本
+
 
 ### 1背景
 

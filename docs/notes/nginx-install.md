@@ -1,9 +1,5 @@
----
-title: Nginx安装-基于腾讯云Centos7
-date: 2019-02-15 13:28:42
-categories: Linux
-top: 12
----
+# Nginx安装-基于腾讯云Centos7
+
 
 ### 1Nginx简介
 

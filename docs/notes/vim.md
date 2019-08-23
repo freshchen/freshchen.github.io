@@ -1,9 +1,4 @@
----
-title: Vim笔记
-date: 2019-5-20
-categories: Linux
-top:
----
+# Vim笔记
 
 ## 按键图
 

@@ -1,9 +1,4 @@
----
-title: Openstack的Heat服务api支持HTTPS
-date: 2019-02-19 12:43:28
-categories: Openstack
-top: 23
----
+# Openstack的Heat服务api支持HTTPS
 
 ### 背景Openstack Queens版本
 

@@ -1,9 +1,4 @@
----
-title: Tensorflow的安装以及入门案例
-date: 2019-03-05 17:44:10
-categories: ML
-top: 17
----
+# Tensorflow的安装以及入门案例
 
 ## 1简介
 

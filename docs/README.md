@@ -1,6 +1,4 @@
-# fresh-notes
-
-## 博客
+# 目录
 
 [Reading Links](notes/common/links.md)
 
@@ -36,8 +34,6 @@
 
 [Nginx安装-基于腾讯云Centos7](notes/nginx-install.md)
 
-[原始感知机PLA算法实现](notes/pla.md)
-
 [自签的SSL证书创建与验证过程](notes/self-ssl-signing.md)
 
 [自己制作Yum源](notes/yumsource.md)
@@ -50,7 +46,7 @@
 
 [J.U.C 源码初体验](notes/juc.md)
 
-### Python
+### Python & AI
 
 [Python可视化库（绘制图表）matplotlib](notes/matplotlib.md)
 
@@ -59,6 +55,8 @@
 [Tensorflow的安装以及入门案例](notes/tensorflow-start.md)
 
 [Python可视化高级库seaborn](notes/seaborn.md)
+
+[原始感知机PLA算法实现](notes/pla.md)
 
 ### Others
 

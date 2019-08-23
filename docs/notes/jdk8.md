@@ -1,9 +1,5 @@
----
-title: JDK8笔记
-date: 2019-02-02 15:49:32
-categories: java
-top: 24
----
+# JDK8笔记
+
 
 ### 1java.util
 

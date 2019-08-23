@@ -1,9 +1,6 @@
----
-title: Python远程调用 Openstack 主要服务（keystone,nova,glance,neutron,heat）
-date: 2019-02-02 14:24:04
-categories: Openstack
-top: 7
----
+# Python远程调用 Openstack 主要服务（keystone,nova,glance,neutron,heat）
+
+
 由于Openstack跟新很快，现在准备搭建基于Queen版本的Openstack，Queen版本要求keystone版本为V3，所以之前大多数接口都不能用了，百度了一下都没有比较新的实例，官方文档又过于简单。所以简单总结下各客户端的调用方式，非常简单的案例，仅供参考。
 
 ## 1 前期准备

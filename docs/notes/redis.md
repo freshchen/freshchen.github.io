@@ -1,9 +1,4 @@
----
-title: Redis学习笔记
-date: 2019-03-13 10:23:19
-categories: Linux
-top: 26
----
+# Redis学习笔记
 
 ## 简介
 

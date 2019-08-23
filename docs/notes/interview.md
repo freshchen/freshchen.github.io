@@ -1,9 +1,4 @@
----
-title: Java开发面试记录
-date: 2019-03-13 10:23:19
-categories: java
-top: 
----
+# Java开发面试记录
 
 ## [Guide](<https://snailclimb.top/JavaGuide/#/./system-design/framework/Spring%E5%AD%A6%E4%B9%A0%E4%B8%8E%E9%9D%A2%E8%AF%95>)
 

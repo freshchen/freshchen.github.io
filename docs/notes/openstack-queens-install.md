@@ -1,9 +1,4 @@
----
-title: Queens版本Openstack安装记录
-date: 2019-02-21 17:10:16
-categories: Openstack
-top: 16
----
+# Queens版本Openstack安装记录
 
 ### 准备工作
 

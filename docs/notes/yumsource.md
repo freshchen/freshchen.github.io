@@ -1,9 +1,4 @@
----
-title: 自己制作Yum源
-date: 2019-02-14 10:30:10
-categories: Linux
-top: 22
----
+# 自己制作Yum源
 
 ### 1背景
 

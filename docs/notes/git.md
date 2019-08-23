@@ -1,9 +1,5 @@
----
-title: Git常用命令总结
-date: 2019-02-02 15:19:50
-categories: others
-top: 2
----
+
+# Git常用命令总结
 
 ```
 //时刻掌握仓库当前的状态

@@ -1,9 +1,4 @@
----
-title: markdown语法简介
-date: 2019-02-02 15:16:14
-categories: others
-top: 3
----
+# markdown语法简介
 
 [数学公式速查](https://blog.csdn.net/jyfu2_12/article/details/79207643)
 

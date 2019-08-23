@@ -1,9 +1,4 @@
----
-title: Openstack murano打包部署应用
-date: 2019-04-04
-categories: Openstack
-top: 25
----
+# Openstack murano打包部署应用
 
 ## 简介
 

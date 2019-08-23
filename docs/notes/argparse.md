@@ -1,9 +1,5 @@
----
-title: Python标准库：CLI(命令行)参数解析工具argparse
-date: 2019-02-02 14:20:10
-categories: python
-top: 28
----
+# Python标准库：CLI(命令行)参数解析工具argparse
+
 
 ## 为什么需要argparse
 
