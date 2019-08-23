@@ -1,5 +1,7 @@
 # Catalog
 
+### Common
+
 [Trouble Shooting](notes/common/troubleshooting.md)
 
 [Quick Note](notes/common/quick.md)
