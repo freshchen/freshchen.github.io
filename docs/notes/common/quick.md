@@ -10,9 +10,33 @@
 
 
 
+### InnoDB可重复读（Repeatable read）级别为啥可以避免幻读
 
+- 表象：快照读（非阻塞读不加锁，对应加锁的叫当前读）伪MVCC
 
+- 内在：next-key锁（行锁 + gap锁）
 
+### Mysql事务隔离级别
+
+隔离级别	|更新丢失|脏读（Dirty Read）|不可重复读（NonRepeatable Read）|幻读（Phantom Read）
+|---|---|---|---|---
+未提交读（Read uncommitted） |不可能 |可能	|可能	|可能
+已提交读（Read committed）	|不可能 |不可能	|可能	|可能
+可重复读（Repeatable read）	|不可能 |不可能	|不可能	|可能
+可串行化（Serializable）	|不可能 |不可能	|不可能	|不可能
+
+```sql
+查看隔离级别
+select @@tx_isolation;
+设置隔离级别
+set session transaction isolation level read UNCOMMITTED;
+开启事务
+start transaction;
+回滚
+rollback;
+提交
+commit;
+```
 
 ### Mysql常用存储引擎适用场景
 
@@ -48,6 +72,16 @@
 - InnoDB 主键走聚集索引，其他走稀疏索引
 
 - MyISAM 全是走稀疏索引
+
+### 数据库事务四大特性
+
+- 原子性（Atomic）要么全做要么全不做
+
+- 一致性（Consistency）数据要保持完整性，从一个一致状态到另一个一致状态
+
+- 隔离性（Isolation）一个事务的执行不影响其他事务
+
+- 持久性（Durability）事务一旦提交，变更应该永久的保存到数据库中
 
 ### 不可变对象
 
