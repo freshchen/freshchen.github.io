@@ -10,9 +10,9 @@
 
 []()
 
-[]()
+[迟到一年HashMap解读](http://dandanlove.com/2017/10/27/late-one-year-hashmap/)
 
-[]()
+[寻找红黑树的操作手册](http://dandanlove.com/2018/03/18/red-black-tree/#%E5%AF%BB%E6%89%BE%E7%BA%A2%E9%BB%91%E6%A0%91%E7%9A%84%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8C)
 
 [深入理解JVM-内存模型（jmm）和GC](https://www.jianshu.com/p/76959115d486)
 
