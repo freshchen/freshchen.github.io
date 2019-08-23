@@ -18,7 +18,7 @@
 
 [Apache支持HTTPS](notes/apache-self-ssl.md)
 
-[Python标准库：CLI(命令行)参数解析工具argparse](docs/notes/argparse.md)
+[Python标准库：CLI(命令行)参数解析工具argparse](notes/argparse.md)
 
 [Python远程调用 Openstack 主要服务（keystone,nova,glance,neutron,heat）](notes/python-openstack.md)
 
@@ -28,11 +28,11 @@
 
 [Queens版本Openstack安装记录](notes/openstack-queens-install.md)
 
-[Docker用法总结](docs/notes/notes/docker-cli.md)
+[Docker用法总结](notes/notes/docker-cli.md)
 
-[Git常用命令总结](docs/notes/notes/git.md)
+[Git常用命令总结](notes/notes/git.md)
 
-[Docker我的Hexo构建源码](docs/notes/notes/docker-hexo.md)
+[Docker我的Hexo构建源码](notes/notes/docker-hexo.md)
 
 [Nginx安装-基于腾讯云Centos7](notes/nginx-install.md)
 
