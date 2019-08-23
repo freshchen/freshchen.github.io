@@ -11,6 +11,44 @@
 
 
 
+
+
+
+### Mysql常用存储引擎适用场景
+
+- MyISAM适用频繁执行全表count，查询频率高，增删改频率不高
+
+- InnoDB增删改查都频繁，对可靠性要求高，要求支持事务
+
+### Mysql锁
+
+- InnoDB默认行锁，也支持表锁,没有用到索引的时候用表级锁
+
+- MyISAM默认表锁
+
+- 手动给表加锁 lock tables <table_name> <read|write> ， 解锁 unlock tables <table_name>
+
+- 加共享锁/读锁  在sql语句后面加 lock in share mode
+
+- InnoDB支持事务，关闭事务自动方法 set autocommit = 0
+
+
+### Mysql简单优化步骤
+
+- 查看慢日志，找到查询比较慢的语句
+
+- 使用explain分析sql。分析结果中type字段是index和all就有问题需要优化，extra字段是Using filesort指用的外部索引例如文件系统索引等，Using temporary指用的临时表，这两种情况也需要优化
+
+- 加索引 alter table <table-name> add index index_name(<column-name>)
+
+- 有时候优化器选择不一定准确，需要手动测试，强制使用某一个索引可以在sql语句中加入 force index(<column-name>)
+
+### Mysql稀疏索引和聚集索引 
+
+- InnoDB 主键走聚集索引，其他走稀疏索引
+
+- MyISAM 全是走稀疏索引
+
 ### 不可变对象
 
 - 对象创建之后状态不能修改
@@ -54,37 +92,6 @@ elementData[elementCount] = null; /* to let gc do its work
 
 - HashMap默认大小16，当前容量超过总容量乘以散列因子（默认0.75）就扩容，每次2倍扩容。
 
-### Mysql锁
-
-- InnoDB默认行锁，也支持表锁
-
-- MyISAM默认表锁
-
-- 手动给表加锁 lock tables <table_name> <read|write> ， 解锁 unlock tables <table_name>
-
-- 加共享锁/读锁  在sql语句后面加 lock in share mode
-
-- InnoDB支持事务，关闭事务自动方法 set autocommit = 0
-
-
-### Mysql简单优化步骤
-
-- 查看慢日志，找到查询比较慢的语句
-
-- 使用explain分析sql。分析结果中type字段是index和all就有问题需要优化，extra字段是Using filesort指用的外部索引例如文件系统索引等，Using temporary指用的临时表，这两种情况也需要优化
-
-- 加索引 alter table <table-name> add index index_name(<column-name>)
-
-- 有时候优化器选择不一定准确，需要手动测试，强制使用某一个索引可以在sql语句中加入 force index(<column-name>)
-
-
-### Mysql稀疏索引和聚集索引 
-
-- InnoDB 主键走聚集索引，其他走稀疏索引
-
-- MyISAM 全是走稀疏索引
-
-
 ### 重写equals
 
 - 四大原则，自反性，对称性，传递性，一致性，非空性
@@ -92,7 +99,6 @@ elementData[elementCount] = null; /* to let gc do its work
 - 如果继承一个类，并且新增了值属性，重写equals会变得很麻烦，这时候推荐用组合
 
 - 如果重写了equals但是没有重写hashcode有可能出现equals返回true但是hashcode不相等的情况
-
 
 ### 泛型参数
 

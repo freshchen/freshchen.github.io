@@ -28,11 +28,7 @@
 
 [Queens版本Openstack安装记录](notes/openstack-queens-install.md)
 
-[Docker用法总结](notes/notes/docker-cli.md)
-
-[Git常用命令总结](notes/notes/git.md)
-
-[Docker我的Hexo构建源码](notes/notes/docker-hexo.md)
+[Docker用法总结](notes/docker-cli.md)
 
 [Nginx安装-基于腾讯云Centos7](notes/nginx-install.md)
 
@@ -63,3 +59,7 @@
 ### Others
 
 [markdown语法简介](notes/markdown.md)
+
+[Git常用命令总结](notes/git.md)
+
+[Docker我的Hexo构建源码](notes/docker-hexo.md)
