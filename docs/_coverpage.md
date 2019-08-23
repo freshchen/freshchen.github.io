@@ -1,5 +1,3 @@
-![](resource/images/logo.jpg)
-
 # Blog & Note
 
 > Nice to meet you !
