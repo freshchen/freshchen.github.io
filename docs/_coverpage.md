@@ -9,4 +9,5 @@
 - Personal blog
 
 [GitHub](https://github.com/freshchen/fresh-notes/)
+
 [Get Started](#fresh-notes)
