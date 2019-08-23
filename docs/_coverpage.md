@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://github.com/freshchen/fresh-notes/blob/master/docs/resource/images/logo.png" width="200"/>
+<img src="./resource/images/logo.png" width="200px"/>
 </p>
 
 # Blog & Note
