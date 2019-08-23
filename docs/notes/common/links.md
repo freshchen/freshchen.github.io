@@ -8,7 +8,7 @@
 
 []()
 
-[]()
+[Synchronized关键字和锁升级，详细分析偏向锁和轻量级锁的升级](https://blog.csdn.net/tongdanping/article/details/79647337)
 
 [迟到一年HashMap解读](http://dandanlove.com/2017/10/27/late-one-year-hashmap/)
 
