@@ -1,4 +1,6 @@
-![](resource/images/logo.png)
+<p align="center">
+<img src="https://github.com/freshchen/fresh-notes/blob/master/docs/resource/images/logo.png" width="200"/>
+</p>
 
 # Blog & Note
 
