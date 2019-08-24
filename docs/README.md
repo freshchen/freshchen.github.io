@@ -2,15 +2,25 @@
 
 ## 常用
 
-[知识点快速记录](notes/common/quick.md)
+### 知识点
 
-[问题解决方案](notes/common/troubleshooting.md)
+[Quick Note](notes/common/quick.md)
 
-[好文以及常用链接](notes/common/links.md)
+### 问题解决方案
 
-[Linux常用命令](notes/linux-notes.md)
+[Trouble Shooting](notes/common/troubleshooting.md)
 
-[个人常用工具脚本库](https://github.com/freshchen/fresh-tools)
+###  好文链接
+
+[Reading Links](notes/common/links.md)
+
+### Linux常用命令
+
+[Linux Common Commands](notes/linux-notes.md)
+
+### 个人常用工具脚本
+
+[Tools & Template](https://github.com/freshchen/fresh-tools)
 
 ## 博客
 
