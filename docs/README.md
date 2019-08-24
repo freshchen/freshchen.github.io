@@ -1,6 +1,6 @@
 # 目录
 
-## 常用
+## 笔记
 
 ### 知识点
 
@@ -46,7 +46,7 @@
 
 [Apache支持HTTPS](notes/apache-self-ssl.md)
 
-### JAVA
+### Java
 
 [Java调用本地脚本](notes/jcallscript.md)
 
