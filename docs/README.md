@@ -1,31 +1,22 @@
-# Catalog
+# 目录
 
-- Common目录
-  -  Quick Note 知识点记录
-  -  Trouble Shooting 问题解决方案记录
-  -  Reading Links 好文常用链接记录
-  -  Tools & Template 个人常用工具脚本模板
-- 其他目录分类下为个人博客
+## 常用
 
-### Common
+[知识点快速记录](notes/common/quick.md)
 
-[Quick Note](notes/common/quick.md)
+[问题解决方案](notes/common/troubleshooting.md)
 
-[Trouble Shooting](notes/common/troubleshooting.md)
+[好文以及常用链接](notes/common/links.md)
 
-[Reading Links](notes/common/links.md)
+[Linux常用命令](notes/linux-notes.md)
 
-[Tools & Template](https://github.com/freshchen/fresh-tools)
+[个人常用工具脚本库](https://github.com/freshchen/fresh-tools)
 
-### Linux
+## 博客
 
-[Linux Common Commands](notes/linux-notes.md)
+### System
 
-[Redis学习笔记](notes/redis.md)
-
-[Apache支持HTTPS](notes/apache-self-ssl.md)
-
-[Python标准库：CLI(命令行)参数解析工具argparse](notes/argparse.md)
+[Redis学习](notes/redis.md)
 
 [Python远程调用 Openstack 主要服务（keystone,nova,glance,neutron,heat）](notes/python-openstack.md)
 
@@ -43,6 +34,8 @@
 
 [自己制作Yum源](notes/yumsource.md)
 
+[Apache支持HTTPS](notes/apache-self-ssl.md)
+
 ### JAVA
 
 [Java调用本地脚本](notes/jcallscript.md)
@@ -52,6 +45,8 @@
 [J.U.C 源码初体验](notes/juc.md)
 
 ### Python & AI
+
+[Python标准库：CLI(命令行)参数解析工具argparse](notes/argparse.md)
 
 [Python可视化库（绘制图表）matplotlib](notes/matplotlib.md)
 

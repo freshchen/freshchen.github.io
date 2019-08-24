@@ -1,6 +1,6 @@
 # Common Commands
 
-服务器常用命令，以及问题解决记录
+Linux服务器常用命令
 
 ## Common Commands
 
