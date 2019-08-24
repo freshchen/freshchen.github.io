@@ -34,7 +34,7 @@
 
 []()
 
-[]()
+[深入浅出一致性Hash原理](https://www.jianshu.com/p/e968c081f563)
 
 [Linux中文件描述符fd和文件指针flip的理解](https://www.cnblogs.com/aaronLinux/p/5617070.html)
 

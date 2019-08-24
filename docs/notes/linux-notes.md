@@ -46,6 +46,16 @@ echo ${var} | sed 's/[ \t]*$//g'
 # 去掉单引号
 echo ${var} | sed $'s/\'//g'
 
+########################      awk       ########################
+
+# 例如查看状态是UNCONN,Recv-Q是0的端口信息
+
+ss -ln | awk '($2=="UNCONN" && $3=="0") {print $0}'
+
+# 统计状态是UNCONN,Recv-Q是0的端口的netid和出现的次数
+
+ss -ln | awk '($2=="UNCONN" && $3=="0") {netids[$1]++}END{for(i in netids)print i "\t" netids[i]}'
+
 ########################      tr       ########################
 
 # 大写转小写
