@@ -36,6 +36,24 @@
 
 []()
 
+[强引用、软引用、弱引用、虚引用的概念](<https://www.cnblogs.com/alias-blog/p/5793108.html>)
+
+[Spring中Bean的五个作用域](https://www.cnblogs.com/goody9807/p/7472127.html)
+
+[docker namespace cgroup network](http://www.cnblogs.com/sammyliu/p/5878973.html)
+
+[java中对象锁与类锁的一些理解与实例](https://www.cnblogs.com/houzheng/p/9084026.html)
+
+[nginx和tomcat的区别](https://www.cnblogs.com/flypie/p/5153702.html)
+
+[Nginx基本概念、模块化思想、工作流程、工作原理](https://www.baidu.com/link?url=WPRot77-1KvO2wqLhjc9qJ62sN0h5dxJIVXDIm6tyvFfjWURqNsVqDjzDEFEMKw-lnem_iUAHWNHhLOeV6wsbE-Z9C9efw16wBRScMK1K8y&wd=&eqid=9004656400116839000000065cadae70)
+
+[Tomcat服务器原理详解](https://www.cnblogs.com/crazylqy/p/4706223.html)
+
+[超详细！使用 LVS 实现负载均衡原理及安装配置详解](<https://blog.csdn.net/Ki8Qzvka6Gz4n450m/article/details/79119665>)
+
+[LVS负载均衡（LVS简介、三种工作模式、十种调度算法）](<https://blog.csdn.net/weixin_40470303/article/details/80541639>)
+
 [深入浅出一致性Hash原理](https://www.jianshu.com/p/e968c081f563)
 
 [Linux中文件描述符fd和文件指针flip的理解](https://www.cnblogs.com/aaronLinux/p/5617070.html)

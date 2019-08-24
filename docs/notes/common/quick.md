@@ -20,7 +20,19 @@
 
 
 
+### Java类加载器ClassLoader种类
 
+- BootStrapClassLoader：C++编写，加载核心库java.*
+- ExtClassLoader：Java编写，加载扩展库javax.*
+- AppClassLoader：Java编写，加载程序所在目录classpath
+- CustomClassLoader：Java编写，定制化加载
+
+### Java从编写到运行的大致过程
+
+- 将写好的.java文件通过javac编译成由JVM可识别指令组成的.class文件（IED可以自动反编译.class文件，可以通过javap -c 反编译）
+- 通过ClassLoader分三步加载，连接（验证，准备，解析）和初始化 将.class文件加载到JVM中
+- 然后用加载的Class类经过内存分配，初始化，init调用构造来创建对象
+- 最后有了对象就可以执行相关方法了
 
 ### 一致性哈希算法
 

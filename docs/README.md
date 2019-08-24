@@ -1,30 +1,30 @@
-# 目录
+## 目录
 
-## 笔记
+### 笔记
 
-### 知识点
+#### 知识点
 
 [Quick Note](notes/common/quick.md)
 
-### 问题解决方案
+#### 问题解决方案
 
 [Trouble Shooting](notes/common/troubleshooting.md)
 
-###  好文链接
+####  好文链接
 
 [Reading Links](notes/common/links.md)
 
-### Linux常用命令
+#### Linux常用命令
 
 [Linux Common Commands](notes/linux-notes.md)
 
-### 个人常用工具脚本
+#### 个人常用工具脚本
 
 [Tools & Template](https://github.com/freshchen/fresh-tools)
 
-## 博客
+### 博客
 
-### System
+#### System
 
 [Redis学习](notes/redis.md)
 
@@ -46,7 +46,7 @@
 
 [Apache支持HTTPS](notes/apache-self-ssl.md)
 
-### Java
+#### Java
 
 [Java调用本地脚本](notes/jcallscript.md)
 
@@ -54,7 +54,7 @@
 
 [J.U.C 源码初体验](notes/juc.md)
 
-### Python & AI
+#### Python & AI
 
 [Python标准库：CLI(命令行)参数解析工具argparse](notes/argparse.md)
 
@@ -68,7 +68,7 @@
 
 [原始感知机PLA算法实现](notes/pla.md)
 
-### Others
+#### Others
 
 [markdown语法简介](notes/markdown.md)
 
