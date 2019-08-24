@@ -1,5 +1,12 @@
 # Catalog
 
+- Common目录
+  -  Quick Note 知识点记录
+  -  Trouble Shooting 问题解决方案记录
+  -  Reading Links 好文常用链接记录
+  -  Tools & Template 个人常用工具脚本模板
+- 其他目录分类下为个人博客
+
 ### Common
 
 [Quick Note](notes/common/quick.md)

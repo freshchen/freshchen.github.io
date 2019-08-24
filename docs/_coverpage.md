@@ -2,12 +2,7 @@
 
 # Blog & Note
 
-- Common目录
-  -  Quick Note知识点记录
-  -  Trouble Shooting问题解决方案记录
-  -  Reading Links 好文记录
-  -  Tools & Template 个人常用工具脚本模板
-- 其他目录分类下为个人博客
+> Nice to meet you !
 
 [GitHub](https://github.com/freshchen/fresh-notes/)
 [Get Started](#Catalog)
