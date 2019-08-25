@@ -24,6 +24,115 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+### Java中的四种引用类型
+
+- 强引用
+  - 最普遍的引用：Object obj = new Object();
+  - 宁可抛出OOM异常也不会回收有强引用的对象
+  - 通过将对象设置为null，使其被回收（栈pop中用到）
+- 软引用
+  - 对象处在有用但是非必须的状态
+  - 只有内存空间不足才回收
+  - 可以用来实现高速缓存
+- 弱引用
+  - 对象处在有用但是非必须的状态，比软引用更没用一点
+  - GC时会被回收
+  - 适用于偶尔使用且不希望影响垃圾收集的对象
+- 虚引用
+  - 不会觉得对象生命周期
+  - 任何时候会被回收
+  - 用于跟踪GC活动，起哨兵作用
+  - 必须与引用队列ReferenceQueue联合使用
+
+### JVM常用的垃圾收集器
+
+- 年轻代
+
+  - Serial收集器（-XX:+UseSerialGC，复制算法）
+    - 单线程，进行回收时，必须停止所有工作线程
+    - 简单高效，Client模式下默认的年轻代收集器 
+  - ParNew收集器（-XX:+UseParNewGC，复制算法）
+    - 多线程并行，其他类似Serial收集器
+    - 多核下优势
+  - Parallel收集器（-XX:+UseParallelGC，复制算法）
+    - 多线程并行，更关注性能，吞吐量，而不是GC停顿
+    - 多核下优势，Server模式下默认的年轻代收集器
+
+- 老年代
+
+  - Serial Old收集器（-XX:+UseSerialOldGC，标记-整理算法）
+    - 单线程，进行回收时，必须停止所有工作线程
+    - 简单高效，Client模式下默认的老年代收集器 
+  - Parallel Old收集器（-XX:+UseParallelOldGC，标记-整理算法）
+    - 多线程并行，其他类似Serial Old收集器
+    - 多核下优势
+  - CMS收集器（-XX:+UseConcMarkSweepGC，标记-清除算法）
+    - 多线程并发
+
+- 通用
+
+  - G1收集器（-XX:+UseG1GC，复制+标记-整理算法）
+
+    - 分代收集
+    - 空间整合
+    - 可预测的停顿
+    - 多线程并发
+
+    - 将Heap堆内存划分成多个大小相等的Region
+    - 年轻代和老年代不再物理隔离
+
+### CMS收集器执行步骤
+
+- 初始阶段：stop-the-world
+- 并发标记：并发追溯标记，程序不停顿
+- 并发预清理：查找并发标记阶段从新生代晋升老年代的对象
+- 重新标记：stop-the-world，扫描CMS堆中的剩余对象
+- 并发清理：清理垃圾对象，程序不停顿
+- 并发重置：重置CMS收集器的数据结构，程序不停顿
+
+### JVM常用调优参数
+
+- -Xss: 规定每个线程虚拟机栈的大小
+- -Xms: 堆的初始值
+- -Xmx: 堆能扩展的最大值
+- -XX:SurvivorRatio：Eden区和其中一个Survivor区的比值
+- -XX:NewRatio：老年代和新生代比值
+- -XX:MaxTenuringThreshold：对象从年轻代进入老年代经历过GC次数的阈值
+
+### JVM常用的垃圾回收算法
+
+- 标记-清除算法
+  - 缺点：容易产生碎片化
+- 复制算法（适用与对象存活率低的场景）
+  - 优点：不会碎片化
+  - 缺点：浪费50%空间
+- 标记-整理算法（适用于对象存活率高场景）
+  - 优点：标记清除的加强版，不会碎片化
+  - 缺点：性能差一点
+- 分代收集算法
+  - Minor GC：使用复制算法处理年轻代（eden区8/10，from survivor区1/10，to survivor区1/10），默认经历15次Minor GC仍然存活就进老年代，执行条件如下：
+    - 年轻代满了执行
+    - Full GC触发时也会执行
+  - Full GC：主要使用标记-整理算法处理老年代（老年代默认是年轻代的两倍），执行条件如下：
+    - 老年代满了执行
+    - 使用CMS垃圾收集器时候，出现promotion failed或concurrent mode failed时候也会执行
+    - 调用System.gc()后的某个时刻
+    - 使用RMI时，一般每小时执行一次GC
+
+### 何时真正开始Full GC（stop-the-world）
+
+程序到达安全点，安全点是对象引用关系不会变化的点，例如方法调用，循环跳转，异常跳转等
+
 ### JavaGC如何标记垃圾对象
 
 没有被任何其他对象引用的对象被视为垃圾。
@@ -87,12 +196,6 @@ System.out.println(s3 == s4);
 // jdk6 下false false
 // jdk7 下false false
 ```
-
-### JVM三大调优参数
-
-- -Xss：规定每个线程虚拟机栈的大小
-- -Xms：堆的初始值
-- -Xmx：堆能扩展的最大值
 
 ### Java内存模型（jdk8）
 
@@ -318,7 +421,7 @@ elementData[elementCount] = null; /* to let gc do its work
 - 监听器和其他回调，可以用WeakHashMap作为引用外键
 
 
-### ArrayList & HashMap 扩容
+### Java中ArrayList & HashMap 扩容
 
 - ArrayList默认大小10，装不下就扩容，每次1.5倍扩容
 

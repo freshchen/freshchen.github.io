@@ -32,7 +32,7 @@
 
 []()
 
-[]()
+[Java——七种垃圾收集器+JDK11最新ZGC](https://blog.csdn.net/CrankZ/article/details/86009279)
 
 [String的Intern方法详解](https://www.cnblogs.com/wxgblogs/p/5635099.html)
 
