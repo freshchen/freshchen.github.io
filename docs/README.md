@@ -2,7 +2,7 @@
 
 ### 笔记
 
-- #### 知识点
+- #### 知识点总结
 
   - [Quick Note](notes/common/quick.md)
 
