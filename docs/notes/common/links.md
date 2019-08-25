@@ -1,6 +1,6 @@
 # Reading Links
 
-[]()
+[Openjdk8n ative源码](http://hg.openjdk.java.net/jdk8u/jdk8u/jdk/file/f6a3bd14735c/src/share/native)
 
 []()
 
@@ -34,7 +34,7 @@
 
 []()
 
-[]()
+[String的Intern方法详解](https://www.cnblogs.com/wxgblogs/p/5635099.html)
 
 [强引用、软引用、弱引用、虚引用的概念](<https://www.cnblogs.com/alias-blog/p/5793108.html>)
 

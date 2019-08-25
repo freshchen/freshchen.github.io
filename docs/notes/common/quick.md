@@ -20,6 +20,102 @@
 
 
 
+
+
+
+
+### JavaGC如何标记垃圾对象
+
+没有被任何其他对象引用的对象被视为垃圾。
+
+问1：JavaGC中如何判断对象是否被引用
+
+答1：GC中主要有两种引用判断方法
+
+- 引用计数法
+  - 优点：执行效率高
+  - 缺点：无法检测出循环引用情况，导致内存泄漏
+- 可达性分析法（主流）
+
+问2：可达性分析中，哪些对象可作为GC root
+
+答2：
+
+- 虚拟机栈中变量表引用的对象
+- 方法区中常量引用的对象
+- 方法区中类静态属性引用的对象
+- 本地方法栈中JNI引用的对象
+- 活跃线程的引用对象
+
+### Java中String.intern()的用法
+
+- 作用
+  - 直接使用双引号声明出来的`String`对象会直接存储在常量池中。
+  - 如果不是用双引号声明的`String`对象，可以使用`String`提供的`intern`方法。intern 方法会从字符串常量池中查询当前字符串是否存在，若不存在就会将当前字符串放入常量池中的StringTable，StringTable默认大小1009，可以通过参数修改 -XX:StringTableSize=111111
+
+- 区别
+
+  - jdk6之前包括jdk6，intern方法会在常量池中创建相同String对象
+  - jdk7开始，intern只会把堆中String对象的引用放入常量池中，主要原因是常量池从永久代已移入堆中
+
+```java
+String s = new String("1");
+s.intern();
+String s2 = "1";
+System.out.println(s == s2);
+
+String s3 = new String("1") + new String("1");
+s3.intern();
+String s4 = "11";
+System.out.println(s3 == s4);
+
+// 打印结果是
+// jdk6 下false false
+// jdk7 下false true
+
+String s = new String("1");
+String s2 = "1";
+s.intern();
+System.out.println(s == s2);
+
+String s3 = new String("1") + new String("1");
+String s4 = "11";
+s3.intern();
+System.out.println(s3 == s4);
+
+// 打印结果是
+// jdk6 下false false
+// jdk7 下false false
+```
+
+### JVM三大调优参数
+
+- -Xss：规定每个线程虚拟机栈的大小
+- -Xms：堆的初始值
+- -Xmx：堆能扩展的最大值
+
+### Java内存模型（jdk8）
+
+- 线程私有
+  - 程序计数器，唯一不会OOM的区域
+  - 虚拟机栈
+    - 局部变量表
+    - 操作栈
+    - 动态链接
+    - 返回地址
+  - 本地方法栈
+- 线程共享 
+  - Metadata元空间
+    - 本地内存存放Class对象
+  - heap堆
+    - 常量池
+    - 实例对象
+
+### Java类加载双亲委派机制
+
+- 从底向上检查ClassLoader中类是否加载
+- 从顶向下调用ClassLoader加载类
+
 ### Java类加载器ClassLoader种类
 
 - BootStrapClassLoader：C++编写，加载核心库java.*
@@ -185,7 +281,7 @@ commit;
 
 - 持久性（Durability）事务一旦提交，变更应该永久的保存到数据库中
 
-### 不可变对象
+### Java不可变对象
 
 - 对象创建之后状态不能修改
 
@@ -193,7 +289,7 @@ commit;
 
 - 对象是正确创建的（对象创建过程中，this引用没用逃逸）
 
-### 如何安全发布对象
+### Java如何安全发布对象
 
 - 在静态初始化函数中初始化一个对象引用
 
@@ -204,7 +300,7 @@ commit;
 - 将对象的引用用volatile关键字修饰，或者保存到AtomicReference对象中
 
 
-### 为什么双检查单例模式实例引用不加volatile不是线程安全的
+### Java为什么双检查单例模式实例引用不加volatile不是线程安全的
 
 - 对象发布主要有三步 1.分配内存空间 2初始化对象 3引用指向分配的内存
 
@@ -228,7 +324,7 @@ elementData[elementCount] = null; /* to let gc do its work
 
 - HashMap默认大小16，当前容量超过总容量乘以散列因子（默认0.75）就扩容，每次2倍扩容。
 
-### 重写equals
+### Java重写equals
 
 - 四大原则，自反性，对称性，传递性，一致性，非空性
 
@@ -236,7 +332,7 @@ elementData[elementCount] = null; /* to let gc do its work
 
 - 如果重写了equals但是没有重写hashcode有可能出现equals返回true但是hashcode不相等的情况
 
-### 泛型参数
+### Java泛型参数
 
 生产者用extends，消费者用super
 
@@ -257,7 +353,7 @@ public class NewStack<T>{
 
 ```
 
-### synchronized使用
+### Java中synchronized使用
 
 - 修饰实例方法: 作用于当前对象实例加锁，进入同步代码前要获得当前对象实例的锁
 
