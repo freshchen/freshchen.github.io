@@ -1,11 +1,5 @@
 # Trouble Shooting
 
-[TOC]
-
-
-
-
-
 
 
 
