@@ -1,5 +1,7 @@
 # The All-In-One Note
 
+[TOC]
+
 
 
 
