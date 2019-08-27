@@ -42,10 +42,10 @@
     - BlockingQueue<Runnable> workQueue：核心线程全在干活，新任务进去这个阻塞队列等待执行，**只有执行execute方法时才会进入等待队列**
     - ThreadFactory threadFactory：创建新线程的工厂
     - RejectedExecutionHandler handler：workQueue满了，池中线程数也到了maximumPoolSize，就需要执行拒绝策略
-      - `CallerRunsPolicy`：只要线程池没关闭，就直接用调用者所在线程来运行任务
-      - `AbortPolicy`：直接抛出 `RejectedExecutionException` 异常
-      - `DiscardPolicy`：悄悄把任务放生，不做了
-      - `DiscardOldestPolicy`：把队列里待最久的那个任务扔了
+      - CallerRunsPolicy：只要线程池没关闭，就直接用调用者所在线程来运行任务
+      - AbortPolicy：直接抛出 `RejectedExecutionException` 异常
+      - DiscardPolicy：悄悄把任务放生，不做了
+      - DiscardOldestPolicy：把队列里待最久的那个任务扔了
   - 可能抛出的异常：
     - IllegalArgumentException
       - corePoolSize < 0
@@ -64,7 +64,7 @@
 
 ![](../../resource/images/threadpool.jpg)
 
-### Java中synchronized使用
+### Java中synchronized使用方式
 
 - 获取对象锁
   - 同步代码块: 指定加锁对象，对给定对象加锁
