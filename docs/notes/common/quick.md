@@ -43,6 +43,9 @@
     - ThreadFactory threadFactory：创建新线程的工厂
     - RejectedExecutionHandler handler：workQueue满了，池中线程数也到了maximumPoolSize，就需要执行拒绝策略
       - `CallerRunsPolicy`：只要线程池没关闭，就直接用调用者所在线程来运行任务
+      - `AbortPolicy`：直接抛出 `RejectedExecutionException` 异常
+      - `DiscardPolicy`：悄悄把任务放生，不做了
+      - `DiscardOldestPolicy`：把队列里待最久的那个任务扔了
   - 可能抛出的异常：
     - IllegalArgumentException
       - corePoolSize < 0
@@ -53,7 +56,10 @@
       - workQueue，threadFactory和handler其中有一个为null
   
 - 通过Executors工程创建常用的线程池方案
-  - newFixedThreadPool
+  - newFixedThreadPool **用于负载比较重的服务器，为了资源的合理利用，需要限制当前线程数量**
+  - newSingleThreadExecutor **用于串行执行任务的场景，每个任务必须按顺序执行，不需要并发执行**
+  - newCachedThreadPool  **用于并发执行大量短期的小任务，或者是负载较轻的服务器**
+  - newScheduledThreadPool **用于需要多个后台线程执行周期任务，同时需要限制线程数量的场景**
 
 
 ![](../../resource/images/threadpool.jpg)
