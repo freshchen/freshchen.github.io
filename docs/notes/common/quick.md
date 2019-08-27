@@ -24,6 +24,34 @@
 
 
 
+
+
+
+
+### Java如何创建线程池
+
+- 直接通过new ThreadPoolExecutor()创建（推荐，可以定制化，控制细节）
+- 构造参数：
+  - int corePoolSize：线程池正常运行时的核心线程数，即使空闲也会等待任务
+    - 在线程数少于核心数量时，有新任务进来就新建一个线程，即使有的线程没事干
+    - 等超出核心数量后，就不会新建线程了，空闲的线程就得去任务队列里取任务执行了
+    - int maximumPoolSize：线程池允许的最大线程数
+      - 如果任务队列满了，并且池中线程数小于最大线程数，会再创建新的线程执行任务
+    - long keepAliveTime：超出corePoolSize的线程的存活时间
+    - TimeUnit unit：keepAliveTime参数的时间单位
+    - BlockingQueue<Runnable> workQueue：核心线程全在干活，新任务进去这个阻塞队列等待执行，**只有执行execute方法时才会进入等待队列**
+    - ThreadFactory threadFactory：创建新线程的工厂
+    - RejectedExecutionHandler handler：workQueue满了，池中线程数也到了maximumPoolSize，就需要执行拒绝策略
+      - `CallerRunsPolicy`：只要线程池没关闭，就直接用调用者所在线程来运行任务
+  - 可能抛出的异常：
+    - IllegalArgumentException
+      - corePoolSize < 0
+      - keepAliveTime < 0
+      - maximumPoolSize <= 0
+      - maximumPoolSize < corePoolSize
+    - NullPointerException
+      - workQueue，threadFactory和handler其中有一个为null
+
 ### Java中synchronized使用
 
 - 获取对象锁
@@ -36,11 +64,6 @@
     - synchronized(类名.class){}
   - 同步静态方法: 作用于当前对象实例加锁，进入同步代码前要获得当前对象实例的锁
     - public synchronized  static void methodA(){}
-- 获取类锁
-
-- 修饰实例方法: 作用于当前对象实例加锁，进入同步代码前要获得当前对象实例的锁
-- 修饰静态方法: :也就是给当前类加锁，会作用于类的所有对象实例，因为静态成员不属于任何一个实例对象，是类成员（ static 表明这是该类的一个静态资源，不管new了多少个对象，只有一份）。所以如果一个线程A调用一个实例对象的非静态 synchronized 方法，而线程B需要调用这个实例对象所属类的静态 synchronized 方法，是允许的，不会发生互斥现象，因为访问静态 synchronized 方法占用的锁是当前类的锁，而访问非静态 synchronized 方法占用的锁是当前实例对象锁。
-- 修饰代码块: 指定加锁对象，对给定对象加锁，进入同步代码库前要获得给定对象的锁
 
 ### java如何终止线程
 
@@ -58,7 +81,7 @@
 - notify从等待池中随机选一个线程放入锁池
 - notifyAll把所有等待池全放入锁池
 
-### Java中Sleep方法和wait方法的区别
+### Java中sleep方法和wait方法的区别
 
 - sleep
   - Thread类方法
