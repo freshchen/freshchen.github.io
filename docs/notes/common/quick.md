@@ -1,4 +1,4 @@
-# Quick Note
+# The All-In-One Note
 
 
 
@@ -43,7 +43,7 @@
     - ThreadFactory threadFactory：创建新线程的工厂
     - RejectedExecutionHandler handler：workQueue满了，池中线程数也到了maximumPoolSize，就需要执行拒绝策略
       - CallerRunsPolicy：只要线程池没关闭，就直接用调用者所在线程来运行任务
-      - AbortPolicy：直接抛出 `RejectedExecutionException` 异常
+      - AbortPolicy：直接抛出 RejectedExecutionException异常
       - DiscardPolicy：悄悄把任务放生，不做了
       - DiscardOldestPolicy：把队列里待最久的那个任务扔了
   - 可能抛出的异常：

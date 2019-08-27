@@ -1,10 +1,42 @@
-# Reading Links
+# Reading & Common Links
+
+### Common Links
 
 [Openjdk8n ative源码](http://hg.openjdk.java.net/jdk8u/jdk8u/jdk/file/f6a3bd14735c/src/share/native)
 
 [Process On](https://www.processon.com/)
 
+[md5解密]([https://cmd5.com](https://cmd5.com/))
+
+[Latex数学公式](https://www.codecogs.com/latex/eqneditor.php)
+
 []()
+
+[]()
+
+[]()
+
+[]()
+
+[]()
+
+[]()
+
+[]()
+
+[]()
+
+[]()
+
+[NIPS Proceedings](https://papers.nips.cc/)
+
+[paperswithcode]([https://paperswithcode.com](https://paperswithcode.com/))
+
+[arxiv]([https://arxiv.org](https://arxiv.org/))
+
+[Proceedings of Machine Learning Research](http://proceedings.mlr.press/index.html)
+
+### Reading Links
 
 []()
 

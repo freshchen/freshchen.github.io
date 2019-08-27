@@ -4,28 +4,23 @@
 
 - #### 知识点总结
 
-  - [Quick Note](notes/common/quick.md)
+  - [The All-In-One Note](notes/common/quick.md)
 
 - #### 问题解决方案
 
   - [Trouble Shooting](notes/common/troubleshooting.md)
 
-- ####  好文链接
+- ####  好文和常用链接
 
-  - [Reading Links](notes/common/links.md)
+  - [Reading & Common Links](notes/common/links.md)
 
-- #### Linux常用命令
 
-  - [Linux Common Commands](notes/linux-notes.md)
-
-- #### 个人常用工具脚本
-
-  - [Tools & Template](https://github.com/freshchen/fresh-tools)
 
 ### 博客
 
 - #### System
 
+  - [Linux Common Commands](notes/linux-notes.md)
   - [Redis学习](notes/redis.md)
 
   - [Python远程调用 Openstack 主要服务（keystone,nova,glance,neutron,heat）](notes/python-openstack.md)
