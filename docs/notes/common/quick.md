@@ -31,8 +31,8 @@
 ### Java如何创建线程池
 
 - 直接通过new ThreadPoolExecutor()创建（推荐，可以定制化，控制细节）
-- 构造参数：
-  - int corePoolSize：线程池正常运行时的核心线程数，即使空闲也会等待任务
+  - 构造参数：
+    - int corePoolSize：线程池正常运行时的核心线程数，即使空闲也会等待任务
     - 在线程数少于核心数量时，有新任务进来就新建一个线程，即使有的线程没事干
     - 等超出核心数量后，就不会新建线程了，空闲的线程就得去任务队列里取任务执行了
     - int maximumPoolSize：线程池允许的最大线程数
@@ -51,6 +51,12 @@
       - maximumPoolSize < corePoolSize
     - NullPointerException
       - workQueue，threadFactory和handler其中有一个为null
+  
+- 通过Executors工程创建常用的线程池方案
+  - newFixedThreadPool
+
+
+![](../../resource/images/threadpool.jpg)
 
 ### Java中synchronized使用
 
