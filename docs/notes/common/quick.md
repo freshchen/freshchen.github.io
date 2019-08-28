@@ -26,7 +26,7 @@
 
 
 
-### Java如何创建线程池
+### Java如何创建ThreadPoolExecutor线程池
 
 - 直接通过new ThreadPoolExecutor()创建（推荐，可以定制化，控制细节）
   - 构造参数：
@@ -53,11 +53,79 @@
     - NullPointerException
       - workQueue，threadFactory和handler其中有一个为null
   
-- 通过Executors工程创建常用的线程池方案
+- 通过Executors工具类创建内置常用的线程池方案
   - newFixedThreadPool **用于负载比较重的服务器，为了资源的合理利用，需要限制当前线程数量**
+  
+    - 源码：
+  
+      ```java
+      public static ExecutorService newFixedThreadPool(int nThreads) {
+          return new ThreadPoolExecutor(nThreads, nThreads,
+                                        0L, TimeUnit.MILLISECONDS,
+                                        new LinkedBlockingQueue<Runnable>();
+      }
+      ```
+      
+     - 核心线程数和最大线程数一样，稳定高负荷工作，因此没用超出核心线程数回收的情况keepAliveTime 设置为0，等待队列用LinkedBlockingQueue无界队列
+
   - newSingleThreadExecutor **用于串行执行任务的场景，每个任务必须按顺序执行，不需要并发执行**
+  
+    - 源码：
+  
+      ```java
+      public static ExecutorService newSingleThreadExecutor() {
+          return new FinalizableDelegatedExecutorService
+              (new ThreadPoolExecutor(1, 1,
+                                      0L, TimeUnit.MILLISECONDS,
+                                      new LinkedBlockingQueue<Runnable>()));
+      }
+      ```
+  
+    - 解释：
+  
+      类似于newFixedThreadPool，只是顾名思义池中只有一个线程干活，相当于串行 
+  
   - newCachedThreadPool  **用于并发执行大量短期的小任务，或者是负载较轻的服务器**
+  
+    - 源码：
+  
+      ```java
+      public static ExecutorService newCachedThreadPool() {
+          return new ThreadPoolExecutor(0, Integer.MAX_VALUE,
+                                        60L, TimeUnit.SECONDS,
+                                        new SynchronousQueue<Runnable>());
+      }
+      ```
+  
+    - 解释：
+  
+      没用核心线程，最大线程数无限，线程60秒没任务干就停止 ，等待队列用直接握手队列SynchronousQueue，任务直接交给线程执行不会保存
+  
   - newScheduledThreadPool **用于需要多个后台线程执行周期任务，同时需要限制线程数量的场景**
+  
+    - 源码：
+  
+      ```java
+      public static ScheduledExecutorService newScheduledThreadPool(int corePoolSize) {
+          return new ScheduledThreadPoolExecutor(corePoolSize);
+      }
+      public ScheduledThreadPoolExecutor(int corePoolSize) {
+          super(corePoolSize, Integer.MAX_VALUE,
+                DEFAULT_KEEPALIVE_MILLIS, MILLISECONDS,
+                new DelayedWorkQueue());
+      }
+      private static final long DEFAULT_KEEPALIVE_MILLIS = 10L;
+      ```
+  
+    - 解释：
+  
+      ScheduledThreadPoolExecutor继承自ThreadPoolExecutor，使用优先级队列DelayedWorkQueue，运行时间短的任务先执行，否则先等待的先执行
+  
+  - newSingleThreadScheduledExecutor **用于需要单后台线程执行周期任务**
+  
+    - 解释：
+  
+      单线程执行版的newScheduledThreadPool ，保证任务串行执行，保证串行返回
 
 
 ![](../../resource/images/threadpool.jpg)
