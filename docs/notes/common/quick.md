@@ -121,7 +121,7 @@
   
       ScheduledThreadPoolExecutor继承自ThreadPoolExecutor，使用优先级队列DelayedWorkQueue，运行时间短的任务先执行，否则先等待的先执行
   
-  - newSingleThreadScheduledExecutor **用于需要单后台线程执行周期任务**
+  - newSingleThreadScheduledExecutor **用于需要后台单线程执行周期任务**
   
     - 解释：
   
@@ -130,18 +130,24 @@
 
 ![](../../resource/images/threadpool.jpg)
 
-### Java中synchronized使用方式
+### Java中synchronized关键字
 
-- 获取对象锁
-  - 同步代码块: 指定加锁对象，对给定对象加锁
-    - synchronized(this){}
-  - 同步非静态方法: 作用于当前对象实例加锁，进入同步代码前要获得当前对象实例的锁
-    - public synchronized void methodA(){}
-- 获取类锁
-  - 同步代码块: 指定加锁的类，对给定类加锁
-    - synchronized(类名.class){}
-  - 同步静态方法: 作用于当前对象实例加锁，进入同步代码前要获得当前对象实例的锁
-    - public synchronized  static void methodA(){}
+- 使用方式
+  - 获取对象锁
+    - 同步代码块: 指定加锁对象，对给定对象加锁
+      - synchronized(this){}
+    - 同步非静态方法: 作用于当前对象实例加锁，进入同步代码前要获得当前对象实例的锁
+      - public synchronized void methodA(){}
+  - 获取类锁
+    - 同步代码块: 指定加锁的类，对给定类加锁
+      - synchronized(类名.class){}
+    - 同步静态方法: 作用于当前对象实例加锁，进入同步代码前要获得当前对象实例的锁
+      - public synchronized  static void methodA(){}
+- 实现方式
+  - 同步代码块：使用了monitorenter和monitorexit指令
+  - 同步方法：通过方法修饰符上的ACC_AYNCHRONIZED实现
+- JVM中锁升级流程
+  - ![](../../resource/images/synchronized.png)
 
 ### java如何终止线程
 
