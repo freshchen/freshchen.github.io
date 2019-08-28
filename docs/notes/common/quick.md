@@ -151,7 +151,8 @@
   - 同步代码块：使用了monitorenter和monitorexit指令
   - 同步方法：通过方法修饰符上的ACC_AYNCHRONIZED实现
 - JVM中锁升级流程
-  - ![](../../resource/images/synchronized.png)
+  
+  ![](../../resource/images/synchronized.png)
 
 ### java如何终止线程
 

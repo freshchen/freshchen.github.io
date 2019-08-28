@@ -60,7 +60,7 @@
 
 []()
 
-[]()
+[JMM和底层实现原理](https://www.jianshu.com/p/8a58d8335270)
 
 [kafka中文教程](https://www.orchome.com/kafka/index)
 
