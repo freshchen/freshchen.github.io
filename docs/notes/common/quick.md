@@ -26,7 +26,7 @@
 
 
 
-## Java
+## Java SE 8
 
 ### 线程池的五种状态
 
@@ -164,6 +164,13 @@
   - 会立即释放锁，有可能引起线程不同步
 - interrupt方法
   - 阻塞状态下会推出阻塞状态，抛出InterruptedException；运行状态下设置中断标志位为true，继续运行，线程自行检查标志位主动终止，相对温柔
+
+### 线程如何通信
+
+线程的通信是指线程之间以何种机制来交换信息，在编程中，线程之间的通信机制有两种，共享内存和消息传递
+
+- 共享内存：线程之间共享程序的公共状态，线程之间通过写-读内存中的公共状态来隐式进行通信，典型的共享内存通信方式就是通过共享对象进行通信
+- 消息传递：线程之间没有公共状态，线程之间必须通过明确的发送消息来显式进行通信，在java中典型的消息传递方式就是wait()和notify()
 
 ### notify方法和notifyAll方法的区别
 
@@ -354,6 +361,29 @@ System.out.println(s3 == s4);
   - heap堆
     - 常量池
     - 实例对象
+
+### Java内存模型（JMM）
+
+![](../../resource/images/jmm.png)
+
+### Happens-Before原则
+
+保证单线程执行的内存可见性，多线程不能保证
+
+- 程序顺序规则：一个线程中的每个操作，happens-before于该线程中的任意后续操作
+- 监视器锁规则：对一个锁的解锁，happens-before于随后对这个锁的加锁
+- volatile变量规则：对一个volatile域的写，happens-before于任意后续对这个volatile域的读
+- 传递性：如果A happens-before B，且B happens-before C，那么A happens-before C
+- start()规则：如果线程A执行操作ThreadB.start()（启动线程B），那么A线程的ThreadB.start()操作happens-before于线程B中的任意操作
+- join()规则：如果线程A执行操作ThreadB.join()并成功返回，那么线程B中的任意操作happens-before于线程A从ThreadB.join()操作成功返回
+- 线程中断规则:对线程interrupt方法的调用happens-before于被中断线程的代码检测到中断事件的发生
+
+### 指令重排
+
+在执行程序时，为了提高性能，编译器和处理器常常会对指令做重排序
+
+- 可以通过内存屏障避免重排序（volatile就是这么做的）
+- 如果指令执行顺序不会破坏Happens-Before原则，JVM就有可能对指令重排
 
 ### 类加载双亲委派机制
 
