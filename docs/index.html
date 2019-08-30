@@ -25,8 +25,22 @@
 		    placeholder: 'Search',
 		    noData: 'No Results',
             depth: 6,
-        }
-    }
+        },
+        plugins: [
+          function(hook) {
+            var footer = [
+              '<hr/>',
+              '<footer>',
+              '<span id="busuanzi_container_site_pv">站点总访问量<span id="busuanzi_value_site_pv"><i class="fa fa-spinner fa-spin"></i></span>次</span>',
+              '</footer>'
+            ].join('');
+
+            hook.afterEach(function(html) {
+              return html + footer;
+            });
+          }
+        ]
+    };
     const gitalk = new Gitalk({
         clientID: 'e3b307c445075f80c922',
         clientSecret: '2a671e439facb24e5628d56393b6d430fa0f2b4d',
@@ -42,7 +56,8 @@
   <script src="//unpkg.com/prismjs/components/prism-bash.min.js"></script>
   <script src="//unpkg.com/prismjs/components/prism-markdown.min.js"></script>
   <script src="https://cdn.bootcss.com/docsify/4.5.9/plugins/search.min.js"></script>
-  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <script src="//unpkg.com/docsify-copy-code"></script>
   <script src="//unpkg.com/docsify/lib/plugins/gitalk.min.js"></script>
   <script src="//unpkg.com/gitalk/dist/gitalk.min.js"></script>
 </body>
