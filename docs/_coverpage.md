@@ -2,9 +2,10 @@
 
 # Blog & Note
 
-> 很高兴遇见你 !
+很高兴遇见你 !
+
+<span id="busuanzi_container_site_pv">站点总访问量<span id="busuanzi_value_site_pv"></span>次</span>
 
 [GitHub](https://github.com/freshchen/fresh-notes/)
 [开始阅读](#目录)
 
-<span id="busuanzi_container_site_pv">站点总访问量<span id="busuanzi_value_site_pv"></span>次</span>
