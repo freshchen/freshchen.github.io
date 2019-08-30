@@ -647,7 +647,7 @@ public class NewStack<T>{
 ### Netty执行流程
 
 - 当客户端网络I/O请求来了就需要为其通过**Bootstrap**创建一个**Channel**，**Channel**是一个Socket的抽象
-- 在创建过程中**Channel**会去**EventLoopGroup**中申请注册一个**EventLoop**，**Channel**和**EventLoopGroup**是多对一的关系，**EventLoop**对应一个Reactor线程，没有线程安全问题
+- 在创建过程中**Channel**会去**EventLoopGroup**中申请注册一个**EventLoop**，**Channel**和**EventLoopGroup**是多对一的关系，**EventLoop**对应一个Reactor线程模型
 - 注册完成后**Channel**就可以执行**ChannelpipeLine**中的任务了
 - **ChannelpipeLine**由各种Handler组成，主要有**ChannelInboundHandler**（读）和**ChannelOutboundHandler**（写），通过**HandlerContext**管理，各大Handler可以通过**ByteBuf**操作数据
 
@@ -950,6 +950,10 @@ ${JAVA_HOME}/bin/keytool -importkeystore -trustcacerts -noprompt -alias <别名>
 
 ## 网络
 
+### Socket网络传输数据的过程
+
+
+
 ### TCP粘包，拆包
 
 粘包拆包问题是处于网络比较底层的问题，在数据链路层、网络层以及传输层都有可能发生。我们日常的网络应用开发大都在传输层进行，由于UDP有消息保护边界，不会发生粘包拆包问题，因此粘包拆包问题只发生在TCP协议中
@@ -962,6 +966,7 @@ ${JAVA_HOME}/bin/keytool -importkeystore -trustcacerts -noprompt -alias <别名>
 
   - 应用程序写入的数据大于套接字缓冲区大小，这将会发生拆包
   - 进行MSS（最大报文长度）大小的TCP分段，当TCP报文长度-TCP头部长度>MSS的时候将发生拆包
+  - 以太网帧的payload（净荷）大于MTU（1500字节）进行ip分片
   - 接收方法不及时读取套接字缓冲区数据，这将发生粘包
   - 应用程序写入数据小于套接字缓冲区大小，网卡将应用多次写入的数据发送到网络上，这将会发生粘包
 
@@ -970,6 +975,8 @@ ${JAVA_HOME}/bin/keytool -importkeystore -trustcacerts -noprompt -alias <别名>
   - 发送端给每个数据包添加包首部，首部中应该至少包含数据包的长度，这样接收端在接收到数据后，通过读取包首部的长度字段，便知道每一个数据包的实际长度了
   - 发送端将每个数据包封装为固定长度（不够的可以通过补0填充），这样接收端每次从接收缓冲区中读取固定长度的数据就自然而然的把每个数据包拆分开来
   - 可以在数据包之间设置边界，如添加特殊符号，这样，接收端通过这个边界就可以将不同的数据包拆分开
+
+
 
 
 

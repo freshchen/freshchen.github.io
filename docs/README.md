@@ -2,7 +2,7 @@
 
 ### 笔记
 
-- #### 知识点总结（推荐阅读）
+- #### 知识点总结（墙裂推荐）
 
   - [The All-In-One Note](notes/common/all-in-one.md)
 

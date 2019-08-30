@@ -58,7 +58,7 @@
 
 []()
 
-[]()
+[netty学习系列二：NIO Reactor模型 & Netty线程模型](https://www.jianshu.com/p/38b56531565d)
 
 [JMM和底层实现原理](https://www.jianshu.com/p/8a58d8335270)
 
