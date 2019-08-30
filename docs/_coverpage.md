@@ -3,7 +3,7 @@
 
 # Blog & Note
 
-很高兴遇见你 !
+> 很高兴遇见你 !
 
 <span id="busuanzi_container_site_pv">
     站点总访问量
