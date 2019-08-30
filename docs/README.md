@@ -2,9 +2,9 @@
 
 ### 笔记
 
-- #### 知识点总结
+- #### 知识点总结（推荐阅读）
 
-  - [The All-In-One Note](notes/common/quick.md)
+  - [The All-In-One Note](notes/common/all-in-one.md)
 
 - #### 问题解决方案
 
