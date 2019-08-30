@@ -1,7 +1,13 @@
 # The All-In-One Note
 
-- [java](#Java)
+- [Java8](#Java8)
+  - [基础](#基础)
+  - [并发](#并发)
+  - [JVM](#JVM)
+- [Java框架](#Java框架)
 - [数据库](#数据库)
+  - [Mysql](#Mysql)
+  - [Redis](#Redis)
 - [分布式](#分布式)
 
 
@@ -26,7 +32,11 @@
 
 
 
-## Java SE 8
+
+
+# Java8
+
+## 并发
 
 ### 线程池的五种状态
 
@@ -190,6 +200,10 @@
   - Object类方法
   - 让出CPU，释放当前占用的锁
   - 只能在synchronized中的中使用
+
+
+
+## JVM
 
 ### 四种引用类型
 
@@ -441,6 +455,9 @@ elementData[elementCount] = null; /* to let gc do its work
 - 监听器和其他回调，可以用WeakHashMap作为引用外键
 
 
+
+## 基础
+
 ### ArrayList & HashMap 扩容
 
 - ArrayList默认大小10，装不下就扩容，每次1.5倍扩容
@@ -478,9 +495,19 @@ public class NewStack<T>{
 
 
 
+# Java框架
+
+### Netty4的特点
 
 
-## 数据库
+
+
+
+
+
+# 数据库
+
+## Redis
 
 ### Redis部署
 
@@ -545,6 +572,10 @@ public class NewStack<T>{
 - Memcache支持简单的数据类型，不支持持久化存储，不支持主从，不支持分片
 
 - Redis数据类型丰富，支持持久化存储，支持主从，支持分片
+
+
+
+## Mysql
 
 ### InnoDB可重复读（Repeatable read）级别为啥可以避免幻读
 
@@ -648,7 +679,7 @@ commit;
 
 
 
-## 分布式
+# 分布式
 
 ### 一致性哈希算法
 
