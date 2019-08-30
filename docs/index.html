@@ -8,6 +8,7 @@
   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/vue.css">
   <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/prism.css">
+  <link rel="stylesheet" href="//unpkg.com/gitalk/dist/gitalk.css">
 </head>
 <body>
   <div id="app"></div>
@@ -48,6 +49,14 @@
                 })
             }]
     }
+    const gitalk = new Gitalk({
+        clientID: 'e3b307c445075f80c922',
+        clientSecret: '2a671e439facb24e5628d56393b6d430fa0f2b4d',
+        repo: 'fresh-notes',
+        owner: 'freshchen',
+        admin: ['freshchen'],
+        distractionFreeMode: false
+    })
   </script>
   <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>
   <script src="//unpkg.com/prismjs/components/prism-java.js"></script>
@@ -56,5 +65,7 @@
   <script src="//unpkg.com/prismjs/components/prism-markdown.min.js"></script>
   <script src="https://cdn.bootcss.com/docsify/4.5.9/plugins/search.min.js"></script>
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <script src="//unpkg.com/docsify/lib/plugins/gitalk.min.js"></script>
+  <script src="//unpkg.com/gitalk/dist/gitalk.min.js"></script>
 </body>
 </html>
