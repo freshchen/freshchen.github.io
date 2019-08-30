@@ -24,6 +24,29 @@
 		    noData: 'No Results',
             depth: 6,
         },
+        plugins: [
+            function (hook, vm) {
+                hook.beforeEach(function (html) {
+                    var site = "<span id=\"busuanzi_container_site_pv\" allowtransparency=\"true\" frameborder=\"0\" scrolling=\"0\" width=\"110\" height=\"20\" style='margin:0 10px -6px'>\n" +
+                        "    站点总访问量\n" +
+                        "    <span id=\"busuanzi_value_site_pv\">\n" +
+                        "    <i class=\"fa fa-spinner fa-spin\"></i>\n" +
+                        "    </span>次\n" +
+                        "</span>";
+                    var page = "<span id=\"busuanzi_container_site_pv\" allowtransparency=\"true\" frameborder=\"0\" scrolling=\"0\" width=\"110\" height=\"20\" style='margin:0 10px -6px'>\n" +
+                        "    本文总访问量\n" +
+                        "    <span id=\"busuanzi_value_page_pv\">\n" +
+                        "    <i class=\"fa fa-spinner fa-spin\"></i>\n" +
+                        "    </span>次\n" +
+                        "</span>";
+                    return "<div class=\"tool-docs-header\">"
+                        + page
+                        + site
+                        + "</div>"
+                        + '\n\n'
+                        + html
+                })
+            }]
     }
   </script>
   <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>
