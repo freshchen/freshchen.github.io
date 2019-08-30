@@ -4,7 +4,10 @@
   - [基础](#基础)
   - [并发](#并发)
   - [JVM](#JVM)
+  - [设计模式](#设计模式)
 - [Java框架](#Java框架)
+- [系统](#系统)
+  - [Linux常用命令](#Linux常用命令)
 - [数据库](#数据库)
   - [Mysql](#Mysql)
   - [Redis](#Redis)
@@ -495,11 +498,442 @@ public class NewStack<T>{
 
 
 
+## 设计模式
+
+[关于设计模式的一些简单案例](https://github.com/freshchen/fresh-design-pattern)
+
+### 概念简述
+
+- **单一责任原则**
+
+  就一个类而言，应该只有一个引起它变化的原因。
+
+- **开放封闭原则**
+
+  软件实体应该是可以扩展的，但是不可修改。
+
+- **依赖倒转原则**
+
+  1.高层模块不应该依赖底层模块，两个都应该抽象依赖。
+
+  2.抽象不应该依赖细节。细节应该依赖抽象。
+
+- **迪米特法则**
+
+  如果两个类不必彼此直接通信，那么这两个类就不应该发生直接的相互作用。如果其中一个类需要调用另一个类的摸一个方法的话，应该同通过第三方转发这个调用。
+
+- **简单工厂模式**
+
+  定义超类，子类通过继承重写方法实现多态，创建一个Factory工厂类，调用统一的超类接口，实例化相应的子类对象，实现解耦。
+
+- **策略模式**
+
+  封装实现同一功能的不同算法，通过Context上下文方式加载不同策略，可以和简单工厂模式结合使用。
+
+
+- **装饰模式**
+
+  动态地给一个对象添加一些额外的职责，就增加功能来说，装饰模式比生成子类更加灵活。
+
+- **代理模式**
+
+  为其他对象提供一种代理以控制对这个对象的访问。
+
+- **工厂方法模式**
+
+  定义一个用于创建对象的接口，让子类决定实例化哪一个类。工厂方法使一个类的实例化延迟到了其子类。
+
+- **原型模式**
+
+  用原型实例指定创建对象的种类，并且通过拷贝这些原型创建新的对象。
+
+- **模板方法模式**
+
+  定义一个操作中的算法的骨架，而将一些步骤延迟到子类中。模板方法使得子类可以不改变一个算法的结构即可重定义该算法的某些特定的步骤。
+
+- **外观模式（门面模式）**
+
+  为了系统中的一组接口提供一个一致的界面，此模式定义了一个高层接口，这个接口使得这以子系统更加容易使用。
+
+- **建造者模式**
+
+  将一个复杂对象的构建与他的表示分离，使得同样的构建过程可以创建不同的表示。
+
+- **观察者模式（发布订阅）**
+
+  一对多的依赖关系，让多个观察者对象同时监听某一个主题对象。这个主题对象在状态发生变化时，会通知所有观察者对象，使它们能够自动更新自己。
+
+- **抽象工厂方法**
+
+  提供一个创建一系列相关或相互依赖对象的接口，而无需具体指定他们的实现。
+
+- **状态模式**
+
+  当一个对象的内在状态改变时允许改变其行为，这个对象看起来像是改变了其类。（状态模式主要解决的是控制一个对象状态转换的条件表达式过于复杂时的情况）
+
+- **适配器模式**
+
+  将一个类的接口转换成客户希望的另一个接口。Adapter模式使得原本由于接口不兼容而不能一起工作的那些类可以一起工作。
+
+- **备忘录模式**
+
+  在不破坏封装性的前提下，捕获一个对象的内部状态，并在对象之外保存这个状态。这样以后就可将对象恢复到原先保存的状态。
+
+- **组合模式**
+
+  将对象组合成树形结构以表示 “部分-整体” 的层次结构。组合模式使得用户对单个对象和组合对象的使用具有一致性。 
+
+- **迭代器模式**
+
+  提供一种方法顺序访问一个聚合对象中各个元素，而又不暴露该对象的内部表示。
+
+- **单例模式**
+
+  保证一个类仅有一个实例，并提供一个访问它的全局访问点。
+
+- **组合聚合复用原则**
+
+  尽量使用组合聚合，尽量不要使用类继承。
+
+- **桥接模式**
+
+  将抽象部分与它的实现部分分离，使它们都可以独立地变化。
+
+- **命令模式**
+
+  将一个请求封装为一个对象，从而使你可用不同的请求对客户进行参数化，对请求排队或记录请求日志，以及支持可撤销的操作。
+
+- **责任链模式**
+
+  使多个对象都有机会处理请求，从而避免请求的发送者和接收者之间的耦合关系。将这个对象连成链条，并沿着这条链传递该请求，直到有一个对象处理它为止。
+
+- **中介者模式**
+
+  用 一个中介对象封装一系列对象交互。中介者使得各对象不需要显示地互相引用，从而使得其耦合松散，而且可以独立地改变它们之间的交互。
+
+- **享元模式**
+
+  运用共享技术有效地支持大量细粒度的对象。
+
+- **解释器模式**
+
+  给定一个语言，定义它的文法的一种表示，并定义一个解释器，这个解释器使用该表示来解释语言中的句子。
+
+- **访问者模式**
+
+  表示一个作用于某种对象结构中的各元素的操作。它使你可以在不改变各元素的类的前提下定义作用于这些元素的新操作。
+
+
+
+
+
 # Java框架
 
-### Netty4的特点
+## Netty4
+
+### Netty的特点
+
+- 一个高性能、异步事件驱动的NIO框架，它提供了对TCP、UDP和文件传输的支持
+- 使用更高效的socket底层，对epoll空轮询引起的cpu占用飙升在内部进行了处理，避免了直接使用NIO的陷阱，简化了NIO的处理方式。
+- 采用多种decoder/encoder 支持，对TCP粘包/分包进行自动化处理
+- 可使用接受/处理线程池，提高连接效率，对重连、心跳检测的简单支持
+- 可配置IO线程数、TCP参数， TCP接收和发送缓冲区使用直接内存代替堆内存，通过内存池的方式循环利用ByteBuf
+- 通过引用计数器及时申请释放不再引用的对象，降低了GC频率
+- 使用单线程串行化的方式，高效的Reactor线程模型
+- 大量使用了volitale、使用了CAS和原子类、线程安全类的使用、读写锁的使用
 
 
+
+# 系统
+
+## Linux常用命令
+
+### 文本处理
+
+```bash
+
+# 目录dos2unix转换格式
+find . -type f -exec dos2unix {} \;
+
+########################      $      ########################
+
+# 变量要保留其原来的换行符要加双引号，建议所有变量引用都用双引号加大括号圈上
+echo "${var}"
+# 变量长度
+echo "${#var}"
+# 接受所有参数
+$@
+# 查看数组中所有元素
+${list[@]}
+# 查看数组长度
+${#list[@]}
+# 去掉全路径的文件名，只保留目录
+${path%/*}
+
+########################      =      ########################
+
+# 定义数组
+list=("1" "2" "3")
+# 定义map
+declare -A map=(["1"]="name" ["2"]="age")
+
+########################     grep      ########################
+
+# 删除空白行和注释行
+cat <file> | grep -v ^# | grep .
+cat <file> | grep -Ev '^$|^#'
+
+########################     grep      ########################
+
+# 去掉行尾巴空格
+echo ${var} | sed 's/[ \t]*$//g'
+# 去掉单引号
+echo ${var} | sed $'s/\'//g'
+
+########################      awk       ########################
+
+# 例如查看状态是UNCONN,Recv-Q是0的端口信息
+
+ss -ln | awk '($2=="UNCONN" && $3=="0") {print $0}'
+
+# 统计状态是UNCONN,Recv-Q是0的端口的netid和出现的次数
+
+ss -ln | awk '($2=="UNCONN" && $3=="0") {netids[$1]++}END{for(i in netids)print i "\t" netids[i]}'
+
+########################      tr       ########################
+
+# 大写转小写
+echo ${var} | tr 'A-Z' 'a-z'
+
+########################      od       ########################
+
+# 字符串转ASCLL码
+echo "${var}" | tr -d "\n" | od -An -t dC
+
+```
+
+### 系统管理
+
+```bash
+########################     process      ########################
+
+# 查看后台job
+jobs
+# 后台运行
+( cmd ) &
+# 唤醒
+fg %<job_num>
+# 暂停放入后台
+ctrl z
+# 唤醒stop的job
+bg %<job_num>
+# 发送信号，优先15SIGTERM，不行再9SIGKILL
+kill -SIGTERM <PID>
+# 杀用户所有进程
+pkill -SIGTERM -u <user_name>
+# 杀父进程
+pkill -P <PID>
+# 杀终端
+pkill -SIGTERM -u <tty_name>
+# 查看cpu信息
+cat /proc/cpuinfo
+
+########################     systemctl      ########################
+
+# 查看服务单元
+systemctl
+systemctl --type service
+systemctl list-units
+# 判断状态
+systemctl <is-active|is-enabled|is-failed|isolate|is-system-running> <unit_name>
+# 看错误信息
+systemctl --failed
+systemctl status <unit_name> -l
+# 看enable disable static的单元
+systemctl list-unit-files
+
+########################     journalctl      ########################
+
+# 查看systemd日志
+journalctl
+# 指定级别
+journalctl -p <err|debug|info|warning...>
+# 持续打印
+journalctl -f
+# 指定单元
+journalctl -u
+
+########################     find      ########################
+
+# 根据名字找
+find <dir> -name <org>
+# 根据用户找
+find <dir> -user <org>
+# 根据组找
+find <dir> -group <org>
+# 根据权限找
+find <dir> -perm <org>
+# 根据大小找
+find <dir> -size <org>
+# 根据更改找
+find <dir> -mmin <org>
+# 根据类型找
+find <dir> -type <l|b|f>
+
+
+########################     timedatectl      ########################
+
+# 当前时钟时区
+timedatectl
+# 设置
+timedatectl <set-ntp|set-time|set-timezone|set-local-rtc> 
+
+########################     hostname      ########################
+
+# 查看hostname信息
+hostnamectl status
+# 本地域名解析位置
+cat /etc/hosts
+cat /etc/resolv.conf
+
+########################     ip      ########################
+
+# 检查网络设备
+ip addr show <eno>
+# 查看网络性能
+ip -s link <eno>
+# 跟踪请求路径
+tracepath
+tracepath6
+
+########################     nmcli      ########################
+
+# 查看网络连接
+nmcli con show
+# 查看网络设备信息
+nmcli dev show <eno>
+# 修改网络接口
+nmcli con add
+nmcli con mod
+# 激活/取消连接
+nmcli con up "<id>"
+nmcli con down "<id>"
+# 网络配置文件位置
+ls /etc/sysconfig/network-scripts/
+
+
+########################      yum        ########################
+
+yum <repolist|list|search|install|remove|update>
+
+########################      rpm        ########################
+
+# 查找rpm包
+rpm -qa | grep <name>
+# 查看rpm信息
+rpm -qi <name>
+# 解压rpm包
+rpm2cpio <rpm> | cpio -id
+
+########################     user:group      ########################
+
+# 用户信息
+cat /etc/passwd
+# 组信息
+cat /etc/group
+# 更改用户或组
+chown -R <user> <dir>
+chown -R :<group> <dir>
+chown -R <user>:<group> <dir>
+# 改权限
+chmod -R 750 <file>
+
+########################     ssh      ########################
+
+# 显示当前登录信息
+w -f
+# 公钥存放位置
+cat ~/.ssh/known_hosts
+# 私钥位置
+ls /etc/ssh/ssh_host_*
+# 创建私钥公钥对
+ssh-keygen
+# 将公钥复制到远程机器实现互信
+ssh-copy-id <user>@<host>
+
+########################     fs      ########################
+
+# 检测文件挂载点
+df -h
+# 检测目录使用空间信息
+du -h <dir>
+# 文件系统挂在
+mount <dir> <dir>
+# 查看目录中所有打开的文件和正在运行的进程
+lsof <dir>
+# 取消挂载
+umount <dir>
+
+########################     ln      ########################
+
+# 创建硬连接
+ln <exist_path> <path>
+# 创建软连接
+ln -s <exist_path> <path>
+```
+
+
+### 其他应用
+
+```bash
+########################      docker        ########################
+
+# 删除tag和name为none的坏掉的image
+docker rmi $(docker images -f "dangling=true" -q)
+# 删掉所有容器
+docker stop $(docker ps -qa)
+docker kill $(docker ps -qa)
+docker rm $(docker ps -qa)
+# 删除所有镜像
+docker rmi --force $(docker images -q)
+
+########################      mysql        ########################
+
+# 查配置
+show variables like '%';
+# 放开用户的远程操作权限
+GRANT ALL PRIVILEGES ON *.* TO '<user>'@'%' IDENTIFIED BY '<password>' WITH GRANT OPTION;
+# 刷新权限规则生效
+flush privileges;
+# 在线改配置
+set <global|session>
+
+########################      openssl        ########################
+
+# 查看证书过期时间
+openssl x509 -noout -enddate -in <crt_path>
+# 获取端口证书过期时间
+echo 'Q' | timeout 5 openssl s_client -connect <host:port> 2>/dev/null | openssl x509 -noout -enddate
+# 自签根证书
+openssl genrsa -aes256 -out <ca私钥位置> 2048
+openssl req -new -key <ca私钥位置> -out <ca签发流程位置> -subj "/C=/ST=/L=/O=/OU=/CN=/emailAddress="
+openssl x509 -req -sha256 -days <过期天数> -in <ca签发流程位置> -out <ca证书位置> -signkey <ca私钥位置> -CAcreateserial
+# 根证书签发子证书
+openssl genrsa -aes256 -out <私钥位置> 2048
+openssl req -new -key <私钥位置> -out <签发流程位置> -subj "/C=/ST=/L=/O=/OU=/CN=/emailAddress=" 
+openssl x509 -req -sha256 -days <过期天数> -in <签发流程位置> -out <证书位置> -signkey <私钥位置> -CAkey <ca私钥> -CA <ca证书位置> -CAcreateserial
+openssl pkcs12 -export -clcerts -in <证书位置> -inkey <私钥位置> -out <p12证书位置> -name <别名>
+
+########################      keytool        ########################
+
+# 查看keystore
+${JAVA_HOME}/bin/keytool -v -list -storepass <password> -keystore <keystore_path>
+# 导入trust keystore
+${JAVA_HOME}/bin/keytool -import -trustcacerts -noprompt -alias <别名> -file <证书位置> -keystore <Keystore位置>
+# 导入keystore
+${JAVA_HOME}/bin/keytool -importkeystore -trustcacerts -noprompt -alias <别名> -deststoretype pkcs12 -srcstoretype pkcs12 -srckeystore <p12证书位置> -destkeystore <Keystore位置>
+
+```
 
 
 
