@@ -3,13 +3,15 @@
 - [Java8](#Java8)
   - [基础](#基础)
   - [并发](#并发)
+  - [IO](#IO)
   - [JVM](#JVM)
   - [设计模式](#设计模式)
 - [Java框架](#Java框架)
   - [Netty4](#Netty4)
-- [系统](#系统)
+- [操作系统](#操作系统)
   - [Linux常用命令](#Linux常用命令)
-  - [网络](#网络)
+- [网络](#网络)
+  - [TCP](#TCP)
 - [数据库](#数据库)
   - [Mysql](#Mysql)
   - [Redis](#Redis)
@@ -42,6 +44,40 @@
 # Java8
 
 ## 并发
+
+### J.U.C总览图
+
+![](../../resource/images/juc.png)
+
+### J.U.C常用工具类
+
+- **CountDownLatch**
+  - 作用：主要用于一个线程要等待其他线程任务执行完再执行
+- **CyclicBarrier**
+  - 作用：主要用于多个线程到达起跑线之后同时等待，发令枪响齐头并进
+- **Executors**
+  - 作用：主要用于提供默认应用场景的线程池创建，以及一些任务调度方法
+- **Semaphore**
+  - 作用：主要用于限制同时执行任务的线程数量
+- **Exchanger**
+  - 作用：主要用于两个线程之间交换数据
+
+### J.U.C阻塞队列BlockingQueue
+
+- ArrayBlockingQueue
+  - 结构：由数组组成的有界阻塞队列
+- LinkedBlockingQueue
+  - 结构：由链表组成的有界/无界阻塞队列
+- LinkedTransferQueue
+  - 结构：由链表组成的无界阻塞队列
+- LinkedBlockingDeque
+  - 结构：由链表组成的双端阻塞队列
+- PriorityBlockingQueue
+  - 结构：由链表组成的支持优先级排序的无界阻塞队列
+- DelayQueue
+  - 结构：使用PriorityQueue实现的带延迟的无界阻塞队列
+- SynchronousQueue
+  - 结构：不存储元素的阻塞队列
 
 ### 线程池的五种状态
 
@@ -205,8 +241,6 @@
   - Object类方法
   - 让出CPU，释放当前占用的锁
   - 只能在synchronized中的中使用
-
-
 
 ## JVM
 
@@ -461,6 +495,12 @@ elementData[elementCount] = null; /* to let gc do its work
 
 
 
+## IO
+
+### BIO,NIO,AIO的区别
+
+
+
 ## 基础
 
 ### ArrayList & HashMap 扩容
@@ -655,7 +695,7 @@ public class NewStack<T>{
 
 
 
-# 系统
+# 操作系统
 
 ## Linux常用命令
 
@@ -948,11 +988,9 @@ ${JAVA_HOME}/bin/keytool -importkeystore -trustcacerts -noprompt -alias <别名>
 
 
 
-## 网络
+# 网络
 
-### Socket网络传输数据的过程
-
-
+## TCP
 
 ### TCP粘包，拆包
 
