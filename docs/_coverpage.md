@@ -1,4 +1,3 @@
-<link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
 <img src="https://img.alicdn.com/tfs/TB1kCs_er_I8KJjy1XaXXbsxpXa-419-495.png" width="200px">
 
 # Blog & Note
