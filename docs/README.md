@@ -23,16 +23,17 @@
   - [Python远程调用 Openstack 主要服务（keystone,nova,glance,neutron,heat）](blogs/os/openstack/python-openstack.md)
   - [Openstack-cinder服务](blogs/os/openstack/openstack-cinder.md)
   - [Openstack的Heat服务api支持HTTPS](blogs/os/openstack/openstack-heatapi-https.md)
-- [Queens版本Openstack安装记录](blogs/os/openstack/openstack-queens-install.md)
+  - [Queens版本Openstack安装记录](blogs/os/openstack/openstack-queens-install.md)
+  
   - [Nginx安装-基于腾讯云Centos7](blogs/os/nginx-install.md)
-- [自签的SSL证书创建与验证过程](blogs/os/self-ssl-signing.md)
+  - [自签的SSL证书创建与验证过程](blogs/os/self-ssl-signing.md)
   - [Apache支持HTTPS](blogs/os/apache-self-ssl.md)
-- [自己制作Yum源](blogs/os/yumsource.md)
+  - [自己制作Yum源](blogs/os/yumsource.md)
   
 - #### Java
 
   - [JDK8](blogs/java/jdk8.md)
-- [J.U.C 源码初体验](blogs/java/juc.md)
+  - [J.U.C 源码初体验](blogs/java/juc.md)
   
 - #### 数据库
 
