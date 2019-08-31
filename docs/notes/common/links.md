@@ -10,7 +10,7 @@
 
 [Latex数学公式](https://www.codecogs.com/latex/eqneditor.php)
 
-[]()
+[图片压缩](https://tinypng.com/)
 
 []()
 

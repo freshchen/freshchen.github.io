@@ -1,19 +1,35 @@
 #!/usr/bin/env bash
 
+CURRENT_PATH=$(cd "$(dirname "$0")"; pwd)
 if [[ $# -eq 0 ]] ; then
-    comment="update"
+    COMMENT="update"
 else
-    comment=$*
+    COMMENT=$*
 fi
-current_path=$(cd "$(dirname "$0")"; pwd)
-cd ${current_path}
-status=$(git pull)
-if [[ ${status} == "Already up to date." ]]; then
+cd ${CURRENT_PATH}
+
+
+pre_check() {
+    local status=$(git pull)
+    if [[ ${status} == "Already up to date." ]]; then
+        echo 'Pre-Check successfully.'
+    else
+        echo 'Need merge.'
+        exit 1
+    fi
+}
+
+post_push() {
     echo 'Start to push.'
     git add ./docs/ || exit 1
-    git commit -m "${comment}" || exit 1
+    git commit -m "${COMMENT}" || exit 1
     git push origin master || exit 1
     echo 'Push successfully.'
-else
-    echo 'Need merge.'
-fi
+}
+
+main() {
+    pre_check
+    post_push
+}
+
+main
