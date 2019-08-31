@@ -1,4 +1,4 @@
-# The All-In-One Note
+# The All-in-One Note
 
 - [Java8](#Java8)
   - [基础](#基础)
@@ -6,8 +6,9 @@
   - [IO](#IO)
   - [JVM](#JVM)
   - [设计模式](#设计模式)
-- [Java框架](#Java框架)
-  - [Netty4](#Netty4)
+- [JavaEE](#Java框架)
+  - [Spring](#Spring)
+  - [Netty](#Netty)
 - [服务器](#服务器)
   - [Linux常用命令](#Linux常用命令)
 - [网络](#网络)
@@ -49,7 +50,7 @@
 
 ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/juc.png)
 
-### J.U.C常用工具类
+### J.U.C常用同步器
 
 - **CountDownLatch**
   - 作用：主要用于一个线程要等待其他线程任务执行完再执行
@@ -499,7 +500,31 @@ elementData[elementCount] = null; /* to let gc do its work
 
 ### BIO,NIO,AIO的区别
 
+- **BIO**
+  - 基于字节流(InputStream,OutputStream)，字符流(Reader,Writer)
+  - 同步阻塞I/O操作
+  - 一个连接对应一个线程
+- **NIO**（>jdk4）
+  - 多路复用，同步非阻塞I/O操作
+  - 增加了Channel,Buffer,Selector等组件
+  - 多个连接对应一个线程
+- **AIO**（>jdk7）
+  - 异步非阻塞I/O操作
+  - 基于事件和回调机制
+  - 请求立即返回，连接和线程无对应关系
 
+### I/O多路复用技术select、poll、epoll之间的区别
+
+- **select**
+  - 单个进程所能打开的最大连接数有FD_SETSIZE宏定义，其大小是32个整数的大小（在32位的机器上，大小就是32*32，同理64位机器上FD_SETSIZE为32*64）
+  - 每次调用时都会对连接进行线性遍历，所以随着FD的增加会造成遍历速度慢的“线性下降性能问题”
+  - 内核需要将消息传递到用户空间，都需要内核拷贝动作
+- **poll**
+  - poll本质上和select没有区别，但是它没有最大连接数的限制，原因是它是基于链表来存储的，其他性质同select
+- **epoll**
+  - 虽然连接数有上限，但是很大，1G内存的机器上可以打开10万左右的连接，2G内存的机器可以打开20万左右的连接
+  - 因为epoll内核中实现是根据每个fd上的callback函数来实现的，只有活跃的socket才会主动调用callback，所以在活跃socket较少的情况下，使用epoll没有前面两者的线性下降的性能问题，但是所有socket都很活跃的情况下，可能会有性能问题
+  - epoll通过内核和用户空间共享一块内存来实现的消息传递
 
 ## 基础
 
@@ -669,9 +694,19 @@ public class NewStack<T>{
 
 
 
-# Java框架
+# JavaEE
 
-## Netty4
+## Spring
+
+### 什么是IoC和DI
+
+- IoC（控制反转），控制反转是把传统上由程序代码直接操控的对象的调用权交给IoC容器，通过IoC容器来实现对象组件的依赖注入，依赖检查，自动装配等对象生命周期管理
+- DI（依赖注入）主要是遵循设计模式中依赖倒转原则中的“高层模块不应该依赖底层模块，两个都应该抽象依赖”，依赖注入的方式主要包括，setter方法，interface接口，constructor构造函数，annotation注解
+
+
+![Spring Ioc容器](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/spring-ioc.PNG)
+
+## Netty
 
 ### Netty的特点
 

@@ -60,6 +60,8 @@
 
 [netty学习系列二：NIO Reactor模型 & Netty线程模型](https://www.jianshu.com/p/38b56531565d)
 
+[select、poll、epoll之间的区别](https://www.cnblogs.com/aspirant/p/9166944.html)
+
 [JMM和底层实现原理](https://www.jianshu.com/p/8a58d8335270)
 
 [kafka中文教程](https://www.orchome.com/kafka/index)

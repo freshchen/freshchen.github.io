@@ -4,7 +4,7 @@
 
 - #### 知识点总结（墙裂推荐）
 
-  - [The All-In-One Note](notes/all-in-one.md)
+  - [The All-in-One Note](notes/all-in-one.md)
 
 - #### 问题解决方案
 
