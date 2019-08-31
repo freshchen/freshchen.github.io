@@ -4,15 +4,15 @@
 
 - #### 知识点总结（墙裂推荐）
 
-  - [The All-In-One Note](notes/common/all-in-one.md)
+  - [The All-In-One Note](notes/all-in-one.md)
 
 - #### 问题解决方案
 
-  - [Trouble Shooting](notes/common/troubleshooting.md)
+  - [Trouble Shooting](notes/troubleshooting.md)
 
 - ####  好文和常用链接
 
-  - [Reading & Common Links](notes/common/links.md)
+  - [Reading & Common Links](notes/links.md)
 
 
 
@@ -20,53 +20,54 @@
 
 - #### System
 
-  - [Linux Common Commands](notes/linux-notes.md)
-  - [Redis学习](notes/redis.md)
+  - [Linux Common Commands](blogs/os/linux-notes.md)
+  
+  - [Redis学习](blogs/database/redis.md)
 
-  - [Python远程调用 Openstack 主要服务（keystone,nova,glance,neutron,heat）](notes/python-openstack.md)
+  - [Python远程调用 Openstack 主要服务（keystone,nova,glance,neutron,heat）](blogs/os/openstack/python-openstack.md)
 
-  - [Openstack-cinder服务](notes/openstack-cinder.md)
+  - [Openstack-cinder服务](blogs/os/openstack/openstack-cinder.md)
 
-  - [Openstack的Heat服务api支持HTTPS](notes/openstack-heatapi-https.md)
+  - [Openstack的Heat服务api支持HTTPS](blogs/os/openstack/openstack-heatapi-https.md)
 
-  - [Queens版本Openstack安装记录](notes/openstack-queens-install.md)
+  - [Queens版本Openstack安装记录](blogs/os/openstack/openstack-queens-install.md)
 
-  - [Docker用法总结](notes/docker-cli.md)
+  - [Docker用法总结](blogs/os/docker-cli.md)
 
-  - [Nginx安装-基于腾讯云Centos7](notes/nginx-install.md)
+  - [Nginx安装-基于腾讯云Centos7](blogs/os/nginx-install.md)
 
-  - [自签的SSL证书创建与验证过程](notes/self-ssl-signing.md)
+  - [自签的SSL证书创建与验证过程](blogs/os/self-ssl-signing.md)
 
-  - [自己制作Yum源](notes/yumsource.md)
+  - [自己制作Yum源](blogs/os/yumsource.md)
 
-  - [Apache支持HTTPS](notes/apache-self-ssl.md)
+  - [Apache支持HTTPS](blogs/os/apache-self-ssl.md)
 
 - #### Java
 
-  - [Java调用本地脚本](notes/jcallscript.md)
+  - [Java调用本地脚本](blogs/java/jcallscript.md)
 
-  - [JDK8笔记](notes/jdk8.md)
+  - [JDK8笔记](blogs/java/jdk8.md)
 
-  - [J.U.C 源码初体验](notes/juc.md)
+  - [J.U.C 源码初体验](blogs/java/juc.md)
 
-- #### Python & AI
+- #### Python & ML
 
-  - [Python标准库：CLI(命令行)参数解析工具argparse](notes/argparse.md)
+  - [Python标准库：CLI(命令行)参数解析工具argparse](blogs/python/argparse.md)
 
-  - [Python可视化库（绘制图表）matplotlib](notes/matplotlib.md)
+  - [Python可视化库（绘制图表）matplotlib](blogs/python/matplotlib.md)
 
-  - [K近邻算法实现](notes/knn.md)
+  - [K近邻算法实现](blogs/ml/knn.md)
 
-  - [Tensorflow的安装以及入门案例](notes/tensorflow-start.md)
+  - [Tensorflow的安装以及入门案例](blogs/ml/tensorflow-start.md)
 
-  - [Python可视化高级库seaborn](notes/seaborn.md)
+  - [Python可视化高级库seaborn](blogs/python/seaborn.md)
 
-  - [原始感知机PLA算法实现](notes/pla.md)
+  - [原始感知机PLA算法实现](blogs/ml/pla.md)
 
 - #### Others
 
-  - [markdown语法简介](notes/markdown.md)
+  - [markdown语法简介](blogs/others/markdown.md)
 
-  - [Git常用命令总结](notes/git.md)
+  - [Git常用命令总结](blogs/others/git.md)
 
-  - [Docker我的Hexo构建源码](notes/docker-hexo.md)
+  - [Docker我的Hexo构建源码](blogs/others/docker-hexo.md)
