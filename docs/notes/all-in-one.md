@@ -47,7 +47,7 @@
 
 ### J.U.C总览图
 
-![](../../resource/images/juc.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/juc.png)
 
 ### J.U.C常用工具类
 
@@ -81,7 +81,7 @@
 
 ### 线程池的五种状态
 
-![](../../resource/images/threadpoolstatus.jpg)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/threadpoolstatus.jpg)
 
 ### 如何创建ThreadPoolExecutor线程池
 
@@ -185,7 +185,7 @@
       单线程执行版的newScheduledThreadPool ，保证任务串行执行，保证串行返回
 
 
-![](../../resource/images/threadpool.jpg)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/threadpool.jpg)
 
 ### synchronized关键字
 
@@ -205,7 +205,7 @@
   - 同步方法：通过方法修饰符上的ACC_AYNCHRONIZED实现
 - JVM中锁升级流程
   
-  ![](../../resource/images/synchronized.png)
+  ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/synchronized.png)
 
 ### 如何终止线程
 
@@ -417,7 +417,7 @@ System.out.println(s3 == s4);
 
 ### Java内存模型（JMM）
 
-![](../../resource/images/jmm.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/jmm.png)
 
 ### Happens-Before原则
 

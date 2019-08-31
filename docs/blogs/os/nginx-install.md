@@ -52,4 +52,4 @@ $ make && make install
 
 正常启动了Nginx之后，访问自己服务器的ip，看到如下页面就成功了，至此安装成功
 
-![](../resource/images/nginx-install.png?raw=true)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/nginx-install.png)

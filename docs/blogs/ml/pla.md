@@ -111,4 +111,4 @@ def _init_():
 
 ### 3效果图
 
-![](../resource/images/OldPLA.png?raw=true)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/OldPLA.png)
