@@ -706,6 +706,67 @@ public class NewStack<T>{
 
 ![Spring Ioc容器](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/spring-ioc.PNG)
 
+### Bean的五种作用域
+
+- singleton：单例模式，在整个Spring IoC容器中，使用singleton定义的Bean将只有一个实例
+- prototype：原型模式，每次通过容器的getBean方法获取prototype定义的Bean时，都将产生一个新的Bean实例
+- request：对于每次HTTP请求，使用request定义的Bean都将产生一个新实例，即每次HTTP请求将会产生不同的Bean实例。只有在Web应用中使用Spring时，该作用域才有效
+- session：对于每次HTTP Session，使用session定义的Bean豆浆产生一个新实例。同样只有在Web应用中使用Spring时，该作用域才有效
+- globalsession：每个全局的HTTP Session，使用session定义的Bean都将产生一个新实例。典型情况下，仅在使用portlet context的时候有效。同样只有在Web应用中使用Spring时，该作用域才有效
+
+### Bean的生命周期
+
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/spring-bean-lifecycle.png)
+
+### AOP（面向切面编程）基础
+
+- **通知(Advice)**
+
+  通知定义了在切入点代码执行时间点附近需要做的工作。
+
+  - Spring支持五种类型的通知：
+    - **前置通知[Before advice]**：在连接点前面执行，前置通知不会影响连接点的执行，除非此处抛出异常
+    - **正常返回通知[After returning advice]**：在连接点正常执行完成后执行，如果连接点抛出异常，则不会执行
+    - **异常返回通知[After throwing advice]**：在连接点抛出异常后执行
+    - **返回通知[After (finally) advice]**：在连接点执行完成后执行，不管是正常执行完成，还是抛出异常，都会执行返回通知中的内容
+    - **环绕通知[Around advice]**：环绕通知围绕在连接点前后，比如一个方法调用的前后。这是最强大的通知类型，能在方法调用前后自定义一些操作。环绕通知还需要负责决定是继续处理join point(调用ProceedingJoinPoint的proceed方法)还是中断执行
+
+- **连接点(Joinpoint)**
+
+  程序能够应用通知的一个“时机”，这些“时机”就是连接点，例如方法调用时、异常抛出时、方法返回后等等
+
+- **切入点(Pointcut)**
+
+  通知定义了切面要发生的“故事”，连接点定义了“故事”发生的时机，那么切入点就定义了“故事”发生的地点，例如某个类或方法的名称，Spring中允许我们方便的用正则表达式来指定。
+
+- **切面(Aspect)**
+
+  通知、连接点、切入点共同组成了切面：时间、地点和要发生的“故事”
+
+- **引入(Introduction)**
+
+  引入允许我们向现有的类添加新的方法和属性(Spring提供了一个方法注入的功能）
+
+- **目标(Target)**
+
+  即被通知的对象，如果没有AOP，那么通知的逻辑就要写在目标对象中，有了AOP之后它可以只关注自己要做的事，解耦合
+
+- **代理(proxy)**
+
+  应用通知的对象，详细内容参见设计模式里面的动态代理模式
+
+- **织入(Weaving)**
+
+  把切面应用到目标对象来创建新的代理对象的过程，aop织入的三种方式:
+
+  - 编译时：当一个类文件被编译时进行织入，这需要特殊的编译器才可以做的到，例如AspectJ的织入编译器；
+
+  - 类加载时：使用特殊的ClassLoader在目标类被加载到程序之前增强类的字节代码；
+
+  - 运行时：切面在运行的某个时刻被织入,SpringAOP就是以这种方式织入切面的，Spring默认使用了JDK的动态代理技术，如果没有实现接口则转为使用Cglib
+
+
+
 ## Netty
 
 ### Netty的特点
