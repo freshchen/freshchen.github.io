@@ -1,6 +1,6 @@
 # Python可视化高级库seaborn
 
-图片乱了，仅用作记录
+图片乱了，仅用作用法记录
 
 ```python
 import numpy as np
