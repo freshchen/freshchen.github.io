@@ -16,7 +16,8 @@
 - [数据库](#数据库)
   - [Mysql](#Mysql)
   - [Redis](#Redis)
-- [分布式](#分布式)
+- [架构](#架构)
+  - [分布式](#分布式)
 
 
 
@@ -704,7 +705,7 @@ public class NewStack<T>{
 - DI（依赖注入）主要是遵循设计模式中依赖倒转原则中的“高层模块不应该依赖底层模块，两个都应该抽象依赖”，依赖注入的方式主要包括，setter方法，interface接口，constructor构造函数，annotation注解
 
 
-![Spring Ioc容器](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/spring-ioc.PNG)
+![Spring Ioc容器](https://cdn.jsdelivr.net/gh/freshchen/resource/img/spring-ioc.PNG)
 
 ### Bean的五种作用域
 
@@ -716,7 +717,7 @@ public class NewStack<T>{
 
 ### Bean的生命周期
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/spring-bean-lifecycle.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/spring-bean-lifecycle.png)
 
 ### AOP（面向切面编程）基础
 
@@ -1031,6 +1032,24 @@ ${JAVA_HOME}/bin/keytool -importkeystore -trustcacerts -noprompt -alias <别名>
 
 ## TCP
 
+### 建立连接三次握手
+
+- 第一次握手：建立连接时，客户端发送syn包（seq=x）到服务器，并进入**SYN_SENT**状态，等待服务器确认；SYN：同步序列编号
+- 第二次握手：服务器收到syn包，必须确认客户的SYN（ack=x+1），同时自己也发送一个SYN包（seq=y），即SYN+ACK包，此时服务器进入**SYN_RECV**状态
+- 客户端收到服务器的SYN+ACK包，向服务器发送确认包ACK(ack=y+1），此包发送完毕，客户端和服务器进入**ESTABLISHED**（TCP连接成功）状态，完成三次握手
+
+![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/tcp-3.png)
+
+### 结束连接四次挥手
+
+- 第一次挥手：客户端进程发出连接释放报文，并且停止发送数据。释放数据报文首部，FIN=1，其序列号为seq=u（等于前面已经传送过来的数据的最后一个字节的序号加1），此时，客户端进入FIN-WAIT-1（终止等待1）状态。 TCP规定，FIN报文段即使不携带数据，也要消耗一个序号
+- 第二次挥手：服务器收到连接释放报文，发出确认报文，ACK=1，ack=u+1，并且带上自己的序列号seq=v，此时，服务端就进入了CLOSE-WAIT（关闭等待）状态。TCP服务器通知高层的应用进程，客户端向服务器的方向就释放了，这时候处于半关闭状态，即客户端已经没有数据要发送了，但是服务器若发送数据，客户端依然要接受。这个状态还要持续一段时间，也就是整个CLOSE-WAIT状态持续的时间，客户端收到服务器的确认请求后，此时，客户端就进入FIN-WAIT-2（终止等待2）状态，等待服务器发送连接释放报文（在这之前还需要接受服务器发送的最后的数据）
+- 第三次挥手：服务器将最后的数据发送完毕后，就向客户端发送连接释放报文，FIN=1，ack=u+1，由于在半关闭状态，服务器很可能又发送了一些数据，假定此时的序列号为seq=w，此时，服务器就进入了LAST-ACK（最后确认）状态，等待客户端的确认
+- 第四次挥手：客户端收到服务器的连接释放报文后，必须发出确认，ACK=1，ack=w+1，而自己的序列号是seq=u+1，此时，客户端就进入了TIME-WAIT（时间等待）状态。注意此时TCP连接还没有释放，必须经过2∗∗MSL（最长报文段寿命）的时间后，当客户端撤销相应的TCB后，才进入CLOSED状态，服务器只要收到了客户端发出的确认，立即进入CLOSED状态。同样，撤销TCB后，就结束了这次的TCP连接。可以看到，服务器结束TCP连接的时间要比客户端早一些
+
+![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/tcp-4.png)
+
+
 ### TCP粘包，拆包
 
 粘包拆包问题是处于网络比较底层的问题，在数据链路层、网络层以及传输层都有可能发生。我们日常的网络应用开发大都在传输层进行，由于UDP有消息保护边界，不会发生粘包拆包问题，因此粘包拆包问题只发生在TCP协议中
@@ -1244,7 +1263,9 @@ commit;
 
 
 
-# 分布式
+# 架构
+
+## 分布式
 
 ### 一致性哈希算法
 
