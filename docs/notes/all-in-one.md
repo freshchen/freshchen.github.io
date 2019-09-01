@@ -6,7 +6,7 @@
   - [IO](#IO)
   - [JVM](#JVM)
   - [设计模式](#设计模式)
-- [JavaEE](#Java框架)
+- [JavaEE](#JavaEE)
   - [Spring](#Spring)
   - [Netty](#Netty)
 - [服务器](#服务器)
