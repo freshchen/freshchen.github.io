@@ -41,6 +41,392 @@
 
 
 
+# 系统
+
+## 网络
+
+### 网络模型
+
+- 常说的模型主要有3中，TCP/IP模型是OSI模型的一种商用实现
+
+![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/net-model.jpg)
+
+- 7层模型中主要的协议
+
+![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/osi.png)
+
+
+
+### TCP建立连接三次握手
+
+- 第一次握手：建立连接时，客户端发送syn包（seq=x）到服务器，并进入**SYN_SENT**状态，等待服务器确认；SYN：同步序列编号
+- 第二次握手：服务器收到syn包，必须确认客户的SYN（ack=x+1），同时自己也发送一个SYN包（seq=y），即SYN+ACK包，此时服务器进入**SYN_RECV**状态
+- 客户端收到服务器的SYN+ACK包，向服务器发送确认包ACK(ack=y+1），此包发送完毕，客户端和服务器进入**ESTABLISHED**（TCP连接成功）状态，完成三次握手
+
+![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/tcp-3.png)
+
+### TCP结束连接四次挥手
+
+- 第一次挥手：客户端进程发出连接释放报文，并且停止发送数据。释放数据报文首部，FIN=1，其序列号为seq=u（等于前面已经传送过来的数据的最后一个字节的序号加1），此时，客户端进入FIN-WAIT-1（终止等待1）状态。 TCP规定，FIN报文段即使不携带数据，也要消耗一个序号
+- 第二次挥手：服务器收到连接释放报文，发出确认报文，ACK=1，ack=u+1，并且带上自己的序列号seq=v，此时，服务端就进入了CLOSE-WAIT（关闭等待）状态。TCP服务器通知高层的应用进程，客户端向服务器的方向就释放了，这时候处于半关闭状态，即客户端已经没有数据要发送了，但是服务器若发送数据，客户端依然要接受。这个状态还要持续一段时间，也就是整个CLOSE-WAIT状态持续的时间，客户端收到服务器的确认请求后，此时，客户端就进入FIN-WAIT-2（终止等待2）状态，等待服务器发送连接释放报文（在这之前还需要接受服务器发送的最后的数据）
+- 第三次挥手：服务器将最后的数据发送完毕后，就向客户端发送连接释放报文，FIN=1，ack=u+1，由于在半关闭状态，服务器很可能又发送了一些数据，假定此时的序列号为seq=w，此时，服务器就进入了LAST-ACK（最后确认）状态，等待客户端的确认
+- 第四次挥手：客户端收到服务器的连接释放报文后，必须发出确认，ACK=1，ack=w+1，而自己的序列号是seq=u+1，此时，客户端就进入了TIME-WAIT（时间等待）状态。注意此时TCP连接还没有释放，必须经过2∗∗MSL（最长报文段寿命）的时间后，当客户端撤销相应的TCB后，才进入CLOSED状态，服务器只要收到了客户端发出的确认，立即进入CLOSED状态。同样，撤销TCB后，就结束了这次的TCP连接。可以看到，服务器结束TCP连接的时间要比客户端早一些
+
+![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/tcp-4.png)
+
+### TCP粘包，拆包
+
+粘包拆包问题是处于网络比较底层的问题，在数据链路层、网络层以及传输层都有可能发生。我们日常的网络应用开发大都在传输层进行，由于UDP有消息保护边界，不会发生粘包拆包问题，因此粘包拆包问题只发生在TCP协议中
+
+- 什么是粘包、拆包
+
+  例如客户端给服务端发了两个包，包1和包2，服务端收到了一个包（包1和包2首尾连在一起）就叫做粘包，如果服务端正常收到两个包，但是第一个包是包1的前半部分，第二个包是包1的后半部分加上包2，就叫做发生了粘包和拆包
+
+- 为什么会发生粘包、拆包
+
+  - 应用程序写入的数据大于套接字缓冲区大小，这将会发生拆包
+  - 进行MSS（最大报文长度）大小的TCP分段，当TCP报文长度-TCP头部长度>MSS的时候将发生拆包
+  - 以太网帧的payload（净荷）大于MTU（1500字节）进行ip分片
+  - 接收方法不及时读取套接字缓冲区数据，这将发生粘包
+  - 应用程序写入数据小于套接字缓冲区大小，网卡将应用多次写入的数据发送到网络上，这将会发生粘包
+
+- 粘包、拆包解决办法
+
+  - 发送端给每个数据包添加包首部，首部中应该至少包含数据包的长度，这样接收端在接收到数据后，通过读取包首部的长度字段，便知道每一个数据包的实际长度了
+  - 发送端将每个数据包封装为固定长度（不够的可以通过补0填充），这样接收端每次从接收缓冲区中读取固定长度的数据就自然而然的把每个数据包拆分开来
+  - 可以在数据包之间设置边界，如添加特殊符号，这样，接收端通过这个边界就可以将不同的数据包拆分开
+
+
+
+## IO
+
+### I/O 模型
+
+- **阻塞式 I/O 模型(blocking I/O）**
+  - 描述：在阻塞式 I/O 模型中，应用程序在从调用 recvfrom 开始到它返回有数据报准备好这段时间是阻塞的，recvfrom 返回成功后，应用进程开始处理数据报
+  - 优点：程序简单，在阻塞等待数据期间进程/线程挂起，基本不会占用 CPU 资源
+  - 缺点：每个连接需要独立的进程/线程单独处理，当并发请求量大时为了维护程序，内存、线程切换开销较大，这种模型在实际生产中很少使用
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/bio.jpg)
+- **非阻塞式 I/O 模型(non-blocking I/O）**
+  - 描述：在非阻塞式 I/O 模型中，应用程序把一个套接口设置为非阻塞，就是告诉内核，当所请求的 I/O 操作无法完成时，返回一个错误，应用程序基于 I/O 操作函数将不断的轮询数据是否已经准备好，直到数据准备好为止
+  - 优点：不会阻塞在内核的等待数据过程，每次发起的 I/O 请求可以立即返回，不用阻塞等待，实时性较好
+  - 缺点：轮询将会不断地询问内核，这将占用大量的 CPU 时间，系统资源利用率较低，所以一般 Web 服务器不使用这种 I/O 模型
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/nio.jpg)
+- **I/O 复用模型(I/O multiplexing）**
+  - 描述：在 I/O 复用模型中，会用到 Select 或 Poll 函数或 Epoll 函数(Linux 2.6 以后的内核开始支持)，可以同时阻塞多个 I/O 操作，而且可以同时对多个读或者写操作的 I/O 函数进行检测，直到有数据可读或可写时，才真正调用 I/O 操作函数
+  - 优点：可以基于一个阻塞对象，同时在多个描述符上等待就绪，而不是使用多个线程(每个文件描述符一个线程)，这样可以大大节省系统资源
+  - 缺点：当连接数较少时效率相比多线程+阻塞 I/O 模型效率较低，可能延迟更大，因为单个连接处理需要 2 次系统调用，占用时间会有增加
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/multiplexingio.jpg)
+- **信号驱动式 I/O 模型（signal-driven I/O)**
+  - 描述：在信号驱动式 I/O 模型中，应用程序使用套接口进行信号驱动 I/O，并安装一个信号处理函数，进程继续运行并不阻塞，当数据准备好时，进程会收到一个 SIGIO 信号，可以在信号处理函数中调用 I/O 操作函数处理数据
+  - 优点：线程并没有在等待数据时被阻塞，可以提高资源的利用率
+  - 缺点：信号 I/O 在大量 IO 操作时可能会因为信号队列溢出导致没法通知，信号驱动 I/O 尽管对于处理 UDP 套接字来说有用，即这种信号通知意味着到达一个数据报，或者返回一个异步错误。但是，对于 TCP 而言，信号驱动的 I/O 方式近乎无用，因为导致这种通知的条件为数众多，每一个来进行判别会消耗很大资源，与前几种方式相比优势尽失
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/signal-drivenio.jpg)
+- **异步 I/O 模型（asynchronous I/O）**
+  - 描述：由 POSIX 规范定义，应用程序告知内核启动某个操作，并让内核在整个操作（包括将数据从内核拷贝到应用程序的缓冲区）完成后通知应用程序。这种模型与信号驱动模型的主要区别在于：信号驱动 I/O 是由内核通知应用程序何时启动一个 I/O 操作，而异步 I/O 模型是由内核通知应用程序 I/O 操作何时完成
+  - 优点：异步 I/O 能够充分利用 DMA 特性，让 I/O 操作与计算重叠
+  - 缺点：要实现真正的异步 I/O，操作系统需要做大量的工作
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/aio.jpg)
+
+**总结**
+
+这五种 I/O 模型中，前四种属于同步 I/O，因为其中真正的 I/O 操作(recvfrom)将阻塞进程/线程，只有异步 I/O 模型才与 POSIX 定义的异步 I/O 相匹配
+
+![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/io-model.jpg)
+
+### I/O处理线程模型
+
+- **传统阻塞 I/O 服务模型**
+
+  - 特点：
+    - 采用阻塞式 I/O 模型获取输入数据。
+    - 每个连接都需要独立的线程完成数据输入，业务处理，数据返回的完整操作
+  - 问题：
+    - 当并发数较大时，需要创建大量线程来处理连接，系统资源占用较大。
+    - 连接建立后，如果当前线程暂时没有数据可读，则线程就阻塞在 Read 操作上，造成线程资源浪费
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/thread-oio.jpg)
+
+- **Reactor 模式**
+
+  Reactor是非阻塞同步网络模型，通过一个或多个输入同时传递给服务处理器的服务请求的事件驱动处理模式， 基本设计思想就是I/O 复用模型结合线程池，Reactor 模式也叫 Dispatcher 模式
+
+  ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/thread-reactor-io.jpg)
+
+  - **单 Reactor 单线程**
+    - 描述：Reactor 对象通过 Select 监控客户端请求事件，收到事件后通过 Dispatch 进行分发，如果是建立连接请求事件，则由 Acceptor 通过 Accept 处理连接请求，然后创建一个 Handler 对象处理连接完成后的后续业务处理，如果不是建立连接事件，则 Reactor 会分发调用连接对应的 Handler 来响应，Handler 会完成 Read→业务处理→Send 的完整业务流程
+    - 优点：模型简单，没有多线程、进程通信、竞争的问题，全部都在一个线程中完成
+    - 缺点：性能问题，只有一个线程，无法完全发挥多核 CPU 的性能。Handler 在处理某个连接上的业务时，整个进程无法处理其他连接事件，很容易导致性能瓶颈
+    - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/thread-reactor-io-single.jpg)
+  - **单 Reactor 多线程**
+    - 描述：不同于单 Reactor 单线程的地方是Handler 只负责响应事件，不做具体业务处理，通过 Read 读取数据后，会分发给后面的 Worker 线程池进行业务处理，Worker 线程池会分配独立的线程完成真正的业务处理，Handler 收到响应结果后通过 Send 将响应结果返回给 Client
+    - 优点：可以充分利用多核 CPU 的处理能力
+    - 缺点：多线程数据共享和访问比较复杂；Reactor 承担所有事件的监听和响应，在单线程中运行，高并发场景下容易成为性能瓶颈
+    - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/thread-reactor-io-muti.jpg)
+  - **主从 Reactor 多线程**
+    - 描述：Reactor 主线程 MainReactor 对象通过 Select 监控建立连接事件，收到建立连接事件后通过 Acceptor 接收，Acceptor 处理建立连接事件后，MainReactor 将连接分配 Reactor 子线程给 SubReactor 进行处理，SubReactor 将连接加入连接队列进行监听，并创建一个 Handler 用于处理各种连接事件，当有新的事件发生时，SubReactor 会调用连接对应的 Handler 进行响应，Handler 处理方式同单 Reactor 多线程
+    - 优点：主线程与子线程的数据交互简单职责明确，主线程线程只需要把新连接传给子线程，子线程完成后续的业务处理
+    - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/thread-reactor-io-ha.jpg)****
+
+- **Proactor 模型**
+
+  Proactor 模型是异步网络模型 ，把 I/O 操作改为异步，即交给操作系统来完成就能进一步提升性能
+
+  - 描述：AsyOptProcessor 处理注册请求，并处理 I/O 操作，Proactor Initiator 创建 Proactor 和 Handler 对象，并将 Proactor 和 Handler 都通过 AsyOptProcessor（Asynchronous Operation Processor）注册到内核，AsyOptProcessor 完成 I/O 操作后通知 Proactor，Proactor 根据不同的事件类型回调不同的 Handler 进行业务处理，Handler 完成业务处理
+  - 优点：效率更高，异步 I/O 更加充分发挥 DMA(Direct Memory Access，直接内存存取)的优势
+  - 缺点：编程复杂性难以 Debug，内存使用，缓冲区在读或写操作的时间段内必须保持住，相比 Reactor 模式，在 Socket 已经准备好读或写前，是不要求开辟缓存的
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/thread-proactor-io.jpg)
+
+
+
+
+
+### I/O多路复用技术select、poll、epoll之间的区别
+
+- **select**
+  - 单个进程所能打开的最大连接数有FD_SETSIZE宏定义，其大小是32个整数的大小（在32位的机器上，大小就是32*32，同理64位机器上FD_SETSIZE为32*64）
+  - 每次调用时都会对连接进行线性遍历，所以随着FD的增加会造成遍历速度慢的“线性下降性能问题”
+  - 内核需要将消息传递到用户空间，都需要内核拷贝动作
+- **poll**
+  - poll本质上和select没有区别，但是它没有最大连接数的限制，原因是它是基于链表来存储的，其他性质同select
+- **epoll**
+  - 虽然连接数有上限，但是很大，1G内存的机器上可以打开10万左右的连接，2G内存的机器可以打开20万左右的连接
+  - 因为epoll内核中实现是根据每个fd上的callback函数来实现的，只有活跃的socket才会主动调用callback，所以在活跃socket较少的情况下，使用epoll没有前面两者的线性下降的性能问题，但是所有socket都很活跃的情况下，可能会有性能问题
+  - epoll通过内核和用户空间共享一块内存来实现的消息传递
+
+## Linux
+
+### Linux常用命令
+
+```bash
+# 目录dos2unix转换格式
+find . -type f -exec dos2unix {} \;
+########################      $      ########################
+# 变量要保留其原来的换行符要加双引号，建议所有变量引用都用双引号加大括号圈上
+echo "${var}"
+# 变量长度
+echo "${#var}"
+# 接受所有参数
+$@
+# 查看数组中所有元素
+${list[@]}
+# 查看数组长度
+${#list[@]}
+# 去掉全路径的文件名，只保留目录
+${path%/*}
+########################      =      ########################
+# 定义数组
+list=("1" "2" "3")
+# 定义map
+declare -A map=(["1"]="name" ["2"]="age")
+########################     grep      ########################
+# 删除空白行和注释行
+cat <file> | grep -v ^# | grep .
+cat <file> | grep -Ev '^$|^#'
+########################     grep      ########################
+# 去掉行尾巴空格
+echo ${var} | sed 's/[ \t]*$//g'
+# 去掉单引号
+echo ${var} | sed $'s/\'//g'
+########################      awk       ########################
+# 例如查看状态是UNCONN,Recv-Q是0的端口信息
+ss -ln | awk '($2=="UNCONN" && $3=="0") {print $0}'
+# 统计状态是UNCONN,Recv-Q是0的端口的netid和出现的次数
+ss -ln | awk '($2=="UNCONN" && $3=="0") {netids[$1]++}END{for(i in netids)print i "\t" netids[i]}'
+########################      tr       ########################
+# 大写转小写
+echo ${var} | tr 'A-Z' 'a-z'
+########################      od       ########################
+# 字符串转ASCLL码
+echo "${var}" | tr -d "\n" | od -An -t dC
+########################     process      ########################
+# 查看后台job
+jobs
+# 后台运行
+( cmd ) &
+# 唤醒
+fg %<job_num>
+# 暂停放入后台
+ctrl z
+# 唤醒stop的job
+bg %<job_num>
+# 发送信号，优先15SIGTERM，不行再9SIGKILL
+kill -SIGTERM <PID>
+# 杀用户所有进程
+pkill -SIGTERM -u <user_name>
+# 杀父进程
+pkill -P <PID>
+# 杀终端
+pkill -SIGTERM -u <tty_name>
+# 查看cpu信息
+cat /proc/cpuinfo
+########################     systemctl      ########################
+# 查看服务单元
+systemctl
+systemctl --type service
+systemctl list-units
+# 判断状态
+systemctl <is-active|is-enabled|is-failed|isolate|is-system-running> <unit_name>
+# 看错误信息
+systemctl --failed
+systemctl status <unit_name> -l
+# 看enable disable static的单元
+systemctl list-unit-files
+########################     journalctl      ########################
+# 查看systemd日志
+journalctl
+# 指定级别
+journalctl -p <err|debug|info|warning...>
+# 持续打印
+journalctl -f
+# 指定单元
+journalctl -u
+########################     find      ########################
+# 根据名字找
+find <dir> -name <org>
+# 根据用户找
+find <dir> -user <org>
+# 根据组找
+find <dir> -group <org>
+# 根据权限找
+find <dir> -perm <org>
+# 根据大小找
+find <dir> -size <org>
+# 根据更改找
+find <dir> -mmin <org>
+# 根据类型找
+find <dir> -type <l|b|f>
+########################     timedatectl      #####################
+# 当前时钟时区
+timedatectl
+# 设置
+timedatectl <set-ntp|set-time|set-timezone|set-local-rtc> 
+########################     hostname      ########################
+# 查看hostname信息
+hostnamectl status
+# 本地域名解析位置
+cat /etc/hosts
+cat /etc/resolv.conf
+########################     ip      ########################
+# 检查网络设备
+ip addr show <eno>
+# 查看网络性能
+ip -s link <eno>
+# 跟踪请求路径
+tracepath
+tracepath6
+########################     nmcli      ########################
+# 查看网络连接
+nmcli con show
+# 查看网络设备信息
+nmcli dev show <eno>
+# 修改网络接口
+nmcli con add
+nmcli con mod
+# 激活/取消连接
+nmcli con up "<id>"
+nmcli con down "<id>"
+# 网络配置文件位置
+ls /etc/sysconfig/network-scripts/
+########################      yum        ########################
+yum <repolist|list|search|install|remove|update>
+########################      rpm        ########################
+# 查找rpm包
+rpm -qa | grep <name>
+# 查看rpm信息
+rpm -qi <name>
+# 解压rpm包
+rpm2cpio <rpm> | cpio -id
+########################     user:group      ####################
+# 用户信息
+cat /etc/passwd
+# 组信息
+cat /etc/group
+# 更改用户或组
+chown -R <user> <dir>
+chown -R :<group> <dir>
+chown -R <user>:<group> <dir>
+# 改权限
+chmod -R 750 <file>
+########################     ssh      ########################
+# 显示当前登录信息
+w -f
+# 公钥存放位置
+cat ~/.ssh/known_hosts
+# 私钥位置
+ls /etc/ssh/ssh_host_*
+# 创建私钥公钥对
+ssh-keygen
+# 将公钥复制到远程机器实现互信
+ssh-copy-id <user>@<host>
+########################     fs      ########################
+# 检测文件挂载点
+df -h
+# 检测目录使用空间信息
+du -h <dir>
+# 文件系统挂在
+mount <dir> <dir>
+# 查看目录中所有打开的文件和正在运行的进程
+lsof <dir>
+# 取消挂载
+umount <dir>
+########################     ln      ########################
+# 创建硬连接
+ln <exist_path> <path>
+# 创建软连接
+ln -s <exist_path> <path>
+########################      openssl        ########################
+# 查看证书过期时间
+openssl x509 -noout -enddate -in <crt_path>
+# 获取端口证书过期时间
+echo 'Q' | timeout 5 openssl s_client -connect <host:port> 2>/dev/null | openssl x509 -noout -enddate
+# 自签根证书
+openssl genrsa -aes256 -out <ca私钥位置> 2048
+openssl req -new -key <ca私钥位置> -out <ca签发流程位置> -subj "/C=/ST=/L=/O=/OU=/CN=/emailAddress="
+openssl x509 -req -sha256 -days <过期天数> -in <ca签发流程位置> -out <ca证书位置> -signkey <ca私钥位置> -CAcreateserial
+# 根证书签发子证书
+openssl genrsa -aes256 -out <私钥位置> 2048
+openssl req -new -key <私钥位置> -out <签发流程位置> -subj "/C=/ST=/L=/O=/OU=/CN=/emailAddress=" 
+openssl x509 -req -sha256 -days <过期天数> -in <签发流程位置> -out <证书位置> -signkey <私钥位置> -CAkey <ca私钥> -CA <ca证书位置> -CAcreateserial
+openssl pkcs12 -export -clcerts -in <证书位置> -inkey <私钥位置> -out <p12证书位置> -name <别名>
+########################      keytool        ########################
+# 查看keystore
+${JAVA_HOME}/bin/keytool -v -list -storepass <password> -keystore <keystore_path>
+# 导入trust keystore
+${JAVA_HOME}/bin/keytool -import -trustcacerts -noprompt -alias <别名> -file <证书位置> -keystore <Keystore位置>
+# 导入keystore
+${JAVA_HOME}/bin/keytool -importkeystore -trustcacerts -noprompt -alias <别名> -deststoretype pkcs12 -srcstoretype pkcs12 -srckeystore <p12证书位置> -destkeystore <Keystore位置>
+########################      docker        ########################
+# 删除tag和name为none的坏掉的image
+docker rmi $(docker images -f "dangling=true" -q)
+# 删掉所有容器
+docker stop $(docker ps -qa)
+docker kill $(docker ps -qa)
+docker rm $(docker ps -qa)
+# 删除所有镜像
+docker rmi --force $(docker images -q)
+########################      openssl        ########################
+# 查看证书过期时间
+openssl x509 -noout -enddate -in <crt_path>
+# 获取端口证书过期时间
+echo 'Q' | timeout 5 openssl s_client -connect <host:port> 2>/dev/null | openssl x509 -noout -enddate
+# 自签根证书
+openssl genrsa -aes256 -out <ca私钥位置> 2048
+openssl req -new -key <ca私钥位置> -out <ca签发流程位置> -subj "/C=/ST=/L=/O=/OU=/CN=/emailAddress="
+openssl x509 -req -sha256 -days <过期天数> -in <ca签发流程位置> -out <ca证书位置> -signkey <ca私钥位置> -CAcreateserial
+# 根证书签发子证书
+openssl genrsa -aes256 -out <私钥位置> 2048
+openssl req -new -key <私钥位置> -out <签发流程位置> -subj "/C=/ST=/L=/O=/OU=/CN=/emailAddress=" 
+openssl x509 -req -sha256 -days <过期天数> -in <签发流程位置> -out <证书位置> -signkey <私钥位置> -CAkey <ca私钥> -CA <ca证书位置> -CAcreateserial
+openssl pkcs12 -export -clcerts -in <证书位置> -inkey <私钥位置> -out <p12证书位置> -name <别名>
+########################      keytool        ########################
+# 查看keystore
+${JAVA_HOME}/bin/keytool -v -list -storepass <password> -keystore <keystore_path>
+# 导入trust keystore
+${JAVA_HOME}/bin/keytool -import -trustcacerts -noprompt -alias <别名> -file <证书位置> -keystore <Keystore位置>
+# 导入keystore
+${JAVA_HOME}/bin/keytool -importkeystore -trustcacerts -noprompt -alias <别名> -deststoretype pkcs12 -srcstoretype pkcs12 -srckeystore <p12证书位置> -destkeystore <Keystore位置>
+```
+
 
 
 # Java8
@@ -514,19 +900,6 @@ elementData[elementCount] = null; /* to let gc do its work
   - 基于事件和回调机制
   - 请求立即返回，连接和线程无对应关系
 
-### I/O多路复用技术select、poll、epoll之间的区别
-
-- **select**
-  - 单个进程所能打开的最大连接数有FD_SETSIZE宏定义，其大小是32个整数的大小（在32位的机器上，大小就是32*32，同理64位机器上FD_SETSIZE为32*64）
-  - 每次调用时都会对连接进行线性遍历，所以随着FD的增加会造成遍历速度慢的“线性下降性能问题”
-  - 内核需要将消息传递到用户空间，都需要内核拷贝动作
-- **poll**
-  - poll本质上和select没有区别，但是它没有最大连接数的限制，原因是它是基于链表来存储的，其他性质同select
-- **epoll**
-  - 虽然连接数有上限，但是很大，1G内存的机器上可以打开10万左右的连接，2G内存的机器可以打开20万左右的连接
-  - 因为epoll内核中实现是根据每个fd上的callback函数来实现的，只有活跃的socket才会主动调用callback，所以在活跃socket较少的情况下，使用epoll没有前面两者的线性下降的性能问题，但是所有socket都很活跃的情况下，可能会有性能问题
-  - epoll通过内核和用户空间共享一块内存来实现的消息传递
-
 ## 核心
 
 ### ArrayList & HashMap 扩容
@@ -660,349 +1033,6 @@ public class NewStack<T>{
 - **ChannelpipeLine**由各种Handler组成，主要有**ChannelInboundHandler**（读）和**ChannelOutboundHandler**（写），通过**HandlerContext**管理，各大Handler可以通过**ByteBuf**操作数据
 
 
-
-# 系统
-
-## Linux
-
-### Linux常用命令
-
-```bash
-# 目录dos2unix转换格式
-find . -type f -exec dos2unix {} \;
-########################      $      ########################
-# 变量要保留其原来的换行符要加双引号，建议所有变量引用都用双引号加大括号圈上
-echo "${var}"
-# 变量长度
-echo "${#var}"
-# 接受所有参数
-$@
-# 查看数组中所有元素
-${list[@]}
-# 查看数组长度
-${#list[@]}
-# 去掉全路径的文件名，只保留目录
-${path%/*}
-########################      =      ########################
-# 定义数组
-list=("1" "2" "3")
-# 定义map
-declare -A map=(["1"]="name" ["2"]="age")
-########################     grep      ########################
-# 删除空白行和注释行
-cat <file> | grep -v ^# | grep .
-cat <file> | grep -Ev '^$|^#'
-########################     grep      ########################
-# 去掉行尾巴空格
-echo ${var} | sed 's/[ \t]*$//g'
-# 去掉单引号
-echo ${var} | sed $'s/\'//g'
-########################      awk       ########################
-# 例如查看状态是UNCONN,Recv-Q是0的端口信息
-ss -ln | awk '($2=="UNCONN" && $3=="0") {print $0}'
-# 统计状态是UNCONN,Recv-Q是0的端口的netid和出现的次数
-ss -ln | awk '($2=="UNCONN" && $3=="0") {netids[$1]++}END{for(i in netids)print i "\t" netids[i]}'
-########################      tr       ########################
-# 大写转小写
-echo ${var} | tr 'A-Z' 'a-z'
-########################      od       ########################
-# 字符串转ASCLL码
-echo "${var}" | tr -d "\n" | od -An -t dC
-########################     process      ########################
-# 查看后台job
-jobs
-# 后台运行
-( cmd ) &
-# 唤醒
-fg %<job_num>
-# 暂停放入后台
-ctrl z
-# 唤醒stop的job
-bg %<job_num>
-# 发送信号，优先15SIGTERM，不行再9SIGKILL
-kill -SIGTERM <PID>
-# 杀用户所有进程
-pkill -SIGTERM -u <user_name>
-# 杀父进程
-pkill -P <PID>
-# 杀终端
-pkill -SIGTERM -u <tty_name>
-# 查看cpu信息
-cat /proc/cpuinfo
-########################     systemctl      ########################
-# 查看服务单元
-systemctl
-systemctl --type service
-systemctl list-units
-# 判断状态
-systemctl <is-active|is-enabled|is-failed|isolate|is-system-running> <unit_name>
-# 看错误信息
-systemctl --failed
-systemctl status <unit_name> -l
-# 看enable disable static的单元
-systemctl list-unit-files
-########################     journalctl      ########################
-# 查看systemd日志
-journalctl
-# 指定级别
-journalctl -p <err|debug|info|warning...>
-# 持续打印
-journalctl -f
-# 指定单元
-journalctl -u
-########################     find      ########################
-# 根据名字找
-find <dir> -name <org>
-# 根据用户找
-find <dir> -user <org>
-# 根据组找
-find <dir> -group <org>
-# 根据权限找
-find <dir> -perm <org>
-# 根据大小找
-find <dir> -size <org>
-# 根据更改找
-find <dir> -mmin <org>
-# 根据类型找
-find <dir> -type <l|b|f>
-########################     timedatectl      #####################
-# 当前时钟时区
-timedatectl
-# 设置
-timedatectl <set-ntp|set-time|set-timezone|set-local-rtc> 
-########################     hostname      ########################
-# 查看hostname信息
-hostnamectl status
-# 本地域名解析位置
-cat /etc/hosts
-cat /etc/resolv.conf
-########################     ip      ########################
-# 检查网络设备
-ip addr show <eno>
-# 查看网络性能
-ip -s link <eno>
-# 跟踪请求路径
-tracepath
-tracepath6
-########################     nmcli      ########################
-# 查看网络连接
-nmcli con show
-# 查看网络设备信息
-nmcli dev show <eno>
-# 修改网络接口
-nmcli con add
-nmcli con mod
-# 激活/取消连接
-nmcli con up "<id>"
-nmcli con down "<id>"
-# 网络配置文件位置
-ls /etc/sysconfig/network-scripts/
-########################      yum        ########################
-yum <repolist|list|search|install|remove|update>
-########################      rpm        ########################
-# 查找rpm包
-rpm -qa | grep <name>
-# 查看rpm信息
-rpm -qi <name>
-# 解压rpm包
-rpm2cpio <rpm> | cpio -id
-########################     user:group      ####################
-# 用户信息
-cat /etc/passwd
-# 组信息
-cat /etc/group
-# 更改用户或组
-chown -R <user> <dir>
-chown -R :<group> <dir>
-chown -R <user>:<group> <dir>
-# 改权限
-chmod -R 750 <file>
-########################     ssh      ########################
-# 显示当前登录信息
-w -f
-# 公钥存放位置
-cat ~/.ssh/known_hosts
-# 私钥位置
-ls /etc/ssh/ssh_host_*
-# 创建私钥公钥对
-ssh-keygen
-# 将公钥复制到远程机器实现互信
-ssh-copy-id <user>@<host>
-########################     fs      ########################
-# 检测文件挂载点
-df -h
-# 检测目录使用空间信息
-du -h <dir>
-# 文件系统挂在
-mount <dir> <dir>
-# 查看目录中所有打开的文件和正在运行的进程
-lsof <dir>
-# 取消挂载
-umount <dir>
-########################     ln      ########################
-# 创建硬连接
-ln <exist_path> <path>
-# 创建软连接
-ln -s <exist_path> <path>
-########################      openssl        ########################
-# 查看证书过期时间
-openssl x509 -noout -enddate -in <crt_path>
-# 获取端口证书过期时间
-echo 'Q' | timeout 5 openssl s_client -connect <host:port> 2>/dev/null | openssl x509 -noout -enddate
-# 自签根证书
-openssl genrsa -aes256 -out <ca私钥位置> 2048
-openssl req -new -key <ca私钥位置> -out <ca签发流程位置> -subj "/C=/ST=/L=/O=/OU=/CN=/emailAddress="
-openssl x509 -req -sha256 -days <过期天数> -in <ca签发流程位置> -out <ca证书位置> -signkey <ca私钥位置> -CAcreateserial
-# 根证书签发子证书
-openssl genrsa -aes256 -out <私钥位置> 2048
-openssl req -new -key <私钥位置> -out <签发流程位置> -subj "/C=/ST=/L=/O=/OU=/CN=/emailAddress=" 
-openssl x509 -req -sha256 -days <过期天数> -in <签发流程位置> -out <证书位置> -signkey <私钥位置> -CAkey <ca私钥> -CA <ca证书位置> -CAcreateserial
-openssl pkcs12 -export -clcerts -in <证书位置> -inkey <私钥位置> -out <p12证书位置> -name <别名>
-########################      keytool        ########################
-# 查看keystore
-${JAVA_HOME}/bin/keytool -v -list -storepass <password> -keystore <keystore_path>
-# 导入trust keystore
-${JAVA_HOME}/bin/keytool -import -trustcacerts -noprompt -alias <别名> -file <证书位置> -keystore <Keystore位置>
-# 导入keystore
-${JAVA_HOME}/bin/keytool -importkeystore -trustcacerts -noprompt -alias <别名> -deststoretype pkcs12 -srcstoretype pkcs12 -srckeystore <p12证书位置> -destkeystore <Keystore位置>
-########################      docker        ########################
-# 删除tag和name为none的坏掉的image
-docker rmi $(docker images -f "dangling=true" -q)
-# 删掉所有容器
-docker stop $(docker ps -qa)
-docker kill $(docker ps -qa)
-docker rm $(docker ps -qa)
-# 删除所有镜像
-docker rmi --force $(docker images -q)
-########################      openssl        ########################
-# 查看证书过期时间
-openssl x509 -noout -enddate -in <crt_path>
-# 获取端口证书过期时间
-echo 'Q' | timeout 5 openssl s_client -connect <host:port> 2>/dev/null | openssl x509 -noout -enddate
-# 自签根证书
-openssl genrsa -aes256 -out <ca私钥位置> 2048
-openssl req -new -key <ca私钥位置> -out <ca签发流程位置> -subj "/C=/ST=/L=/O=/OU=/CN=/emailAddress="
-openssl x509 -req -sha256 -days <过期天数> -in <ca签发流程位置> -out <ca证书位置> -signkey <ca私钥位置> -CAcreateserial
-# 根证书签发子证书
-openssl genrsa -aes256 -out <私钥位置> 2048
-openssl req -new -key <私钥位置> -out <签发流程位置> -subj "/C=/ST=/L=/O=/OU=/CN=/emailAddress=" 
-openssl x509 -req -sha256 -days <过期天数> -in <签发流程位置> -out <证书位置> -signkey <私钥位置> -CAkey <ca私钥> -CA <ca证书位置> -CAcreateserial
-openssl pkcs12 -export -clcerts -in <证书位置> -inkey <私钥位置> -out <p12证书位置> -name <别名>
-########################      keytool        ########################
-# 查看keystore
-${JAVA_HOME}/bin/keytool -v -list -storepass <password> -keystore <keystore_path>
-# 导入trust keystore
-${JAVA_HOME}/bin/keytool -import -trustcacerts -noprompt -alias <别名> -file <证书位置> -keystore <Keystore位置>
-# 导入keystore
-${JAVA_HOME}/bin/keytool -importkeystore -trustcacerts -noprompt -alias <别名> -deststoretype pkcs12 -srcstoretype pkcs12 -srckeystore <p12证书位置> -destkeystore <Keystore位置>
-```
-
-
-
-## 网络
-
-### 网络模型
-
-- 常说的模型主要有3中，TCP/IP模型是OSI模型的一种商用实现
-
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/net-model.jpg)
-
-- 7层模型中主要的协议
-
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/osi.png)
-
-
-
-### TCP建立连接三次握手
-
-- 第一次握手：建立连接时，客户端发送syn包（seq=x）到服务器，并进入**SYN_SENT**状态，等待服务器确认；SYN：同步序列编号
-- 第二次握手：服务器收到syn包，必须确认客户的SYN（ack=x+1），同时自己也发送一个SYN包（seq=y），即SYN+ACK包，此时服务器进入**SYN_RECV**状态
-- 客户端收到服务器的SYN+ACK包，向服务器发送确认包ACK(ack=y+1），此包发送完毕，客户端和服务器进入**ESTABLISHED**（TCP连接成功）状态，完成三次握手
-
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/tcp-3.png)
-
-### TCP结束连接四次挥手
-
-- 第一次挥手：客户端进程发出连接释放报文，并且停止发送数据。释放数据报文首部，FIN=1，其序列号为seq=u（等于前面已经传送过来的数据的最后一个字节的序号加1），此时，客户端进入FIN-WAIT-1（终止等待1）状态。 TCP规定，FIN报文段即使不携带数据，也要消耗一个序号
-- 第二次挥手：服务器收到连接释放报文，发出确认报文，ACK=1，ack=u+1，并且带上自己的序列号seq=v，此时，服务端就进入了CLOSE-WAIT（关闭等待）状态。TCP服务器通知高层的应用进程，客户端向服务器的方向就释放了，这时候处于半关闭状态，即客户端已经没有数据要发送了，但是服务器若发送数据，客户端依然要接受。这个状态还要持续一段时间，也就是整个CLOSE-WAIT状态持续的时间，客户端收到服务器的确认请求后，此时，客户端就进入FIN-WAIT-2（终止等待2）状态，等待服务器发送连接释放报文（在这之前还需要接受服务器发送的最后的数据）
-- 第三次挥手：服务器将最后的数据发送完毕后，就向客户端发送连接释放报文，FIN=1，ack=u+1，由于在半关闭状态，服务器很可能又发送了一些数据，假定此时的序列号为seq=w，此时，服务器就进入了LAST-ACK（最后确认）状态，等待客户端的确认
-- 第四次挥手：客户端收到服务器的连接释放报文后，必须发出确认，ACK=1，ack=w+1，而自己的序列号是seq=u+1，此时，客户端就进入了TIME-WAIT（时间等待）状态。注意此时TCP连接还没有释放，必须经过2∗∗MSL（最长报文段寿命）的时间后，当客户端撤销相应的TCB后，才进入CLOSED状态，服务器只要收到了客户端发出的确认，立即进入CLOSED状态。同样，撤销TCB后，就结束了这次的TCP连接。可以看到，服务器结束TCP连接的时间要比客户端早一些
-
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/tcp-4.png)
-
-
-### TCP粘包，拆包
-
-粘包拆包问题是处于网络比较底层的问题，在数据链路层、网络层以及传输层都有可能发生。我们日常的网络应用开发大都在传输层进行，由于UDP有消息保护边界，不会发生粘包拆包问题，因此粘包拆包问题只发生在TCP协议中
-
-- 什么是粘包、拆包
-
-  例如客户端给服务端发了两个包，包1和包2，服务端收到了一个包（包1和包2首尾连在一起）就叫做粘包，如果服务端正常收到两个包，但是第一个包是包1的前半部分，第二个包是包1的后半部分加上包2，就叫做发生了粘包和拆包
-
-- 为什么会发生粘包、拆包
-
-  - 应用程序写入的数据大于套接字缓冲区大小，这将会发生拆包
-  - 进行MSS（最大报文长度）大小的TCP分段，当TCP报文长度-TCP头部长度>MSS的时候将发生拆包
-  - 以太网帧的payload（净荷）大于MTU（1500字节）进行ip分片
-  - 接收方法不及时读取套接字缓冲区数据，这将发生粘包
-  - 应用程序写入数据小于套接字缓冲区大小，网卡将应用多次写入的数据发送到网络上，这将会发生粘包
-
-- 粘包、拆包解决办法
-
-  - 发送端给每个数据包添加包首部，首部中应该至少包含数据包的长度，这样接收端在接收到数据后，通过读取包首部的长度字段，便知道每一个数据包的实际长度了
-  - 发送端将每个数据包封装为固定长度（不够的可以通过补0填充），这样接收端每次从接收缓冲区中读取固定长度的数据就自然而然的把每个数据包拆分开来
-  - 可以在数据包之间设置边界，如添加特殊符号，这样，接收端通过这个边界就可以将不同的数据包拆分开
-
-
-
-## IO
-
-###  I/O 模型
-
-- **阻塞式 I/O 模型(blocking I/O）**
-  - 在阻塞式 I/O 模型中，应用程序在从调用 recvfrom 开始到它返回有数据报准备好这段时间是阻塞的，recvfrom 返回成功后，应用进程开始处理数据报
-  - 优点：程序简单，在阻塞等待数据期间进程/线程挂起，基本不会占用 CPU 资源
-  - 缺点：每个连接需要独立的进程/线程单独处理，当并发请求量大时为了维护程序，内存、线程切换开销较大，这种模型在实际生产中很少使用
-  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/bio.jpg)
-- **非阻塞式 I/O 模型(non-blocking I/O）**
-  - 在非阻塞式 I/O 模型中，应用程序把一个套接口设置为非阻塞，就是告诉内核，当所请求的 I/O 操作无法完成时，返回一个错误，应用程序基于 I/O 操作函数将不断的轮询数据是否已经准备好，直到数据准备好为止
-  - 优点：不会阻塞在内核的等待数据过程，每次发起的 I/O 请求可以立即返回，不用阻塞等待，实时性较好
-  - 缺点：轮询将会不断地询问内核，这将占用大量的 CPU 时间，系统资源利用率较低，所以一般 Web 服务器不使用这种 I/O 模型
-  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/nio.jpg)
-- **I/O 复用模型(I/O multiplexing）**
-  - 在 I/O 复用模型中，会用到 Select 或 Poll 函数或 Epoll 函数(Linux 2.6 以后的内核开始支持)，可以同时阻塞多个 I/O 操作，而且可以同时对多个读或者写操作的 I/O 函数进行检测，直到有数据可读或可写时，才真正调用 I/O 操作函数
-  - 优点：可以基于一个阻塞对象，同时在多个描述符上等待就绪，而不是使用多个线程(每个文件描述符一个线程)，这样可以大大节省系统资源
-  - 缺点：当连接数较少时效率相比多线程+阻塞 I/O 模型效率较低，可能延迟更大，因为单个连接处理需要 2 次系统调用，占用时间会有增加
-  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/multiplexingio.jpg)
-- **信号驱动式 I/O 模型（signal-driven I/O)**
-  - 在信号驱动式 I/O 模型中，应用程序使用套接口进行信号驱动 I/O，并安装一个信号处理函数，进程继续运行并不阻塞，当数据准备好时，进程会收到一个 SIGIO 信号，可以在信号处理函数中调用 I/O 操作函数处理数据
-  - 优点：线程并没有在等待数据时被阻塞，可以提高资源的利用率
-  - 缺点：信号 I/O 在大量 IO 操作时可能会因为信号队列溢出导致没法通知，信号驱动 I/O 尽管对于处理 UDP 套接字来说有用，即这种信号通知意味着到达一个数据报，或者返回一个异步错误。但是，对于 TCP 而言，信号驱动的 I/O 方式近乎无用，因为导致这种通知的条件为数众多，每一个来进行判别会消耗很大资源，与前几种方式相比优势尽失
-  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/signal-drivenio.jpg)
-- **异步 I/O 模型（asynchronous I/O）**
-  - 由 POSIX 规范定义，应用程序告知内核启动某个操作，并让内核在整个操作（包括将数据从内核拷贝到应用程序的缓冲区）完成后通知应用程序。这种模型与信号驱动模型的主要区别在于：信号驱动 I/O 是由内核通知应用程序何时启动一个 I/O 操作，而异步 I/O 模型是由内核通知应用程序 I/O 操作何时完成
-  - 优点：异步 I/O 能够充分利用 DMA 特性，让 I/O 操作与计算重叠
-  - 缺点：要实现真正的异步 I/O，操作系统需要做大量的工作
-  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/aio.jpg)
-
-**总结**
-
-这五种 I/O 模型中，前四种属于同步 I/O，因为其中真正的 I/O 操作(recvfrom)将阻塞进程/线程，只有异步 I/O 模型才与 POSIX 定义的异步 I/O 相匹配
-
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/io-model.jpg)
-
-### I/O处理线程模型
-
-- **传统阻塞 I/O 服务模型**
-  - 特点：
-    - 采用阻塞式 I/O 模型获取输入数据。
-    - 每个连接都需要独立的线程完成数据输入，业务处理，数据返回的完整操作
-  - 问题：
-    - 当并发数较大时，需要创建大量线程来处理连接，系统资源占用较大。
-    - 连接建立后，如果当前线程暂时没有数据可读，则线程就阻塞在 Read 操作上，造成线程资源浪费
-  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/thread-oio.jpg)
-- **Reactor 模式**
-- 
 
 # 数据库
 
