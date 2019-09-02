@@ -1030,6 +1030,20 @@ ${JAVA_HOME}/bin/keytool -importkeystore -trustcacerts -noprompt -alias <别名>
 
 # 网络
 
+## 基础
+
+### 网络模型
+
+- 常说的模型主要有3中，TCP/IP模型是OSI模型的一种商用实现
+
+![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/net-model.jpg)
+
+- 7层模型中主要的协议
+
+![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/osi.png)
+
+
+
 ## TCP
 
 ### 建立连接三次握手
