@@ -198,9 +198,11 @@
 ### Linux常用命令
 
 ```bash
+########################      文本操作      ########################
+# 升序排列
+ls -lrt
 # 目录dos2unix转换格式
 find . -type f -exec dos2unix {} \;
-########################      $      ########################
 # 变量要保留其原来的换行符要加双引号，建议所有变量引用都用双引号加大括号圈上
 echo "${var}"
 # 变量长度
@@ -213,32 +215,44 @@ ${list[@]}
 ${#list[@]}
 # 去掉全路径的文件名，只保留目录
 ${path%/*}
-########################      =      ########################
 # 定义数组
 list=("1" "2" "3")
 # 定义map
 declare -A map=(["1"]="name" ["2"]="age")
-########################     grep      ########################
 # 删除空白行和注释行
 cat <file> | grep -v ^# | grep .
 cat <file> | grep -Ev '^$|^#'
-########################     grep      ########################
 # 去掉行尾巴空格
 echo ${var} | sed 's/[ \t]*$//g'
 # 去掉单引号
 echo ${var} | sed $'s/\'//g'
-########################      awk       ########################
 # 例如查看状态是UNCONN,Recv-Q是0的端口信息
 ss -ln | awk '($2=="UNCONN" && $3=="0") {print $0}'
 # 统计状态是UNCONN,Recv-Q是0的端口的netid和出现的次数
 ss -ln | awk '($2=="UNCONN" && $3=="0") {netids[$1]++}END{for(i in netids)print i "\t" netids[i]}'
-########################      tr       ########################
 # 大写转小写
 echo ${var} | tr 'A-Z' 'a-z'
-########################      od       ########################
 # 字符串转ASCLL码
 echo "${var}" | tr -d "\n" | od -An -t dC
-########################     process      ########################
+# 根据名字找
+find <dir> -name <org>
+# 根据用户找
+find <dir> -user <org>
+# 根据组找
+find <dir> -group <org>
+# 根据权限找
+find <dir> -perm <org>
+# 根据大小找
+find <dir> -size <org>
+# 根据更改找
+find <dir> -mmin <org>
+# 根据类型找
+find <dir> -type <l|b|f>
+########################     系统命令      ########################
+# 查看cpu
+lscpu
+# 查看pci
+lspci
 # 查看后台job
 jobs
 # 后台运行
@@ -259,7 +273,6 @@ pkill -P <PID>
 pkill -SIGTERM -u <tty_name>
 # 查看cpu信息
 cat /proc/cpuinfo
-########################     systemctl      ########################
 # 查看服务单元
 systemctl
 systemctl --type service
@@ -271,7 +284,6 @@ systemctl --failed
 systemctl status <unit_name> -l
 # 看enable disable static的单元
 systemctl list-unit-files
-########################     journalctl      ########################
 # 查看systemd日志
 journalctl
 # 指定级别
@@ -280,33 +292,15 @@ journalctl -p <err|debug|info|warning...>
 journalctl -f
 # 指定单元
 journalctl -u
-########################     find      ########################
-# 根据名字找
-find <dir> -name <org>
-# 根据用户找
-find <dir> -user <org>
-# 根据组找
-find <dir> -group <org>
-# 根据权限找
-find <dir> -perm <org>
-# 根据大小找
-find <dir> -size <org>
-# 根据更改找
-find <dir> -mmin <org>
-# 根据类型找
-find <dir> -type <l|b|f>
-########################     timedatectl      #####################
 # 当前时钟时区
 timedatectl
 # 设置
 timedatectl <set-ntp|set-time|set-timezone|set-local-rtc> 
-########################     hostname      ########################
 # 查看hostname信息
 hostnamectl status
 # 本地域名解析位置
 cat /etc/hosts
 cat /etc/resolv.conf
-########################     ip      ########################
 # 检查网络设备
 ip addr show <eno>
 # 查看网络性能
@@ -314,7 +308,6 @@ ip -s link <eno>
 # 跟踪请求路径
 tracepath
 tracepath6
-########################     nmcli      ########################
 # 查看网络连接
 nmcli con show
 # 查看网络设备信息
@@ -327,16 +320,14 @@ nmcli con up "<id>"
 nmcli con down "<id>"
 # 网络配置文件位置
 ls /etc/sysconfig/network-scripts/
-########################      yum        ########################
+
 yum <repolist|list|search|install|remove|update>
-########################      rpm        ########################
 # 查找rpm包
 rpm -qa | grep <name>
 # 查看rpm信息
 rpm -qi <name>
 # 解压rpm包
 rpm2cpio <rpm> | cpio -id
-########################     user:group      ####################
 # 用户信息
 cat /etc/passwd
 # 组信息
@@ -347,7 +338,6 @@ chown -R :<group> <dir>
 chown -R <user>:<group> <dir>
 # 改权限
 chmod -R 750 <file>
-########################     ssh      ########################
 # 显示当前登录信息
 w -f
 # 公钥存放位置
@@ -358,7 +348,6 @@ ls /etc/ssh/ssh_host_*
 ssh-keygen
 # 将公钥复制到远程机器实现互信
 ssh-copy-id <user>@<host>
-########################     fs      ########################
 # 检测文件挂载点
 df -h
 # 检测目录使用空间信息
@@ -369,12 +358,11 @@ mount <dir> <dir>
 lsof <dir>
 # 取消挂载
 umount <dir>
-########################     ln      ########################
 # 创建硬连接
 ln <exist_path> <path>
 # 创建软连接
 ln -s <exist_path> <path>
-########################      openssl        ########################
+########################      其他软件        ########################
 # 查看证书过期时间
 openssl x509 -noout -enddate -in <crt_path>
 # 获取端口证书过期时间
@@ -388,14 +376,14 @@ openssl genrsa -aes256 -out <私钥位置> 2048
 openssl req -new -key <私钥位置> -out <签发流程位置> -subj "/C=/ST=/L=/O=/OU=/CN=/emailAddress=" 
 openssl x509 -req -sha256 -days <过期天数> -in <签发流程位置> -out <证书位置> -signkey <私钥位置> -CAkey <ca私钥> -CA <ca证书位置> -CAcreateserial
 openssl pkcs12 -export -clcerts -in <证书位置> -inkey <私钥位置> -out <p12证书位置> -name <别名>
-########################      keytool        ########################
+
 # 查看keystore
 ${JAVA_HOME}/bin/keytool -v -list -storepass <password> -keystore <keystore_path>
 # 导入trust keystore
 ${JAVA_HOME}/bin/keytool -import -trustcacerts -noprompt -alias <别名> -file <证书位置> -keystore <Keystore位置>
 # 导入keystore
 ${JAVA_HOME}/bin/keytool -importkeystore -trustcacerts -noprompt -alias <别名> -deststoretype pkcs12 -srcstoretype pkcs12 -srckeystore <p12证书位置> -destkeystore <Keystore位置>
-########################      docker        ########################
+
 # 删除tag和name为none的坏掉的image
 docker rmi $(docker images -f "dangling=true" -q)
 # 删掉所有容器
@@ -404,27 +392,6 @@ docker kill $(docker ps -qa)
 docker rm $(docker ps -qa)
 # 删除所有镜像
 docker rmi --force $(docker images -q)
-########################      openssl        ########################
-# 查看证书过期时间
-openssl x509 -noout -enddate -in <crt_path>
-# 获取端口证书过期时间
-echo 'Q' | timeout 5 openssl s_client -connect <host:port> 2>/dev/null | openssl x509 -noout -enddate
-# 自签根证书
-openssl genrsa -aes256 -out <ca私钥位置> 2048
-openssl req -new -key <ca私钥位置> -out <ca签发流程位置> -subj "/C=/ST=/L=/O=/OU=/CN=/emailAddress="
-openssl x509 -req -sha256 -days <过期天数> -in <ca签发流程位置> -out <ca证书位置> -signkey <ca私钥位置> -CAcreateserial
-# 根证书签发子证书
-openssl genrsa -aes256 -out <私钥位置> 2048
-openssl req -new -key <私钥位置> -out <签发流程位置> -subj "/C=/ST=/L=/O=/OU=/CN=/emailAddress=" 
-openssl x509 -req -sha256 -days <过期天数> -in <签发流程位置> -out <证书位置> -signkey <私钥位置> -CAkey <ca私钥> -CA <ca证书位置> -CAcreateserial
-openssl pkcs12 -export -clcerts -in <证书位置> -inkey <私钥位置> -out <p12证书位置> -name <别名>
-########################      keytool        ########################
-# 查看keystore
-${JAVA_HOME}/bin/keytool -v -list -storepass <password> -keystore <keystore_path>
-# 导入trust keystore
-${JAVA_HOME}/bin/keytool -import -trustcacerts -noprompt -alias <别名> -file <证书位置> -keystore <Keystore位置>
-# 导入keystore
-${JAVA_HOME}/bin/keytool -importkeystore -trustcacerts -noprompt -alias <别名> -deststoretype pkcs12 -srcstoretype pkcs12 -srckeystore <p12证书位置> -destkeystore <Keystore位置>
 ```
 
 
@@ -951,6 +918,22 @@ public class NewStack<T>{
 
 ![Spring Ioc容器](https://cdn.jsdelivr.net/gh/freshchen/resource/img/spring-ioc.PNG)
 
+### BeanFactory和ApplicationContext
+
+BeanFactory和ApplicationContext是Spring的两大核心接口，都可以当做Spring的容器，ApplicationContext是BeanFactory的子接口
+
+- **BeanFactory**
+  - 是Spring里面最底层的接口，包含了各种Bean的定义，读取bean配置文档，管理bean的加载、实例化，控制bean的生命周期，维护bean之间的依赖关系
+  - BeanFactroy采用的是延迟加载形式来注入Bean的，即只有在使用到某个Bean时(调用getBean())，才对该Bean进行加载实例化
+- **ApplicationContext**
+  - ApplicationContext接口作为BeanFactory的派生，除了提供BeanFactory所具有的功能外，还提供了更完整的框架功能
+    - 继承MessageSource，因此支持国际化。
+    - 统一的资源文件访问方式。
+    - 提供在监听器中注册bean的事件。
+    - 同时加载多个配置文件。
+    - 载入多个（有继承关系）上下文 ，使得每一个上下文都专注于一个特定的层次，比如应用的web层。
+  - 在容器启动时，一次性创建了所有的Bean
+
 ### Bean的五种作用域
 
 - singleton：单例模式，在整个Spring IoC容器中，使用singleton定义的Bean将只有一个实例
@@ -1009,6 +992,30 @@ public class NewStack<T>{
   - 类加载时：使用特殊的ClassLoader在目标类被加载到程序之前增强类的字节代码；
 
   - 运行时：切面在运行的某个时刻被织入,SpringAOP就是以这种方式织入切面的，Spring默认使用了JDK的动态代理技术，如果没有实现接口则转为使用Cglib
+
+### Spring事务
+
+Spring事务的本质其实就是数据库对事务的支持，没有数据库的事务支持，spring是无法提供事务功能的。真正的数据库层的事务提交和回滚是通过binlog或者redo log实现的
+
+- **Spring事务的种类**
+  - 编程式事务管理使用TransactionTemplate
+  - 声明式事务管理建立在AOP之上的。其本质是通过AOP功能，对方法前后进行拦截，将事务处理的功能编织到拦截的方法中，也就是在目标方法开始之前加入一个事务，在执行完目标方法之后根据执行情况提交或者回滚事务
+- **spring的事务传播行为**
+  - PROPAGATION_REQUIRED：如果当前没有事务，就创建一个新事务，如果当前存在事务，就加入该事务，该设置是最常用的设置
+  - PROPAGATION_SUPPORTS：支持当前事务，如果当前存在事务，就加入该事务，如果当前不存在事务，就以非事务执行
+  - PROPAGATION_MANDATORY：支持当前事务，如果当前存在事务，就加入该事务，如果当前不存在事务，就抛出异常
+  - PROPAGATION_REQUIRES_NEW：创建新事务，无论当前存不存在事务，都创建新事务
+  - PROPAGATION_NOT_SUPPORTED：以非事务方式执行操作，如果当前存在事务，就把当前事务挂起
+  - PROPAGATION_NEVER：以非事务方式执行，如果当前存在事务，则抛出异常
+  - PROPAGATION_NESTED：如果当前存在事务，则在嵌套事务内执行。如果当前没有事务，则按REQUIRED属性执行
+- **Spring中的隔离级别**
+  - ISOLATION_DEFAULT：这是个 PlatfromTransactionManager 默认的隔离级别，使用数据库默认的事务隔离级别
+  - ISOLATION_READ_UNCOMMITTED：读未提交，允许另外一个事务可以看到这个事务未提交的数据
+  - ISOLATION_READ_COMMITTED：读已提交，保证一个事务修改的数据提交后才能被另一事务读取，而且能看到该事务对已有记录的更新
+  -  ISOLATION_REPEATABLE_READ：可重复读，保证一个事务修改的数据提交后才能被另一事务读取，但是不能看到该事务对已有记录的更新
+  - ISOLATION_SERIALIZABLE：一个事务在执行的过程中完全看不到其他事务对数据库所做的更新
+
+
 
 
 
