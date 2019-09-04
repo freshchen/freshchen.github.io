@@ -9,7 +9,7 @@ Nginx是一款自由的、开源的、高性能的HTTP服务器和反向代理�
 
 ### 2Nginx安装
 
-[安装Nginx参考](http://www.runoob.com/linux/nginx-install-setup.html)
+[安装Nginx参考](./self-ssl-signing.md)
 
 安装过程没遇到什么问题 一切顺利！
 

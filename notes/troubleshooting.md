@@ -25,6 +25,25 @@ git reset --mixed  <上一个commit的id>
 把线上的还原
 git push origin origin --force
 
+### Openstack安装cinder服务没有磁盘设备
+
+由于装机时把所有空间放在了一块物理盘上，没有预设到cinder服务基于LVM后端时，需要基于物理盘pvcreate 创建物理机，所以只能通过环设备创建一块假的物理盘，脚本如下：
+
+```bash
+#!/usr/bin/env bash
+mkdir /vol
+touch /vol/cinder-volumes
+# seek=100代表创建100G模拟磁盘
+dd if=/dev/zero of=/vol/cinder-volumes bs=1G count=0 seek=100
+loopdev=$(losetup -f)
+losetup $loopdev /vol/cinder-volumes
+pvcreate $loopdev
+vgcreate cinder-volumes $loopdev
+pvdisplay
+```
+
+
+
 ### Openstack主机ssh虚拟机
 
 通常我们在使用Openstack搭建私有云时会使用provider网络，内网的虚拟机将指定网络通过Openstack提供的路由可以和主机相连，但是主机却ping不通相关网络。为了解决这一问题我们需要在主机上也添加一个路由。
@@ -78,6 +97,41 @@ mysql> set global validate_password_policy=0;
 mysql> set password for 'root'@'localhost' = password('123456');
 mysql> GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '123456' WITH GRANT OPTION;
 mysql> flush privileges;
+```
+
+### Openstack安装keystone失败
+
+```bash
+[root@controller ~]# openstack token issue
+An unexpected error prevented the server from fulfilling your request. (HTTP 500) (Request-ID: req-9b2cf24c-b63b-4f66-a069-abba4e3cb766)
+```
+
+```bash
+vi /var/log/keystone/keystone.log 
+
+2019-04-24 16:32:59.961 23037 ERROR keystone OperationalError: (pymysql.err.OperationalError) (1045, u"Access denied for user 'keystone'@'controller' (using password: YES)") (Background on this error at: http://sqlalche.me/e/e3q8)
+```
+
+发现是数据库认证问题，可是明明给keystone用户开权限了啊。
+
+##### 解决方案
+
+经过多次测试，如果在mysql安全初始化时，不移除匿名用户、删除test数据库，就会出现以上授权问题
+
+```bash
+# mysql_secure_installation<<EOF
+n
+Y
+Y
+Y
+Y
+EOF
+```
+
+然后继续执行,查看keystone数据库中有没有表生成
+
+```bash
+su -s /bin/sh -c "keystone-manage db_sync" keystone
 ```
 
 
