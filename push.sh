@@ -21,7 +21,9 @@ pre_check() {
 
 post_push() {
     echo 'Start to push.'
-    git add ./docs/ || exit 1
+    git add ./blogs/ || exit 1
+    git add ./notes/ || exit 1
+    git add ./push.sh || exit 1
     git commit -m "${COMMENT}" || exit 1
     git push origin master || exit 1
     echo 'Push successfully.'
