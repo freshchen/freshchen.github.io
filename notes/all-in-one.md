@@ -614,7 +614,7 @@ docker rmi --force $(docker images -q)
   - GC时会被回收
   - 适用于偶尔使用且不希望影响垃圾收集的对象
 - 虚引用
-  - 不会觉得对象生命周期
+  - 不会决定对象生命周期
   - 任何时候会被回收
   - 用于跟踪GC活动，起哨兵作用
   - 必须与引用队列ReferenceQueue联合使用
@@ -718,40 +718,31 @@ docker rmi --force $(docker images -q)
 
 - 作用
   - 直接使用双引号声明出来的`String`对象会直接存储在常量池中。
-  - 如果不是用双引号声明的`String`对象，可以使用`String`提供的`intern`方法。intern 方法会从字符串常量池中查询当前字符串是否存在，若不存在就会将当前字符串放入常量池中的StringTable，StringTable默认大小1009，可以通过参数修改 -XX:StringTableSize=111111
+  - 如果不是用双引号声明的`String`对象，可以使用`String`提供的`intern`方法同步到常量池中。intern 方法会从字符串常量池中查询当前字符串是否存在，若不存在就会将当前字符串放入常量池StringTable中，StringTable默认大小1009，可以通过参数修改 -XX:StringTableSize=123456...
+  
 - 区别
   - jdk6之前包括jdk6，intern方法会在常量池中创建相同String对象
   - jdk7开始，intern只会把堆中String对象的引用放入常量池中，主要原因是常量池从永久代已移入堆中
+  
+- 案例
 
-```java
-String s = new String("1");
-s.intern();
-String s2 = "1";
-System.out.println(s == s2);
+  - ```java
+    String s = new String("1");
+    s.intern();
+    String s2 = "1";
+    System.out.println(s == s2);
+    
+    String s3 = new String("1") + new String("1");
+    s3.intern();
+    String s4 = "11";
+    System.out.println(s3 == s4);
+    
+    // 打印结果是
+    // jdk6 下false false
+    // jdk7 下false true
+    ```
 
-String s3 = new String("1") + new String("1");
-s3.intern();
-String s4 = "11";
-System.out.println(s3 == s4);
-
-// 打印结果是
-// jdk6 下false false
-// jdk7 下false true
-
-String s = new String("1");
-String s2 = "1";
-s.intern();
-System.out.println(s == s2);
-
-String s3 = new String("1") + new String("1");
-String s4 = "11";
-s3.intern();
-System.out.println(s3 == s4);
-
-// 打印结果是
-// jdk6 下false false
-// jdk7 下false false
-```
+  - 分析：“1”会在常量池中新建一个1，然后又new了一个String对象赋值给s，调用s.intern()因为1已经在常量池中存在，所以不起效果，所以s和s1持有两个不同的引用。然后拼接两个1，创建出s3，此时常量池中不存在11，调用s3.intern()后，jdk6，会去常量池中新建一个11，而从jdk7开始，直接在常量池中创建一个保存s3地址的引用
 
 ### JVM内存模型（jdk8）
 
