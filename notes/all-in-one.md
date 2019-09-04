@@ -1008,6 +1008,17 @@ Spring事务的本质其实就是数据库对事务的支持，没有数据库�
 
 
 
+## SpringMVC
+
+### SpringMVC请求处理流程
+
+![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/springmvc.png)
+
+### SpringMvc的控制器是不是单例模式
+
+- 是单例模式,所以在多线程访问的时候有线程安全问题
+- 不要用同步,会影响性能,解决方案把控制器变为无状态对象
+
 
 
 ## Netty
