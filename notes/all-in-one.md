@@ -798,9 +798,9 @@ docker rmi --force $(docker images -q)
 
 ### Java从编写到运行的大致过程
 
-- 将写好的.java文件通过javac编译成由JVM可识别指令组成的.class文件（IED可以自动反编译.class文件，可以通过javap -c 反编译）
-- 通过ClassLoader分三步加载，连接（验证，准备，解析）和初始化 将.class文件加载到JVM中
-- 然后用加载的Class类经过内存分配，初始化，init调用构造来创建对象
+- 将写好的.java文件通过javac调用编译器生成JVM可识别指令组成的.class文件（IED可以自动反编译.class文件，也可以通过javap -c 反编译）
+- 通过ClassLoader分三步加载，连接（验证，准备，解析）和初始化 将.class文件加载到JVM中生成Class类
+- 然后用加载的Class类经过内存分配，初始化，init调用构造创建出对象
 - 最后有了对象就可以执行相关方法了
 
 ### 不可变对象
@@ -1115,6 +1115,33 @@ GRANT ALL PRIVILEGES ON *.* TO '<user>'@'%' IDENTIFIED BY '<password>' WITH GRAN
 flush privileges;
 # 在线改配置
 set <global|session>
+# 查看隔离级别
+select @@tx_isolation;
+# 设置隔离级别
+set session transaction isolation level read UNCOMMITTED;
+# 开启事务
+start transaction;
+# 事务回滚
+rollback;
+# 事务提交
+commit;
+# 关闭事务自动提交
+set autocommit = 0
+# 加共享锁
+<command> lock in share mode
+# 索引创建
+ALTER TABLE table_name ADD INDEX index_name (column_list)
+ALTER TABLE table_name ADD UNIQUE (column_list)
+ALTER TABLE table_name ADD PRIMARY KEY (column_list)
+CREATE INDEX index_name ON table_name (column_list)
+CREATE UNIQUE INDEX index_name ON table_name (column_list)
+# 删除索引
+DROP INDEX index_name ON talbe_name
+ALTER TABLE table_name DROP INDEX index_name
+ALTER TABLE table_name DROP PRIMARY KEY
+# 查看索引
+show index from table_name;
+show keys from table_name;
 ```
 
 ### InnoDB可重复读（Repeatable read）级别为啥可以避免幻读
@@ -1132,19 +1159,6 @@ set <global|session>
 |可重复读（Repeatable read）	|不可能 |不可能	|不可能	|可能|
 |可串行化（Serializable）	|不可能 |不可能	|不可能	|不可能|
 
-```sql
-查看隔离级别
-select @@tx_isolation;
-设置隔离级别
-set session transaction isolation level read UNCOMMITTED;
-开启事务
-start transaction;
-回滚
-rollback;
-提交
-commit;
-```
-
 ### Mysql常用存储引擎适用场景
 
 - MyISAM适用频繁执行全表count，查询频率高，增删改频率不高
@@ -1161,7 +1175,7 @@ commit;
 
 - 加共享锁/读锁  在sql语句后面加 lock in share mode
 
-- InnoDB支持事务，关闭事务自动方法 set autocommit = 0
+- InnoDB支持事务，关闭事务自动提交方法 set autocommit = 0
 
 
 ### Mysql简单优化步骤
@@ -1175,6 +1189,9 @@ commit;
 - 有时候优化器选择不一定准确，需要手动测试，强制使用某一个索引可以在sql语句中加入 force index(<column-name>)
 
 ### Mysql稀疏索引和聚集索引 
+
+- 聚集索引：指索引项的排序方式和表中数据记录排序方式一致的索引 
+- 稀疏索引：稀疏索引只为某些搜索码值建立索引记录；在搜索时，找到其最大的搜索码值小于或等于所查找记录的搜索码值的索引项，然后从该记录开始向后顺序查询直到找到为止
 
 - InnoDB 主键走聚集索引，其他走稀疏索引
 
