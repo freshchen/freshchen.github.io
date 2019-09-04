@@ -112,11 +112,7 @@ vi /var/log/keystone/keystone.log
 2019-04-24 16:32:59.961 23037 ERROR keystone OperationalError: (pymysql.err.OperationalError) (1045, u"Access denied for user 'keystone'@'controller' (using password: YES)") (Background on this error at: http://sqlalche.me/e/e3q8)
 ```
 
-发现是数据库认证问题，可是明明给keystone用户开权限了啊。
-
-##### 解决方案
-
-经过多次测试，如果在mysql安全初始化时，不移除匿名用户、删除test数据库，就会出现以上授权问题
+发现是数据库认证问题，可是明明给keystone用户开权限了啊。经过多次测试，如果在mysql安全初始化时，不移除匿名用户、删除test数据库，就会出现以上授权问题
 
 ```bash
 # mysql_secure_installation<<EOF
