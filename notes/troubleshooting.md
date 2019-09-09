@@ -7,6 +7,27 @@
 
 
 
+### Openstack rebuild失败
+
+试图重建快照时候，出现如下错误
+
+```bash
+Error: Failed to perform requested operation on instance "", the instance has an error status: Please try again later [Error: Build of instance aborted: Insufficient compute resources: Requested instance NUMA topology cannot fit the given host NUMA topology.].
+```
+
+背景：
+
+为了提高部分CPU使用密集的虚拟机节点的性能，需要使vcpu一对一绑定并且独占宿主机上的真实cpu，flavour使用了如下参数
+
+```bash
+hw:cpu_policy 	dedicated
+hw:cpu_threads_policy	isolate
+```
+
+经过调查，由于openstack的资源隔离是建立在numa的基础上的，所以设置了dedicated参数，之后必须在nova.conf中的scheduler_default_filters 中加入NUMATopologyFilter
+
+https://docs.openstack.org/nova/pike/admin/configuration/schedulers.html
+
 
 
 
