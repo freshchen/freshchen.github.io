@@ -509,7 +509,7 @@ docker rmi --force $(docker images -q)
 - LinkedBlockingDeque
   - 结构：由链表组成的双端阻塞队列
 - PriorityBlockingQueue
-  - 结构：由链表组成的支持优先级排序的无界阻塞队列
+  - 结构：由堆结构支持优先级排序的无界阻塞队列
 - DelayQueue
   - 结构：使用PriorityQueue实现的带延迟的无界阻塞队列
 - SynchronousQueue
@@ -523,9 +523,7 @@ docker rmi --force $(docker images -q)
 
 - 直接通过new ThreadPoolExecutor()创建（推荐，可以定制化，控制细节）
   - 构造参数：
-    - int corePoolSize：线程池正常运行时的核心线程数，即使空闲也会等待任务
-    - 在线程数少于核心数量时，有新任务进来就新建一个线程，即使有的线程没事干
-    - 等超出核心数量后，就不会新建线程了，空闲的线程就得去任务队列里取任务执行了
+    - int corePoolSize：线程池正常运行时的核心线程数，即使空闲也会等待任务在线程数少于核心数量时，有新任务进来就新建一个线程，即使有的线程没事干，等超出核心数量后，就不会新建线程了，空闲的线程就得去任务队列里取任务执行了
     - int maximumPoolSize：线程池允许的最大线程数
       - 如果任务队列满了，并且池中线程数小于最大线程数，会再创建新的线程执行任务
     - long keepAliveTime：超出corePoolSize的线程的存活时间
@@ -879,7 +877,7 @@ docker rmi --force $(docker images -q)
 
 ### Java从编写到运行的大致过程
 
-- 将写好的.java文件通过javac调用编译器生成JVM可识别指令组成的.class文件（IED可以自动反编译.class文件，也可以通过javap -c 反编译）
+- 将写好的.java文件通过javac调用编译器生成JVM可识别指令组成的.class文件（IED可以自动反编译.class文件，也可以通过javap -v 反编译）
 - 通过ClassLoader分三步加载，连接（验证，准备，解析）和初始化 将.class文件加载到JVM中生成Class类
 - 然后用加载的Class类经过内存分配，初始化，init调用构造创建出对象
 - 最后有了对象就可以执行相关方法了
