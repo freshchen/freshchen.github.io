@@ -1,13 +1,10 @@
 # The All-in-One Note
 
-- [系统](#系统)
+- [基础](#基础)
   - [Linux](#Linux)
   - [IO](#IO)
-- [网络](#网络)
-- [数据结构](#数据结构)
-- [数据库](#数据库)
-  - [Mysql](#Mysql)
-  - [Redis](#Redis)
+  - [网络](#网络)
+  - [数据结构与算法](#数据结构与算法)
 - [Java8](#Java8)
   - [核心](#核心)
   - [并发](#并发)
@@ -16,6 +13,9 @@
 - [JavaEE](#JavaEE)
   - [Spring](#Spring)
   - [Netty](#Netty)
+- [数据库](#数据库)
+  - [Mysql](#Mysql)
+  - [Redis](#Redis)
 - [架构设计](#架构设计)
   - [设计模式](#设计模式)
   - [分布式](#分布式)
@@ -43,7 +43,7 @@
 
 
 
-# 系统
+# 基础
 
 ## IO
 
@@ -343,7 +343,7 @@ docker rmi --force $(docker images -q)
 
 
 
-# 网络
+## 网络
 
 ### 网络模型
 
@@ -400,7 +400,7 @@ docker rmi --force $(docker images -q)
 
 
 
-# 数据结构
+## 数据结构与算法
 
 ### 常用排序算法
 
@@ -426,6 +426,8 @@ docker rmi --force $(docker images -q)
 - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/main1.jpe)
 - 然后就可以套公式估算递归的时间复杂度
 - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/main2.jpe)
+
+
 
 ### B树和B+树定义与区别
 
