@@ -1093,10 +1093,11 @@ Spring事务的本质其实就是数据库对事务的支持，没有数据库�
 
 ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/springmvc.png)
 
-### SpringMvc的控制器是不是单例模式
+### SpringMvc的控制器是不是单例模式是不是线程安全
 
 - 是单例模式,所以在多线程访问的时候有线程安全问题
 - 不要用同步,会影响性能,解决方案把控制器变为无状态对象
+- 如果一定有成员变量，可以增加注解@Scope(value = "prototype")改为原型模式
 
 
 

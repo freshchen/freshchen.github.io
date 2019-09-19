@@ -46,6 +46,11 @@ git reset --mixed  <上一个commit的id>
 把线上的还原
 git push origin origin --force
 
+
+### win10查看ip地址
+
+点开右下角网络图标，找到当前连接的网络，点击属性（properties）
+
 ### Openstack安装cinder服务没有磁盘设备
 
 由于装机时把所有空间放在了一块物理盘上，没有预设到cinder服务基于LVM后端时，需要基于物理盘pvcreate 创建物理机，所以只能通过环设备创建一块假的物理盘，脚本如下：
