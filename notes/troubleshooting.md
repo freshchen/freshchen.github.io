@@ -5,7 +5,11 @@
 
 
 
+### 复制代码到IDEA有行号
 
+CTRL+R  ^[ 0-9] relace all狂点直到没有红
+CTRL+R  ^[^\s*\n] relace all
+CTRL+ALT+L 规范代码
 
 ### Openstack rebuild失败
 
