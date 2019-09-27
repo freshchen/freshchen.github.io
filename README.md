@@ -1,9 +1,5 @@
 ## 目录
 
-- ### 个人简介
-
-  - [Resume](others/introduction.md)
-
 - ### 知识点总结（推荐）
 
   - [The All-in-One Note](notes/all-in-one.md)
@@ -23,4 +19,8 @@
 - ###  个人工具
 
   - [Online Api](http://111.230.58.162:1994/doc.html)
+  
+- ### 个人简介
+
+  - [Resume](others/introduction.md)
 
