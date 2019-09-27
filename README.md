@@ -2,7 +2,7 @@
 
 - ### 个人简介
 
-  - [resume](others/introduction.md)
+  - [Resume](others/introduction.md)
 
 - ### 知识点总结（推荐）
 
