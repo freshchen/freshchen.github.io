@@ -960,11 +960,19 @@ elementData[elementCount] = null; /* to let gc do its work
 
 ## 核心
 
+### 集合应用场景
+
+- **TreeSet**
+  - 自动排序
+- **LinkedHashMap**
+  - 保证插入的顺序
+- **PriorityQueue**
+  - 堆实现，找最大最小元素
+
 ### ArrayList & HashMap 扩容
 
 - ArrayList默认大小10，装不下就扩容，每次1.5倍扩容
-
-- HashMap默认大小16，当前容量超过总容量乘以散列因子（默认0.75）就扩容，每次2倍扩容。
+- HashMap默认大小16，当前容量超过总容量乘以散列因子（默认0.75）就扩容，每次2倍扩容
 
 ### 重写equals
 
