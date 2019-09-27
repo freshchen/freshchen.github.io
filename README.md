@@ -10,9 +10,9 @@
 
   - [Trouble Shooting](notes/troubleshooting.md)
 
-- ####  好文和常用链接
+- ####  Links & To-Do List
 
-  - [Reading & Common Links](notes/links.md)
+  - [Links & To-Do List](https://www.notion.so/freshchen/freshchen-ca2b15434a8444cc8ad8a66f675fd2c2)
 
 
 

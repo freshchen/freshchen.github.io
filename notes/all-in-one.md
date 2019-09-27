@@ -18,9 +18,7 @@
   - [Redis](#Redis)
 - [架构设计](#架构设计)
   - [设计模式](#设计模式)
-  - [分布式](#分布式)
-  - [大数据](#大数据)
-
+  - [系统设计](#系统设计)
 
 
 
@@ -267,6 +265,9 @@ nmcli con up "<id>"
 nmcli con down "<id>"
 # 网络配置文件位置
 ls /etc/sysconfig/network-scripts/
+# 查看网卡提供商
+ls -l /sys/class/net/ens1f0/device # 看输出的最后一列<id>
+lspci | grep <id>
 
 yum <repolist|list|search|install|remove|update>
 # 查找rpm包
@@ -677,6 +678,26 @@ docker rmi --force $(docker images -q)
   - 只能在synchronized中的中使用
 
 ## JVM
+
+### 如何分析jvm线程堆栈
+
+```bash
+# 查运行中的java应用
+root@64b47b31317a:/# jps -ml
+1 /app.jar --spring.profiles.active=pro
+116 sun.tools.jps.Jps -ml
+# 根据第一列的PID找出 load比较高的应用PID
+top -p <pids>
+root@64b47b31317a:/# top -p 1
+# dump线程堆栈信息
+jstack <pid>
+root@64b47b31317a:/# jstack 1
+"lettuce-eventExecutorLoop-1-3" #33 daemon prio=5 os_prio=0 tid=0x00007fe394367000 nid=0x24 waiting on condition [0x00007fe376bd3000]
+   java.lang.Thread.State: WAITING (parking)
+	at sun.misc.Unsafe.park(Native Method)
+省略若干
+# 查看java.lang.Thread.State状态
+```
 
 ### 四种引用类型
 
@@ -1438,7 +1459,7 @@ show keys from table_name;
 
 
 
-## 分布式
+## 系统设计
 
 ### 一致性哈希算法
 
@@ -1455,10 +1476,6 @@ show keys from table_name;
 解决方案：可以增加虚拟节点，例如在主机ip后加编号取模映射到环的不同位置。然后数据遇到虚拟节点之后再映射回真实节点。
 
 
-
-
-
-## 大数据
 
 ### 布隆过滤（Bloom Filter）
 
