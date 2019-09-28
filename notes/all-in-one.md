@@ -529,6 +529,19 @@ docker rmi --force $(docker images -q)
   - 从根节点到某个节点，路径上所有的字符连接起来，就是这个节点所对应的字符串
   - 每个节点的子节点所包含的字符都不同
 
+### 如何从暴力递归改动态规范
+
+- 首先写好一个暴力递归
+  - 分析这个递归是否有重复计算
+  - 分析这个递归的当前状态和之前递归计算的顺序是不是无关
+  - 如果都满足就可以改成动态规划
+- 改写成DP
+  - 找出递归中变化的参数
+  - 确定递归的开始位置
+  - 确定一些边界或者特殊情况
+  - 抽象出一次递归的步骤，分析步骤和已经固定的边界的关系
+  - 找出规律后coding
+
 
 
 # Java8
@@ -1084,6 +1097,20 @@ elementData[elementCount] = null; /* to let gc do its work
 
 - 如果重写了equals但是没有重写hashcode有可能出现equals返回true但是hashcode不相等的情况
 
+### 异常处理一般规范
+
+- 在Finally块中清理资源或者使用Try-With-Resource语句
+- 抛出明确的异常，避免抛出Exception这种
+- 在注释Javadoc里边添加@throws声明并且描述什么样的情况会导致异常
+- 将异常与它的描述信息一并抛出
+- 优先catch捕获更明确的异常
+- 不要捕获Throwable
+- 别忽略异常
+- 不要打印异常日志的同时将其抛出
+- 自定义异常包裹某个异常的同时不要丢弃它原本的信息
+
+
+
 ### Java泛型参数
 
 生产者用extends，消费者用super
@@ -1258,7 +1285,7 @@ Spring事务的本质其实就是数据库对事务的支持，没有数据库�
 
 ## Mysql
 
-### Mysql常用命令
+### 常用命令
 
 ```mysql
 # 查配置
@@ -1304,7 +1331,7 @@ show keys from table_name;
 
 - 内在：next-key锁（行锁 + gap锁）
 
-### Mysql事务隔离级别
+### 事务隔离级别
 
 |隔离级别|更新丢失|脏读|不可重复读|幻读|
 |---|---|---|---|---|
@@ -1313,13 +1340,13 @@ show keys from table_name;
 |可重复读（Repeatable read）	|不可能 |不可能	|不可能	|可能|
 |可串行化（Serializable）	|不可能 |不可能	|不可能	|不可能|
 
-### Mysql常用存储引擎适用场景
+### 常用存储引擎适用场景
 
 - MyISAM适用频繁执行全表count，查询频率高，增删改频率不高
 
 - InnoDB增删改查都频繁，对可靠性要求高，要求支持事务
 
-### Mysql锁
+### 锁
 
 - InnoDB默认行锁，也支持表锁,没有用到索引的时候用表级锁
 
@@ -1331,18 +1358,32 @@ show keys from table_name;
 
 - InnoDB支持事务，关闭事务自动提交方法 set autocommit = 0
 
+### SQL慢查询的优化
 
-### Mysql简单优化步骤
+- 分析过程
+  - 开启慢日志，查看慢日志，找到查询比较慢的语句
+  - 使用explain分析sql
+  - 分析结果中type字段，从好到坏是const、eq_reg、ref、range、index和all，是index和all就有问题需要优化
+  - extra字段是Using filesort指用的外部索引例如文件系统索引等，Using temporary指用的临时表，这两种情况也需要优化
+- 解决
+  - 没有索引可以试图建立索引，反复测试
+    - 加索引 alter table <table-name> add index index_name(<column-name>)
+    - 有时候优化器选择不一定准确，需要手动测试，强制使用某一个索引可以在sql语句中加入 force index(<column-name>)
+    - 最后稳定之后再把不必要的索引删除 
+  - 增加查询筛选的限制条件
+  - 改写一些导致索引失效的SQL语句
+  - 优化数据库结构
+    - 将字段很多的表分解成多个表 
+    - 对于需要经常联合查询的表，可以建立中间表以提高查询效率
+  - 分解关联查询
+    - 将一个大的查询分解为多个小查询
+  - 优化LIMIT分页
+    - 筛选字段上加索引
+    - 先查询出主键id值
+    - **关延迟联**
+    - 建立联合索引
 
-- 查看慢日志，找到查询比较慢的语句
-
-- 使用explain分析sql。分析结果中type字段是index和all就有问题需要优化，extra字段是Using filesort指用的外部索引例如文件系统索引等，Using temporary指用的临时表，这两种情况也需要优化
-
-- 加索引 alter table <table-name> add index index_name(<column-name>)
-
-- 有时候优化器选择不一定准确，需要手动测试，强制使用某一个索引可以在sql语句中加入 force index(<column-name>)
-
-### Mysql稀疏索引和聚集索引 
+### 稀疏索引和聚集索引 
 
 - 聚集索引：指索引项的排序方式和表中数据记录排序方式一致的索引 
 - 稀疏索引：稀疏索引只为某些搜索码值建立索引记录；在搜索时，找到其最大的搜索码值小于或等于所查找记录的搜索码值的索引项，然后从该记录开始向后顺序查询直到找到为止
