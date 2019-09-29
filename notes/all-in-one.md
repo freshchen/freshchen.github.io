@@ -1147,6 +1147,12 @@ elementData[elementCount] = null; /* to let gc do its work
 
   - 11
 
+- #### 线程安全性
+
+  - 线程安全
+  - 实现
+    - 方法加synchronized
+
 ### ConcurrentHashMap
 
 - #### 扩容机制
