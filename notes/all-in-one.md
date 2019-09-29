@@ -458,15 +458,208 @@ docker rmi --force $(docker images -q)
 
 ### 常用排序算法
 
+实现比较丑陋，勿喷啊
+
 ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/sort.PNG)
 
-- 冒泡排序：从前向后比较相邻的元素。如果前一个比后一个大，就交换他们两个，每一轮把一个最大的数运到数组最后面。
-- 选择排序：每次从未排序数组中找一个最小的元素，放到以有序数组后面
-- 插入排序：每次把未排序的第一个数，插入到已排序数组的适当位置（如果待插入的元素与有序序列中的某个元素相等，则将待插入元素插入到相等元素的后面）
-- 归并排序：将数组分成很多小份，然后依次合并
-- 荷兰国旗问题：给定一个整数数组，给定一个值K，这个值在原数组中一定存在，要求把数组中小于K的元素放到数组的左边，大于K的元素放到数组的右边，等于K的元素放到数组的中间，最终返回一个整数数组，其中只有两个值，分别是等于K的数组部分的左右两个下标值
-- 快速排序：重新排序数列，所有元素比基准值小的摆放在基准前面，所有元素比基准值大的摆在基准的后面（相同的数可以到任一边）。在这个分区退出之后，该基准就处于数列的中间位置。这个称为分区（partition）操作，递归地（recursive）把小于基准值元素的子数列和大于基准值元素的子数列排序
-- 堆排序：先建立大根堆，然后不停做heapify，也就是把未有序的最后一位和堆首互换，然后调整堆结构
+- **冒泡排序**：从前向后比较相邻的元素。如果前一个比后一个大，就交换他们两个，每一轮把一个最大的数运到数组最后面。
+
+  ```java
+  public static int[] sort(int[] arr) {
+      int len = arr.length;
+      // 冒泡总次数
+      for (int i = 1; i < len; i++) {
+          boolean flag = true;
+          // 每次冒泡过程
+          for (int j = 0; j < len - i; j++) {
+              if (arr[j] > arr[j + 1]) {
+                  MyUtils.swap(arr, j, j + 1);
+                  flag = false;
+              }
+          }
+          if (flag) {
+              // 如果一个冒泡过程没改变，退出返回已经有序
+              break;
+          }
+      }
+      return arr;
+  }
+  ```
+
+- **选择排序**：每次从未排序数组中找一个最小的元素，放到以有序数组后面
+
+  ```java
+  public static int[] sort(int[] arr) {
+      int len = arr.length;
+      // 选择次数
+      for (int i = 0; i < len - 1; i++) {
+          int min = i;
+          // 每次选择过程
+          for (int j = i + 1; j < len; j++) {
+              if (arr[j] < arr[min]) {
+                  min = j;
+              }
+          }
+          if (min != i) {
+              MyUtils.swap(arr, i, min);
+          }
+      }
+      return arr;
+  }
+  ```
+
+- **插入排序**：每次把未排序的第一个数，插入到已排序数组的适当位置（如果待插入的元素与有序序列中的某个元素相等，则将待插入元素插入到相等元素的后面）
+
+  ```java
+  public static int[] sort(int[] arr) {
+      int len = arr.length;
+      // 插入次数，left为未有序的左边
+      for (int left = 1; left < len; left++) {
+          int temp = arr[left];
+          int right = left - 1;
+          // right为有序部分的右边
+          while (right >= 0 && temp < arr[right]) {
+              arr[right + 1] = arr[right];
+              right--;
+          }
+          // 判断是否需要插入
+          if (right != left - 1) {
+              arr[right + 1] = temp;
+          }
+      }
+      return arr;
+  }
+  ```
+
+- **归并排序**：将数组分成很多小份，然后依次合并
+
+  ```java
+  public static int[] sort(int[] arr) {
+      sort(arr, 0, arr.length - 1);
+      return arr;
+  }
+  
+  private static void sort(int[] arr, int left, int right) {
+      if (left == right) {
+          return;
+      }
+      // 等同于(right + left)/2
+      int mid = left + ((right - left) >> 1);
+      sort(arr, left, mid);
+      sort(arr, mid + 1, right);
+      // 已经分成了许多小份，开始合并
+      merge(arr, left, mid, right);
+  }
+  
+  private static void merge(int[] arr, int left, int mid, int right) {
+      int[] help = new int[right - left + 1];
+      int i = 0;
+      int p1 = left;
+      int p2 = mid + 1;
+      // 左边右边通过辅助数组合并
+      while (p1 <= mid && p2 <= right) {
+          help[i++] = arr[p1] < arr[p2] ? arr[p1++] : arr[p2++];
+      }
+      // 左边没空加到后面
+      while (p1 <= mid) {
+          help[i++] = arr[p1++];
+      }
+      // 右边没空加到后面
+      while (p2 <= right) {
+          help[i++] = arr[p2++];
+      }
+      for (int j = 0; j < help.length; j++) {
+          arr[left + j] = help[j];
+      }
+  }
+  ```
+
+- **荷兰国旗问题**：给定一个整数数组，给定一个值K，这个值在原数组中一定存在，要求把数组中小于K的元素放到数组的左边，大于K的元素放到数组的右边，等于K的元素放到数组的中间，最终返回一个整数数组，其中只有两个值，分别是等于K的数组部分的左右两个下标值
+
+  ```java
+  public static int[] sort(int[] arr) {
+      partiton(arr, 0, arr.length - 1);
+      return arr;
+  }
+  
+  public static int[] partiton(int[] arr, int left, int right) {
+      int less = left - 1;
+      int more = right + 1;
+      int pNum = arr[right];
+      while (left < more) {
+          if (arr[left] < pNum) {
+              MyUtils.swap(arr, ++less, left++);
+          } else if (arr[left] > pNum) {
+              MyUtils.swap(arr, --more, left);
+          } else {
+              left++;
+          }
+      }
+      return new int[]{less, more};
+  }
+  ```
+
+- **快速排序**：重新排序数列，所有元素比基准值小的摆放在基准前面，所有元素比基准值大的摆在基准的后面（相同的数可以到任一边）。在这个分区退出之后，该基准就处于数列的中间位置。这个称为分区（partition）操作，递归地（recursive）把小于基准值元素的子数列和大于基准值元素的子数列排序
+
+  ```java
+  // 基于荷兰国旗问题的快排
+  public static int[] sort(int[] arr) {
+      sort(arr, 0, arr.length - 1);
+      return arr;
+  }
+  
+  public static void sort(int[] arr, int left, int right) {
+      if (left < right) {
+          int[] pIndexs = DutchFlag.partiton(arr, left, right);
+          sort(arr, left, pIndexs[0]);
+          sort(arr, pIndexs[1], right);
+      }
+  }
+  ```
+
+- **堆排序**：先建立大根堆，然后不停做heapify，也就是把未有序的最后一位和堆首互换，然后调整堆结构
+
+  ```java
+  public static int[] sort(int[] arr) {
+      int len = arr.length;
+      buildBigHeap(arr, len);
+      while (len > 0) {
+          MyUtils.swap(arr, 0, --len);
+          heapify(arr, 0, len);
+      }
+      return arr;
+  }
+  
+  // 建立大根堆
+  public static void buildBigHeap(int[] arr, int len) {
+      for (int index = 0; index < arr.length; index++) {
+          while (arr[index] > arr[(index - 1) / 2]) {
+              MyUtils.swap(arr, index, (index - 1) / 2);
+              index = (index - 1) / 2;
+          }
+      }
+  }
+  
+  // 调整堆
+  private static void heapify(int[] arr, int currRoot, int len) {
+      int left = currRoot * 2 + 1;
+      int right = currRoot * 2 + 2;
+  
+      while (left < len) {
+          int largest = right < len && arr[left] < arr[right] ? right : left;
+          largest = arr[largest] > arr[currRoot] ? largest : currRoot;
+          if (largest == currRoot) {
+              break;
+          }
+          MyUtils.swap(arr, currRoot, largest);
+          currRoot = largest;
+          left = currRoot * 2 + 1;
+          right = currRoot * 2 + 2;
+      }
+  }
+  ```
+
+  
 
 ### 算法验证对数器
 
@@ -715,6 +908,17 @@ docker rmi --force $(docker images -q)
 - JVM中锁升级流程
   
   ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/synchronized.png)
+
+### volatile关键字
+
+- 作用：
+  - 保证数据线程可见性
+  - 避免指令重排
+- 实现：
+  - 在字节码中加入了 lock 指令：
+    - 锁总线，其它CPU对内存的读写请求都会被阻塞，直到锁释放，**不过实际后来的处理器都采用锁缓存替代锁总线**，因为锁总线的开销比较大，锁总线期间其他CPU没法访问内存，通过缓存一致性协议确保拿到缓存值是最新的
+    - lock后的写操作会把已修改的数据写回内存，同时让其它线程相关缓存行失效，从而重新从主存中加载最新的数据
+    - 不是内存屏障却能完成类似内存屏障的功能，阻止屏障两边的指令重排序
 
 ### 如何终止线程
 
@@ -1045,9 +1249,9 @@ elementData[elementCount] = null; /* to let gc do its work
   - 1.7数组加链表
   - 1.8数组加链表加红黑树
 
-- ### 线程安全
+- #### 线程安全
 
-  - 不是线程安全
+  - **不安全**
   - 多线程下使用扩容步骤存在问题
 
 - #### 默认大小
@@ -1109,27 +1313,35 @@ elementData[elementCount] = null; /* to let gc do its work
   - Node桶下链表长度超过8转为红黑树
   - Node桶下红黑树节点数小于6就转回链表
 
-### TreeSet
-
-- #### 应用场景
-
-  - 自动排序
-
 ### LinkedHashMap
 
 - #### 应用场景
 
   - 保证插入的顺序
 
-### PriorityQueue
+### Hashtable
 
-- #### 应用场景
+- #### 默认大小
 
-  - 找最大最小元素
+  - 11
 
-- #### 数据结构
+- #### 线程安全性
 
-  - 堆
+  - **安全**
+  - 实现
+    - 方法加synchronized
+
+### ConcurrentHashMap
+
+- #### 线程安全性
+
+  - **安全**
+  - jdk1.7
+    - 采用的是分段锁的机制，ConcurrentHashMap维护了一个Segment数组，Segment这个类继承了重入锁ReentrantLock，并且该类里面维护了一个 HashEntry<K,V>[] table数组，在写操作put，remove，扩容的时候，会对Segment加锁
+  - jdk1.8
+    - 新的版本主要使用了Unsafe类的CAS自旋赋值+synchronized同步+LockSupport阻塞等手段直接操作Node， 取消了分段的概念，实现的高效并发。实现中的优化，**等待的线程会帮助扩容的线程一起完成扩容操作**
+
+### ConcurrentSkipListMap
 
 ### ArrayList
 
@@ -1141,25 +1353,27 @@ elementData[elementCount] = null; /* to let gc do its work
 
   - 装不下就扩容，每次1.5倍扩容
 
-### Hashtable
+### CopyOnWriteArrayList
 
-- #### 默认大小
+### TreeSet
 
-  - 11
+- #### 应用场景
 
-- #### 线程安全性
+  - 自动排序
 
-  - 线程安全
-  - 实现
-    - 方法加synchronized
+### CopyOnWriteArraySet
 
-### ConcurrentHashMap
+### ConcurrentSkipListSet
 
-- #### 扩容机制
-  - jdk1.7
-    - 采用的是分段锁的机制，ConcurrentHashMap维护了一个Segment数组，Segment这个类继承了重入锁ReentrantLock，并且该类里面维护了一个 Entry<K,V>[] table数组，在写操作put，remove，扩容的时候，会对Segment加锁
-  - jdk1.8
-    - 新的版本主要使用了Unsafe类的CAS自旋赋值+synchronized同步+LockSupport阻塞等手段直接操作Node， 取消了分段的概念，实现的高效并发。实现中的优化，**等待的线程会帮助扩容的线程一起完成扩容操作**
+### PriorityQueue
+
+- #### 应用场景
+
+  - 找最大最小元素
+
+- #### 数据结构
+
+  - 堆
 
 ### 重写equals
 
@@ -1611,6 +1825,55 @@ show keys from table_name;
 - **Observer（观察者模式的观察者）**
 
 接口：定义了update(Observable o, Object arg)方法，当调用Observable的notifyObservers时，会触发update。观察者需要实现这个接口，重写update方法实现特定功能
+
+### Java中的单例模式
+
+- 普通的线程安全单例
+
+  ```java
+  public class Singleton{
+  
+      private static final Singleton INSTANCE = new Singleton();
+    
+      private Singleton(){}
+  
+      public static Singleton getSingleton(){
+          return INSTANCE;
+      }
+  }
+  ```
+
+- 双检查线程安全单例
+
+  ```java
+  public class SafePublish {
+  
+      private volatile static SafePublish instance = null;
+  
+      public static SafePublish getInstance() {
+          if (instance == null) {
+              synchronized (SafePublish.class) {
+                  if (instance == null) {
+                      instance = new SafePublish();
+                  }
+              }
+          }
+          return instance;
+      }
+  
+      private SafePublish() {}
+  }
+  ```
+
+- 枚举线程安全单利
+
+  ```java
+  public enum Singleton {
+      INSTANCE;
+  }
+  ```
+
+  
 
 
 
