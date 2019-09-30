@@ -659,7 +659,117 @@ docker rmi --force $(docker images -q)
   }
   ```
 
+### 二叉树
+
+- **遍历**
+
+  ```java
+  public static void pre(TreeNode root) {
+      if (root != null) {
+          Stack<TreeNode> stack = new Stack<>();
+          stack.push(root);
+          // 先进右再进左
+          while (!stack.isEmpty()) {
+              root = stack.pop();
+              System.out.print(root.val + " -> ");
+              if (root.right != null) {
+                  stack.push(root.right);
+              }
+              if (root.left != null) {
+                  stack.push(root.left);
+              }
+          }
+      }
+      System.out.println();
+  }
   
+  public static void preReur(TreeNode root) {
+      if (root == null) {
+          return;
+      }
+      System.out.print(root.val + " -> ");
+      preReur(root.left);
+      preReur(root.right);
+  
+  }
+  
+  public static void mid(TreeNode root) {
+      Stack<TreeNode> stack = new Stack<>();
+      // 左走到头了开始弹，然后去右
+      while (root != null || !stack.isEmpty()) {
+          if (root != null) {
+              stack.push(root);
+              root = root.left;
+          } else {
+              root = stack.pop();
+              System.out.print(root.val + " -> ");
+              root = root.right;
+          }
+      }
+      System.out.println();
+  }
+  
+  
+  public static void midReur(TreeNode root) {
+      if (root == null) {
+          return;
+      }
+      midReur(root.left);
+      System.out.print(root.val + " -> ");
+      midReur(root.right);
+  }
+  
+  public static void post(TreeNode root) {
+      // 把线序遍历反过来，得到前右左，然后再反过来变成左右前
+      if (root != null) {
+          Stack<TreeNode> stackStack = new Stack<>();
+          Stack<TreeNode> stack = new Stack<>();
+          stack.push(root);
+          while (!stack.isEmpty()) {
+              root = stack.pop();
+              stackStack.push(root);
+              if (root.left != null) {
+                  stack.push(root.left);
+              }
+              if (root.right != null) {
+                  stack.push(root.right);
+              }
+          }
+          while (!stackStack.isEmpty()) {
+              System.out.print(stackStack.pop().val + " -> ");
+          }
+      }
+      System.out.println();
+  }
+  
+  public static void postReur(TreeNode root) {
+      if (root == null) {
+          return;
+      }
+      postReur(root.left);
+      postReur(root.right);
+      System.out.print(root.val + " -> ");
+  }
+  
+  public static void level(TreeNode root) {
+      if (root == null) {
+          return;
+      }
+      LinkedList<TreeNode> queue = new LinkedList<>();
+      queue.add(root);
+      TreeNode curr = null;
+      while (!queue.isEmpty()) {
+          curr = queue.pop();
+          System.out.print(curr.val + " -> ");
+          if (curr.left != null) {
+              queue.add(curr.left);
+          }
+          if (curr.right != null) {
+              queue.add(curr.right);
+          }
+      }
+  }
+  ```
 
 ### 算法验证对数器
 
@@ -1253,6 +1363,10 @@ elementData[elementCount] = null; /* to let gc do its work
 
   - **不安全**
   - 多线程下使用扩容步骤存在问题
+  - 线程安全的替代
+    - Hashtable
+    - ConcurrentHashMap
+    - ConcurrentSkipListMap
 
 - #### 默认大小
 
@@ -1345,15 +1459,55 @@ elementData[elementCount] = null; /* to let gc do its work
 
 ### ArrayList
 
+- #### 特点
+
+  - 实现标识接口RandomAccess，随机存取，查询效率高，大数据量下迭代效率差
+
+- #### 数据结构
+
+  - 数组
+
+- #### 线程安全性
+
+  - 不安全
+  - 线程安全的替代
+    - List list = Collections.synchronizedList(new ArrayList())
+    - CopyOnWriteArrayList
+
 - #### 默认大小
 
-  - 10
+  - 有个懒加载设计，new ArrayList() 返回的是一个空的默认数组
+  - 当第一次add操作之后扩容成10
 
 - #### 何时扩容
 
-  - 装不下就扩容，每次1.5倍扩容
+  - 装不下就扩容
+  - newCapacity = oldCapacity + (oldCapacity >> 1) 每次1.5倍扩容
 
-### CopyOnWriteArrayList
+- #### 扩容机制
+
+  - 调用 Arrays.copyOf() 方法， 改方法是 native （System.arraycopy）实现
+
+- #### 克隆
+
+  - 深拷贝
+
+### LinkedList
+
+- #### 数据结构
+
+  - 双端链表
+
+- #### 线程安全性
+
+  - 不安全
+  - 线程安全的替代
+    - List list = Collections.synchronizedList(new LinkedList())
+    - ConcurrentLinkedQueue
+
+- #### 克隆
+
+  - 浅拷贝
 
 ### TreeSet
 
@@ -1361,9 +1515,12 @@ elementData[elementCount] = null; /* to let gc do its work
 
   - 自动排序
 
-### CopyOnWriteArraySet
+- #### 线程安全性
 
-### ConcurrentSkipListSet
+  - 不安全
+  - 线程安全的替代
+    - CopyOnWriteArraySet
+    - ConcurrentSkipListSet
 
 ### PriorityQueue
 
@@ -1611,6 +1768,27 @@ show index from table_name;
 show keys from table_name;
 ```
 
+
+
+### 索引为什么能提高查询速度
+
+- 不使用索引如和查询
+
+  - Mysql最小存储结构是页，页是一个单链表把数据连在一起
+  - 各个页通过双端链表连在一起
+  - 查询时，我们要遍历双端链表找到数据所在的页，然后再在页中遍历找到对应的数据项
+
+- 而我们使用索引时Innodb默认使用B+树实现如下效果，大大提高了效率
+
+  ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/mysql-index.jpg)
+
+### Hash索引的局限性
+
+- 哈希索引也没办法利用索引完成**排序**
+- 不支持**最左匹配原则**
+- 在有大量重复键值情况下，哈希索引的效率也是极低的---->**哈希碰撞**问题。
+- **不支持范围查询**
+
 ### InnoDB 可重复读（Repeatable read）级别为啥可以避免幻读
 
 - 表象：快照读（非阻塞读不加锁，对应加锁的叫当前读）伪MVCC
@@ -1626,6 +1804,18 @@ show keys from table_name;
 |可重复读（Repeatable read）	|不可能 |不可能	|不可能	|可能|
 |可串行化（Serializable）	|不可能 |不可能	|不可能	|不可能|
 
+- Read uncommitted会出现的现象--->脏读：**一个事务读取到另外一个事务未提交的数据 **
+  - 例子：A向B转账，**A执行了转账语句，但A还没有提交事务，B读取数据，发现自己账户钱变多了**！B跟A说，我已经收到钱了。A回滚事务【rollback】，等B再查看账户的钱时，发现钱并没有多。
+  - 出现脏读的本质就是因为**操作(修改)完该数据就立马释放掉锁**，导致读的数据就变成了无用的或者是**错误的数据**。
+- Read committed出现的现象--->不可重复读：**一个事务读取到另外一个事务已经提交的数据，也就是说一个事务可以看到其他事务所做的修改**
+  - 注：**A查询数据库得到数据，B去修改数据库的数据，导致A多次查询数据库的结果都不一样【危害：A每次查询的结果都是受B的影响的，那么A查询出来的信息就没有意思了】**
+- Repeatable read避免不可重复读是**事务级别**的快照！每次读取的都是当前事务的版本，即使被修改了，也只会读取当前事务版本的数据
+  - 至于虚读(幻读)：**是指在一个事务内读取到了别的事务插入的数据，导致前后读取不一致。**
+    - 注：**和不可重复读类似，但虚读(幻读)会读到其他事务的插入的数据，导致前后读取不一致**
+    - MySQL的`Repeatable read`隔离级别加上GAP间隙锁**已经处理了幻读了**。
+- Serializable 既然Innodb已经避免了幻读还有场景用么，
+  - **丢失更新**：一个事务的更新**覆盖了其它事务的更新结果**
+
 ### 常用存储引擎适用场景
 
 - MyISAM适用频繁执行全表count，查询频率高，增删改频率不高
@@ -1634,15 +1824,32 @@ show keys from table_name;
 
 ### 锁
 
+- 粒度划分
+  - **表锁**开销小，加锁快；不会出现死锁；锁定力度大，发生锁冲突概率高，并发度最低
+  - **行锁**开销大，加锁慢；会出现死锁；锁定粒度小，发生锁冲突的概率低，并发度高
+
 - InnoDB默认行锁，也支持表锁,没有用到索引的时候用表级锁
-
 - MyISAM默认表锁
-
 - 手动给表加锁 lock tables <table_name> <read|write> ， 解锁 unlock tables <table_name>
-
-- 加共享锁/读锁  在sql语句后面加 lock in share mode
-
+- 共享锁（S）：`SELECT * FROM table_name WHERE ... LOCK IN SHARE MODE`。
+- 排他锁（X)：`SELECT * FROM table_name WHERE ... FOR UPDATE`
 - InnoDB支持事务，关闭事务自动提交方法 set autocommit = 0
+
+### MVCC和事务的隔离级别
+
+- 描述
+  - 数据库事务有不同的隔离级别，不同的隔离级别对锁的使用是不同的，**锁的应用最终导致不同事务的隔离级别**
+  - MVCC(Multi-Version Concurrency Control)多版本并发控制，可以简单地认为：**MVCC就是行级锁的一个变种(升级版)**。
+  - 事务的隔离级别就是**通过锁的机制来实现**，只不过**隐藏了加锁细节**
+
+- 特点
+  - **MVCC一般读写是不阻塞的**(所以说MVCC很多情况下避免了加锁的操作)
+  - MVCC实现的**读写不阻塞**正如其名：**多版本**并发控制--->通过一定机制生成一个数据请求**时间点的一致性数据快照（Snapshot)**，并用这个快照来提供一定级别（**语句级或事务级**）的**一致性读取**。从用户的角度来看，好像是**数据库可以提供同一数据的多个版本**。
+    - 其中数据快照有**两个级别**：
+      - 语句级 
+        - 针对于`Read committed`隔离级别
+      - 事务级别 
+        - 针对于`Repeatable read`隔离级别
 
 ### SQL慢查询的优化
 
@@ -1671,12 +1878,20 @@ show keys from table_name;
 
 ### 稀疏索引和聚集索引 
 
-- 聚集索引：指索引项的排序方式和表中数据记录排序方式一致的索引 
-- 稀疏索引：稀疏索引只为某些搜索码值建立索引记录；在搜索时，找到其最大的搜索码值小于或等于所查找记录的搜索码值的索引项，然后从该记录开始向后顺序查询直到找到为止
-
+- 聚集索引
+  - 指索引项的排序方式和表中数据记录排序方式一致的索引
+  - 在叶子节点存储的是**表中的数据**
+- 稀疏索引
+  - 稀疏索引只为某些搜索码值建立索引记录；在搜索时，找到其最大的搜索码值小于或等于所查找记录的搜索码值的索引项，然后从该记录开始向后顺序查询直到找到为止
+  - 叶子节点存储的是**主键和索引列**
 - InnoDB 主键走聚集索引，其他走稀疏索引
-
 - MyISAM 全是走稀疏索引
+
+### 联合索引
+
+- **最左匹配原则**
+  - 索引只能用于查找key是否**存在（相等）**，遇到范围查询`(>、<、between、like`左匹配)等就**不能进一步匹配**了，后面的条件退化为线性查找
+  - 例如创建 union index (a , b ,c)  查（a，b）走索引，查（a，c）走不了索引
 
 ### 数据库事务四大特性
 
