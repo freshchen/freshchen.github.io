@@ -661,7 +661,7 @@ docker rmi --force $(docker images -q)
 
 ### 二叉树
 
-- **遍历**
+前序 中序 后续 层级遍历
 
   ```java
   public static void pre(TreeNode root) {
@@ -692,7 +692,9 @@ docker rmi --force $(docker images -q)
       preReur(root.right);
   
   }
-  
+  ```
+
+  ```java
   public static void mid(TreeNode root) {
       Stack<TreeNode> stack = new Stack<>();
       // 左走到头了开始弹，然后去右
@@ -718,7 +720,9 @@ docker rmi --force $(docker images -q)
       System.out.print(root.val + " -> ");
       midReur(root.right);
   }
-  
+  ```
+
+  ```java
   public static void post(TreeNode root) {
       // 把线序遍历反过来，得到前右左，然后再反过来变成左右前
       if (root != null) {
@@ -750,7 +754,9 @@ docker rmi --force $(docker images -q)
       postReur(root.right);
       System.out.print(root.val + " -> ");
   }
-  
+  ```
+
+  ```java
   public static void level(TreeNode root) {
       if (root == null) {
           return;
