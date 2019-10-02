@@ -1121,6 +1121,27 @@ docker rmi --force $(docker images -q)
   - 让出CPU，释放当前占用的锁
   - 只能在synchronized中的中使用
 
+### ThreadLocal
+
+- 作用
+  - 主要解决的就是让每个线程绑定自己的值，可以将ThreadLocal类形象的比喻成存放数据的盒子，盒子中可以存储每个线程的私有数据
+- 实现
+  - 数据结构
+    - Map
+  - Thread 类中有一个 threadLocals 和 一个 inheritableThreadLocals 变量，它们都是 ThreadLocalMap类型的变量,我们可以把 ThreadLocalMap 理解为ThreadLocal类实现的定制化的 HashMap,默认情况下这两个变量都是null
+  - 最终的变量是放在了当前线程的 ThreadLocalMap 中，并不是存在 ThreadLocal 上，ThreadLocal 可以理解为只是ThreadLocalMap的封装，传递了变量值
+- 问题
+  - 内存泄露
+    - 原因
+      - ThreadLocalMap 中使用的 key 为 ThreadLocal 的弱引用,而 value 是强引用
+      - 如果 ThreadLocal 没有被外部强引用的情况下，在垃圾回收的时候会 key 会被清理掉，而 value 不会被清理掉。这样一来，ThreadLocalMap中就会出现key为null的Entry。假如我们不做任何措施的话，value 永远无法被GC 回收
+    - 解决方案
+      - 使用完 ThreadLocal方法后 最好手动调用remove()方法
+
+
+
+
+
 ## JVM
 
 ### 如何分析jvm线程堆栈
