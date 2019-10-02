@@ -478,6 +478,7 @@ docker rmi --force $(docker images -q)
   - 客户端使用之前握手过程中获得的服务器随机数、客户端随机数、Premaster secret计算生成会话密钥master secret，然后使用该会话密钥加密之前所有收发握手消息的Hash和MAC值，发送给服务器，以验证加密通信是否可用。服务器将使用相同的方法生成相同的会话密钥以解密此消息，校验其中的Hash和MAC值
   - 服务器发送ChangeCipherSpec消息，通知客户端此消息以后服务器会以加密方式发送数据
   - sever端使用会话密钥加密（生成方式与客户端相同，使用握手过程中获得的服务器随机数、客户端随机数、Premaster secret计算生成）之前所有收发握手消息的Hash和MAC值，发送给客户端去校验。若客户端服务器都校验成功，握手阶段完成，双方将按照SSL记录协议的规范使用协商生成的会话密钥加密发送数据
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/tls.png)
 
 ### ARP地址解析协议（链路层）
 
