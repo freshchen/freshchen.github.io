@@ -429,6 +429,56 @@ docker rmi --force $(docker images -q)
 - **TCP释放链接**
 - **浏览器显示页面中所有文本**
 
+### HTTPS过程解析
+
+- 概述
+  - HTTPS：Hypertext Transfer Protocol Secure 超文本传输安全协议
+  - HTTPS 经由 HTTP 进行通信，但利用 TLS 来保证安全，即 HTTPS = HTTP + TLS
+  - TLS：位于 HTTP 和 TCP 之间的协议，其内部有 TLS握手协议、TLS记录协议（OSI七层模型中的会话层，TCP/IP四层模型中定位模糊）
+- 密码学基础
+  - 伪随机数生成器
+    - 没有真正意义上的随机数，具体可以参考 Random/TheadLocalRandom
+      它的主要作用在于生成对称密码的秘钥、用于公钥密码生成秘钥对
+  - 消息认证码
+    - 消息认证码主要用于验证消息的完整性与消息的认证，其中消息的认证指“消息来自正确的发送者”
+  - 数字签名
+    - 消息认证码的缺点在于**无法防止否认**，因为共享秘钥被 client、server 两端拥有，server 可以伪造 client 发送给自己的消息（自己给自己发送消息），为了解决这个问题，我们需要它们有各自的秘钥不被第二个知晓（这样也解决了共享秘钥的配送问题）
+    - 数字签名和消息认证码都**不是为了加密**
+    - 可以将单向散列函数获取散列值的过程理解为使用 md5 摘要算法获取摘要的过程
+    - 使用自己的私钥对自己所认可的消息生成一个该消息专属的签名，这就是数字签名，表明我承认该消息来自自己
+    - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/digital-sign.png)
+  - 公钥密码（非对称加密）
+    - 也叫非对称密码，由公钥和私钥组成，它是最开始是为了解决秘钥的配送传输安全问题，即，我们不配送私钥，只配送公钥，私钥由本人保管
+    - 它与数字签名相反，非对称密码的私钥用于解密、公钥用于加密，每个人都可以用别人的公钥加密，但只有对应的私钥才能解开密文
+    - client：明文 + 公钥 = 密文
+    - server：密文 + 私钥 = 明文
+    - 注意：**公钥用于加密，私钥用于解密，只有私钥的归属者，才能查看消息的真正内容**
+  - 证书
+    - 全称公钥证书（Public-Key Certificate, PKC）,里面保存着归属者的基本信息，以及证书过期时间、归属者的公钥，并由认证机构（Certification Authority, **CA**）施加数字签名，表明，某个认证机构认定该公钥的确属于此人
+- 认证流程
+  - 建立TCP连接后，开始建立TLS连接
+  - client端发起握手请求，会向服务器发送一个ClientHello消息，该消息包括
+    - 其所支持的SSL/TLS版本
+    - Cipher Suite加密算法列表（告知服务器自己支持哪些加密算法）
+    - sessionID
+    - 随机数等内容
+  - 服务器收到请求后会向client端发送ServerHello消息，其中包括：
+    - SSL/TLS版本
+    - session ID，因为是首次连接会新生成一个session id发给client；
+    - Cipher Suite，sever端从Client Hello消息中的Cipher Suite加密算法列表中选择使用的加密算法
+    - Radmon 随机数
+  - 经过ServerHello消息确定TLS协议版本和选择加密算法之后，就可以开始发送证书给client端了。证书中包含
+    - 公钥
+    - 签名
+    - 证书机构等信息
+  - 服务器向client发送ServerKeyExchange消息，消息中包含了服务器这边的EC Diffie-Hellman算法相关参数。此消息一般只在选择使用DHE 和DH_anon等加密算法组合时才会由服务器发出
+  - server端发送ServerHelloDone消息，表明服务器端握手消息已经发送完成了
+  - client端收到server发来的证书，会去验证证书，当认为证书可信之后，会向server发送ClientKeyExchange消息，消息中包含客户端这边的EC Diffie-Hellman算法相关参数，然后服务器和客户端都可根据接收到的对方参数和自身参数运算出Premaster secret，为生成会话密钥做准备
+  - 此时client端和server端都可以根据之前通信内容计算出Master Secret（加密传输所使用的对称加密秘钥），client端通过发送此消息告知server端开始使用加密方式发送消息
+  - 客户端使用之前握手过程中获得的服务器随机数、客户端随机数、Premaster secret计算生成会话密钥master secret，然后使用该会话密钥加密之前所有收发握手消息的Hash和MAC值，发送给服务器，以验证加密通信是否可用。服务器将使用相同的方法生成相同的会话密钥以解密此消息，校验其中的Hash和MAC值
+  - 服务器发送ChangeCipherSpec消息，通知客户端此消息以后服务器会以加密方式发送数据
+  - sever端使用会话密钥加密（生成方式与客户端相同，使用握手过程中获得的服务器随机数、客户端随机数、Premaster secret计算生成）之前所有收发握手消息的Hash和MAC值，发送给客户端去校验。若客户端服务器都校验成功，握手阶段完成，双方将按照SSL记录协议的规范使用协商生成的会话密钥加密发送数据
+
 ### ARP地址解析协议（链路层）
 
 - 介绍
