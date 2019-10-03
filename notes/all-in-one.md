@@ -1964,6 +1964,20 @@ MySQL 主要分为 Server 层和存储引擎层
     - 数据恢复：通过 mysqlbinlog 工具恢复数据
     - 增量备份
 
+### SQL语句执行得很慢的原因
+
+- 偶尔很慢
+  - 数据库在刷新脏页
+    - redolog写满了
+    - 内存不够用了
+    - MySQL 认为系统“空闲”的时候
+    - MySQL 正常关闭的时候
+  - 拿不到锁
+    - 如果要判断是否真的在等待锁，我们可以用 **show processlist**
+- 一直很慢
+  - 没用到索引
+  - 数据库选错了索引
+
 ### SQL慢查询的优化
 
 - 分析过程
@@ -2119,8 +2133,9 @@ MySQL 主要分为 Server 层和存储引擎层
 
 
 
-
 ### 常用命令
+
+[一千行MySQL命令](https://snailclimb.gitee.io/javaguide/#/database/一千行MySQL命令)
 
 ```mysql
 # 查配置
