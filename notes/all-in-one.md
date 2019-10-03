@@ -2131,8 +2131,6 @@ MySQL 主要分为 Server 层和存储引擎层
   -  对于连续数值，使用`BETWEEN`不用`IN`：`SELECT id FROM t WHERE num BETWEEN 1 AND 5`
   -  尽量避免在 WHERE 子句中使用!=或<>操作符，否则将引擎放弃使用索引而进行全表扫描
 
-
-
 ### 常用命令
 
 [一千行MySQL命令](https://snailclimb.gitee.io/javaguide/#/database/一千行MySQL命令)
