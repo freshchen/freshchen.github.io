@@ -1569,6 +1569,25 @@ elementData[elementCount] = null; /* to let gc do its work
 
   - 深拷贝
 
+### CopyOnWriteArrayList
+
+- #### 数据结构
+
+  - 数组
+
+- #### 线程安全性
+
+  - 安全
+  - 实现
+    - 读操作不加锁，写操作是在副本上执行的，执行完了再去替换原先的值
+    - 在写操作时，使用ReentrantLock保证了同步，然后开始做复制，以及写操作
+
+- #### 特点
+
+  - 读取是完全不用加锁的
+  - 写入也不会阻塞读取操作
+  - 只有写入和写入之间需要进行同步等待
+
 ### LinkedList
 
 - #### 数据结构
@@ -1585,6 +1604,16 @@ elementData[elementCount] = null; /* to let gc do its work
 - #### 克隆
 
   - 浅拷贝
+
+### ConcurrentLinkedQueue
+
+- #### 数据结构
+
+  - 链表
+
+- #### 线程安全性
+
+  - 安全
 
 ### TreeSet
 
