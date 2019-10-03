@@ -1834,72 +1834,46 @@ Spring事务的本质其实就是数据库对事务的支持，没有数据库�
 
 ## Mysql
 
-### 常用命令
+### 基本架构
 
-```mysql
-# 查配置
-show variables like '%';
-# 放开用户的远程操作权限
-GRANT ALL PRIVILEGES ON *.* TO '<user>'@'%' IDENTIFIED BY '<password>' WITH GRANT OPTION;
-# 刷新权限规则生效
-flush privileges;
-# 在线改配置
-set <global|session>
-# 查看隔离级别
-select @@tx_isolation;
-# 设置隔离级别
-set session transaction isolation level read UNCOMMITTED;
-# 开启事务
-start transaction;
-# 事务回滚
-rollback;
-# 事务提交
-commit;
-# 关闭事务自动提交
-set autocommit = 0
-# 加共享锁
-<command> lock in share mode
-# 索引创建
-ALTER TABLE table_name ADD INDEX index_name (column_list)
-ALTER TABLE table_name ADD UNIQUE (column_list)
-ALTER TABLE table_name ADD PRIMARY KEY (column_list)
-CREATE INDEX index_name ON table_name (column_list)
-CREATE UNIQUE INDEX index_name ON table_name (column_list)
-# 删除索引
-DROP INDEX index_name ON talbe_name
-ALTER TABLE table_name DROP INDEX index_name
-ALTER TABLE table_name DROP PRIMARY KEY
-# 查看索引
-show index from table_name;
-show keys from table_name;
-```
+MySQL 主要分为 Server 层和存储引擎层
+
+- **Server 层**：主要包括连接器、查询缓存、分析器、优化器、执行器等，所有跨存储引擎的功能都在这一层实现，比如存储过程、触发器、视图，函数等，还有一个通用的日志模块 binglog 日志模块。
+- **存储引擎**： 主要负责数据的存储和读取，采用可以替换的插件式架构，支持 InnoDB、MyISAM、Memory 等多个存储引擎，其中 InnoDB 引擎有自有的日志模块 redolog 模块。**现在最常用的存储引擎是 InnoDB，它从 MySQL 5.5.5 版本开始就被当做默认存储引擎了。**
+- **组件介绍**
+  - **连接器：** 身份认证和权限相关(登录 MySQL 的时候)
+  - **查询缓存:**  执行查询语句的时候，会先查询缓存（MySQL 8.0 版本后移除，因为这个功能不太实用）
+  - **分析器:**  没有命中缓存的话，SQL 语句就会经过分析器，分析器说白了就是要先看你的 SQL 语句要干嘛，再检查你的 SQL 语句语法是否正确
+  - **优化器：** 按照 MySQL 认为最优的方案去执行
+  - **执行器:**  执行语句，然后从存储引擎返回数据
 
 
 
-### 索引为什么能提高查询速度
+![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/mysql-fw.png)
 
-- 不使用索引如和查询
+### SQL执行过程
 
-  - Mysql最小存储结构是页，页是一个单链表把数据连在一起
-  - 各个页通过双端链表连在一起
-  - 查询时，我们要遍历双端链表找到数据所在的页，然后再在页中遍历找到对应的数据项
+- 查询等过程如下：
+  - 权限校验---》查询缓存---》分析器---》优化器---》权限校验---》执行器---》引擎
+- 更新等语句执行流程如下
+  - 分析器----》权限校验----》执行器---》引擎---redo log prepare---》binlog---》redo log commit
 
-- 而我们使用索引时Innodb默认使用B+树实现如下效果，大大提高了效率
+### MyISAM和InnoDB区别
 
-  ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/mysql-index.jpg)
+- **是否支持行级锁** : MyISAM 只有表级锁(table-level locking)，而InnoDB 支持行级锁(row-level locking)和表级锁,默认为行级锁。
 
-### Hash索引的局限性
+- **是否支持事务和崩溃后的安全恢复： MyISAM** 强调的是性能，每次查询具有原子性,其执行速度比InnoDB类型更快，但是不提供事务支持。但是**InnoDB** 提供事务支持事务，外部键等高级数据库功能。 具有事务(commit)、回滚(rollback)和崩溃修复能力(crash recovery capabilities)的事务安全(transaction-safe (ACID compliant))型表。
 
-- 哈希索引也没办法利用索引完成**排序**
-- 不支持**最左匹配原则**
-- 在有大量重复键值情况下，哈希索引的效率也是极低的---->**哈希碰撞**问题。
-- **不支持范围查询**
+- **是否支持外键：** MyISAM不支持，而InnoDB支持。
 
-### InnoDB 可重复读（Repeatable read）级别为啥可以避免幻读
+- **是否支持MVCC** ：仅 InnoDB 支持。应对高并发事务, MVCC比单纯的加锁更高效;MVCC只在 READ COMMITTED 和 REPEATABLE READ 两个隔离级别下工作;MVCC可以使用 乐观(optimistic)锁 和 悲观(pessimistic)锁来实现;各数据库中MVCC实现并不统一
 
-- 表象：快照读（非阻塞读不加锁，对应加锁的叫当前读）伪MVCC
+### 数据库事务四大特性
 
-- 内在：next-key锁（行锁 + gap锁）
+- 原子性（Atomic）要么全做要么全不做
+- 一致性（Consistency）数据要保持完整性，从一个一致状态到另一个一致状态，执行事务前后，多个事务对同一个数据读取的结果是相同的
+- 隔离性（Isolation）一个事务的执行不影响其他事务
+- 持久性（Durability）事务一旦提交，变更应该永久的保存到数据库中
 
 ### 事务隔离级别
 
@@ -1918,9 +1892,7 @@ show keys from table_name;
 - Repeatable read避免不可重复读是**事务级别**的快照！每次读取的都是当前事务的版本，即使被修改了，也只会读取当前事务版本的数据
   - 至于虚读(幻读)：**是指在一个事务内读取到了别的事务插入的数据，导致前后读取不一致。**
     - 注：**和不可重复读类似，但虚读(幻读)会读到其他事务的插入的数据，导致前后读取不一致**
-    - MySQL的`Repeatable read`隔离级别加上GAP间隙锁**已经处理了幻读了**。
-- Serializable 既然Innodb已经避免了幻读还有场景用么，
-  - **丢失更新**：一个事务的更新**覆盖了其它事务的更新结果**
+    - MySQL的Repeatable read隔离级别加上GAP间隙锁**已经大概率处理了幻读了**。
 
 ### 常用存储引擎适用场景
 
@@ -1933,13 +1905,18 @@ show keys from table_name;
 - 粒度划分
   - **表锁**开销小，加锁快；不会出现死锁；锁定力度大，发生锁冲突概率高，并发度最低
   - **行锁**开销大，加锁慢；会出现死锁；锁定粒度小，发生锁冲突的概率低，并发度高
-
 - InnoDB默认行锁，也支持表锁,没有用到索引的时候用表级锁
 - MyISAM默认表锁
 - 手动给表加锁 lock tables <table_name> <read|write> ， 解锁 unlock tables <table_name>
 - 共享锁（S）：`SELECT * FROM table_name WHERE ... LOCK IN SHARE MODE`。
 - 排他锁（X)：`SELECT * FROM table_name WHERE ... FOR UPDATE`
 - InnoDB支持事务，关闭事务自动提交方法 set autocommit = 0
+
+### InnoDB锁种类
+
+- Record lock：单个行记录上的锁
+- Gap lock：间隙锁，锁定一个范围，不包括记录本身
+- Next-key lock：record+gap 锁定一个范围，包含记录本身
 
 ### MVCC和事务的隔离级别
 
@@ -1953,9 +1930,14 @@ show keys from table_name;
   - MVCC实现的**读写不阻塞**正如其名：**多版本**并发控制--->通过一定机制生成一个数据请求**时间点的一致性数据快照（Snapshot)**，并用这个快照来提供一定级别（**语句级或事务级**）的**一致性读取**。从用户的角度来看，好像是**数据库可以提供同一数据的多个版本**。
     - 其中数据快照有**两个级别**：
       - 语句级 
-        - 针对于`Read committed`隔离级别
+        - 针对于Read committed隔离级别
       - 事务级别 
-        - 针对于`Repeatable read`隔离级别
+        - 针对于Repeatable read隔离级别
+
+### InnoDB 可重复读（Repeatable read）级别为什么可以大概率避免幻读
+
+- 表象：快照读（非阻塞读不加锁，对应加锁的叫当前读）伪MVCC
+- 内在：next-key锁（行锁 + gap锁）
 
 ### Mysql事务日志
 
@@ -2007,6 +1989,25 @@ show keys from table_name;
     - **关延迟联**
     - 建立联合索引
 
+### 索引为什么能提高查询速度
+
+- 不使用索引如和查询
+
+  - Mysql最小存储结构是页，页是一个单链表把数据连在一起
+  - 各个页通过双端链表连在一起
+  - 查询时，我们要遍历双端链表找到数据所在的页，然后再在页中遍历找到对应的数据项
+
+- 而我们使用索引时Innodb默认使用B+树实现如下效果，大大提高了效率
+
+  ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/mysql-index.jpg)
+
+### Hash索引的局限性
+
+- 哈希索引也没办法利用索引完成**排序**
+- 不支持**最左匹配原则**
+- 在有大量重复键值情况下，哈希索引的效率也是极低的---->**哈希碰撞**问题。
+- **不支持范围查询**
+
 ### 稀疏索引和聚集索引 
 
 - 聚集索引
@@ -2024,15 +2025,140 @@ show keys from table_name;
   - 索引只能用于查找key是否**存在（相等）**，遇到范围查询`(>、<、between、like`左匹配)等就**不能进一步匹配**了，后面的条件退化为线性查找
   - 例如创建 union index (a , b ,c)  查（a，b）走索引，查（a，c）走不了索引
 
-### 数据库事务四大特性
+### 大表优化
 
-- 原子性（Atomic）要么全做要么全不做
+- 查询限定数据范围
 
-- 一致性（Consistency）数据要保持完整性，从一个一致状态到另一个一致状态
+  - 比如：我们当用户在查询订单历史的时候，我们可以控制在一个月的范围内
 
-- 隔离性（Isolation）一个事务的执行不影响其他事务
+- 读写分离
 
-- 持久性（Durability）事务一旦提交，变更应该永久的保存到数据库中
+  - 主库负责写，从库负责读
+
+- 垂直拆分
+
+  - 概述
+    - 简单来说垂直拆分是指数据表列的拆分，把一张列比较多的表拆分为多张表
+  - 优点
+    - 可以使得列数据变小，在查询时减少读取的Block数，减少I/O次数。此外，垂直分区可以简化表的结构，易于维护
+  - 缺点
+    - 主键会出现冗余，需要管理冗余列，并会引起Join操作，可以通过在应用层进行Join来解决。此外，垂直分区会让事务变得更加复杂
+
+- 水平拆分
+
+  - 概述
+    - 保持数据表结构不变，通过某种策略存储数据分片。这样每一片数据分散到不同的表或者库中，达到了分布式的目的。 水平拆分可以支撑非常大的数据量，**水平拆分最好分库**
+  - 优点
+    - 支持非常大的数据量存储，应用端改造也少
+  - 缺点
+    - 拆分会带来逻辑、部署、运维的各种复杂度大大提高，所以实际中使用逻辑上的分片方案来代替
+
+  - 实际中使用的方案
+    - **客户端代理：** **分片逻辑在应用端，封装在jar包中，通过修改或者封装JDBC层来实现。** 当当网的 **Sharding-JDBC** 、阿里的TDDL是两种比较常用的实现
+    - **中间件代理：** **在应用和数据中间加了一个代理层。分片逻辑统一维护在中间件服务中。** 我们现在谈的 **Mycat** 、360的Atlas、网易的DDB等等都是这种架构的实现
+
+### 高性能实践的一些规范
+
+[参考](https://mp.weixin.qq.com/s?__biz=Mzg2OTA0Njk0OA==&mid=2247485117&idx=1&sn=92361755b7c3de488b415ec4c5f46d73&chksm=cea24976f9d5c060babe50c3747616cce63df5d50947903a262704988143c2eeb4069ae45420&token=79317275&lang=zh_CN#rd)
+
+- #### 命令规范
+
+  - 所有数据库对象名称必须使用小写字母并用下划线分割
+  - 所有数据库对象名称禁止使用 MySQL 保留关键字（如果表名中包含关键字查询时，需要将其用单引号括起来）
+  - 数据库对象的命名要能做到见名识意，并且最后不要超过 32 个字符
+  - 临时库表必须以 tmp_为前缀并以日期为后缀，备份表必须以 bak_为前缀并以日期 (时间戳) 为后缀
+  - 所有存储相同数据的列名和列类型必须一致（一般作为关联列，如果查询时关联列类型不一致会自动进行数据类型隐式转换，会造成列上的索引失效，导致查询效率降低）
+
+- #### 设计规范
+
+  - 所有表必须使用 Innodb 存储引擎
+  - 数据库和表的字符集统一使用 UTF8
+  - 所有表和字段都需要添加注释
+  - 尽量控制单表数据量的大小,建议控制在 500 万以内
+  - 谨慎使用 MySQL 分区表
+  - 尽量做到冷热数据分离,减小表的宽度
+  -  禁止在表中建立预留字段
+  -  禁止在数据库中存储图片,文件等大的二进制数据
+  -  优先选择符合存储需要的最小的数据类型
+  -  避免使用 TEXT,BLOB 数据类型，最常见的 TEXT 类型可以存储 64k 的数据
+  -  避免使用 ENUM 类型
+  -  尽可能把所有列定义为 NOT NULL
+  -  使用 TIMESTAMP(4 个字节) 或 DATETIME 类型 (8 个字节) 存储时间
+  -  同财务相关的金额类数据必须使用 decimal 类型
+  
+- #### 索引规范
+
+  -  限制每张表上的索引数量,建议单张表索引不超过 5 个
+  -  禁止给表中的每一列都建立单独的索引
+  -  每个 Innodb 表必须有个主键
+  - **常见索引列建议**
+    -  出现在 SELECT、UPDATE、DELETE 语句的 WHERE 从句中的列
+    -  包含在 ORDER BY、GROUP BY、DISTINCT 中的字段
+    -  并不要将符合 1 和 2 中的字段的列都建立一个索引， 通常将 1、2 中的字段建立联合索引效果更好
+    -  多表 join 的关联列
+  - 选择索引列的顺序
+    -  区分度最高的放在联合索引的最左侧（区分度=列中不同值的数量/列的总行数）
+    -  尽量把字段长度小的列放在联合索引的最左侧（因为字段长度越小，一页能存储的数据量越大，IO 性能也就越好）
+    -  使用最频繁的列放到联合索引的左侧（这样可以比较少的建立一些索引）
+  -  避免建立冗余索引和重复索引
+  -  尽量避免使用外键约束
+
+- #### SQL语句规范
+
+  - 禁止使用 SELECT * 必须使用 SELECT <字段列表> 查询
+  -  禁止使用不含字段列表的 INSERT 语句
+  -  避免使用子查询，可以把子查询优化为 join 操作
+  -  避免使用 JOIN 关联太多的表
+  -  对应同一列进行 or 判断时，使用 in 代替 or
+  -  禁止使用 order by rand() 进行随机排序
+  -  WHERE 从句中禁止对列进行函数转换和计算
+  -  在明显不会有重复值时使用 UNION ALL 而不是 UNION
+  -  拆分复杂的大 SQL 为多个小 SQL
+  -  对于连续数值，使用`BETWEEN`不用`IN`：`SELECT id FROM t WHERE num BETWEEN 1 AND 5`
+  -  尽量避免在 WHERE 子句中使用!=或<>操作符，否则将引擎放弃使用索引而进行全表扫描
+
+
+
+
+### 常用命令
+
+```mysql
+# 查配置
+show variables like '%';
+# 放开用户的远程操作权限
+GRANT ALL PRIVILEGES ON *.* TO '<user>'@'%' IDENTIFIED BY '<password>' WITH GRANT OPTION;
+# 刷新权限规则生效
+flush privileges;
+# 在线改配置
+set <global|session>
+# 查看隔离级别
+select @@tx_isolation;
+# 设置隔离级别
+set session transaction isolation level read UNCOMMITTED;
+# 开启事务
+start transaction;
+# 事务回滚
+rollback;
+# 事务提交
+commit;
+# 关闭事务自动提交
+set autocommit = 0
+# 加共享锁
+<command> lock in share mode
+# 索引创建
+ALTER TABLE table_name ADD INDEX index_name (column_list)
+ALTER TABLE table_name ADD UNIQUE (column_list)
+ALTER TABLE table_name ADD PRIMARY KEY (column_list)
+CREATE INDEX index_name ON table_name (column_list)
+CREATE UNIQUE INDEX index_name ON table_name (column_list)
+# 删除索引
+DROP INDEX index_name ON talbe_name
+ALTER TABLE table_name DROP INDEX index_name
+ALTER TABLE table_name DROP PRIMARY KEY
+# 查看索引
+show index from table_name;
+show keys from table_name;
+```
 
 
 
