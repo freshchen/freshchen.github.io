@@ -1245,6 +1245,13 @@ docker rmi --force $(docker images -q)
     - 特点
       - 自动扩容
 
+  - **SynchronousQueue**
+
+    - 特点
+      - 没有存储，读直接交给写，写直接交给读
+      - TransferStack
+      - TransferQueue（默认 非公平模式）
+
 ### TreeSet
 
 - #### 应用场景
@@ -1394,7 +1401,10 @@ public class NewStack<T>{
 
 ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/threadpoolstatus.jpg)
 
-### 如何创建ThreadPoolExecutor线程池
+### 如何创建线程池
+
+- 结构图
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/thread-pool.jpg)
 
 - 直接通过new ThreadPoolExecutor()创建（推荐，可以定制化，控制细节）
   - 构造参数：
