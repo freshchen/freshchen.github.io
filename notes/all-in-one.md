@@ -962,6 +962,40 @@ docker rmi --force $(docker images -q)
 - **Exchanger**
   - 作用：主要用于两个线程之间交换数据
 
+### AbstractQueuedSynchronizer(AQS)
+
+- 大名鼎鼎的AQS，这里涉及源码较多，就贴连接吧
+- [一行一行源码分析清楚AbstractQueuedSynchronizer](https://www.javadoop.com/post/AbstractQueuedSynchronizer)
+
+### ReentrantLock
+
+- 特征
+  - 公平锁
+  - 非公平锁
+  - 可重入
+
+- 实现
+
+  - AQS
+  - lockSupport + CAS + CLH
+
+- 过程
+
+  - 加锁过程 reentrantLock.lock() 
+    - acquire()要锁
+    - tryAcquire()尝试拿锁
+    - 如没拿到锁，则addWaiter()加入等待队列
+    - 加入等待队列冲突了，则enq()自旋的插入队列
+    - 然后acquireQueued()循环的拿等待队列的头去抢锁
+    - 没抢到的线程都要被挂起shouldParkAfterFailedAcquire()， LockSupport.park()
+  - 解锁过程 reentrantLock.unlock()
+    - release()解锁
+    - tryRelease()尝试解锁
+    - unparkSuccessor()唤醒阻塞队列的后继，LockSupport.unpark()
+    - 然后也进acquireQueued()
+
+  
+
 ### J.U.C阻塞队列BlockingQueue
 
 - ArrayBlockingQueue
@@ -1168,7 +1202,16 @@ docker rmi --force $(docker images -q)
     - 解决方案
       - 使用完 ThreadLocal方法后 最好手动调用remove()方法
 
+### 安全发布对象
 
+- 概念
+  - 发布对象：使一个对象能被当前范围之外的代码所使用
+  - 对象溢出：一种错误的发布。当一个对象还没有构造完成时，就使它被其他线程所见
+- 如何安全发布对象
+  - 在静态初始化函数中初始化一个对象引用
+  - 将对象的引用保存到volatile类型域或者AtomicReference对象中
+  - 将对象的引用保存到某个正确构造对象的final类型域中
+  - 将对象的引用保存到一个由锁保护的域中
 
 
 
@@ -1637,6 +1680,11 @@ elementData[elementCount] = null; /* to let gc do its work
 
 ### ConcurrentLinkedQueue
 
+- #### 应用场景
+
+  - 适合在对性能要求相对较高，同时对队列的读写存在多个线程同时进行的场景
+  - 非阻塞
+
 - #### 数据结构
 
   - 链表
@@ -1644,6 +1692,70 @@ elementData[elementCount] = null; /* to let gc do its work
 - #### 线程安全性
 
   - 安全
+  - 实现
+    - 通过 循环CAS 操作实现
+
+### PriorityQueue
+
+- #### 应用场景
+
+  - 找最大最小元素
+
+- #### 数据结构
+
+  - 堆
+
+- #### 线程安全性
+
+  - 不安全
+  - 线程安全的替代
+    - **PriorityBlockingQueue**
+
+### BlockingQueue
+
+- #### 应用场景
+
+  - 生产者-消费者
+
+- #### 线程安全性
+
+  - 安全
+
+- #### 特点
+
+  - 对插入操作、移除操作、获取元素操作提供了四种不同的方法用于不同的场景中使用
+
+    - |             | *Throws exception* | *Special value* | *Blocks*         | *Times out*          |
+      | ----------- | ------------------ | --------------- | ---------------- | -------------------- |
+      | **Insert**  | add(e)             | offer(e)        | **put(e)**       | offer(e, time, unit) |
+      | **Remove**  | remove()           | poll()          | **take()**       | poll(time, unit)     |
+      | **Examine** | element()          | peek()          | *not applicable* | *not applicable*     |
+
+  - 不能插入null
+
+- #### 主要实现
+
+  - **ArrayBlockingQueue**
+    - 数据结构
+      - 数组
+    - 线程安全性
+      - 实现
+        - 可重入锁
+        - 插入或读取操作都需要拿锁
+    - 特点
+      - 容量不能改变
+      - 默认情况不能保证公平性
+  - **LinkedBlockingQueue**
+    - 数据结构
+      - 单向链表
+  - **PriorityBlockingQueue** 
+    - 数据结构
+      - 堆
+    - 线程安全性
+      - 实现
+        - **ReentrantLock**
+    - 特点
+      - 自动扩容
 
 ### TreeSet
 
@@ -1657,16 +1769,6 @@ elementData[elementCount] = null; /* to let gc do its work
   - 线程安全的替代
     - CopyOnWriteArraySet
     - ConcurrentSkipListSet
-
-### PriorityQueue
-
-- #### 应用场景
-
-  - 找最大最小元素
-
-- #### 数据结构
-
-  - 堆
 
 ### 重写equals
 
