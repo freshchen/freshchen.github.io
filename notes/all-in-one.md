@@ -7,8 +7,6 @@
   - [数据结构与算法](#数据结构与算法)
 - [Java](#Java)
   - [核心](#核心)
-  - [并发](#并发)
-  - [IO](#JavaIO)
   - [JVM](#JVM)
 - [JavaEE](#JavaEE)
   - [Spring](#Spring)
@@ -943,7 +941,376 @@ docker rmi --force $(docker images -q)
 
 # Java
 
-## 并发
+## 核心
+
+### HashMap
+
+- #### 应用场景
+
+  - 键值对高效存取
+
+- #### 数据结构
+
+  - 1.7数组加链表
+  - 1.8数组加链表加红黑树
+
+- #### 线程安全
+
+  - **不安全**
+  - 多线程下使用扩容步骤存在问题
+  - 线程安全的替代
+    - Hashtable
+    - ConcurrentHashMap
+    - ConcurrentSkipListMap
+
+- #### 默认大小
+
+  - 初始数组默认长度16
+
+- #### 何时扩容
+
+  - HashMap.Size   >=  Capacity * LoadFactor当前容量超过总容量乘以散列因子（默认0.75）就扩容，每次2倍扩容
+
+- #### 扩容机制
+
+  - jdk1.7
+    - 对于扩容操作，底层实现都需要新生成一个数组，然后拷贝旧数组里面的每一个Entry链表到新数组里面，这个方法在单线程下执行是没有任何问题的，但是在多线程下面却有很大问题，主要的问题在于基于**头插法**的数据迁移，会有几率造成链表倒置，从而引发链表闭链，当map.get(key)落到这个Entry时候就会进入死循环，导致程序死循环，并吃满CPU
+  - jdk1.8
+    - 没有使用**头插法**，而是保留了元素的顺序位置，把要迁移的元素分类之后，最后在分别放到新数组对应的位置上
+
+- #### 为什么数组的长度为2的幂次方
+
+  - **计算桶中位置**
+
+    - 求出 对象的hashcode之后模一个数组长度就可以映射到具体的桶中
+
+      ```java
+      index = hashCode % Length
+      ```
+
+    - 取余操作的性能是不如与运算的，**当长度为2的幂次方时，就可以等价成下面的与运算**
+
+      ```java
+      index = hashCode & (Length - 1)
+      ```
+
+      - 例如
+        - Length是16，对应二进制 10000
+        - 那么(Length - 1)，对应二进制 1111
+        - 被计算出的hash值，高位忽略，只考虑低4位与运算的结果就是对应的桶
+
+    - jdk1.8继续做了优化
+
+      ```java
+      index = hashCode ^ (hashCode >>> 16) & (Length - 1)
+      ```
+
+      - 因为我们只用到了后四位去计算index，所以高位就全忽略了产生冲突的概率大，这时我们把高16位右移并且和原值做异或运算，已最小的代价让高位也参与到计算中来
+
+  - **扩容方面**
+
+    - 扩容需要重计算桶中位置
+    - 接上例
+      - 由于默认扩容2倍，length变为32
+      - 此时(Length - 1)，对应二进制 11111
+      - 高位依旧忽略，现在需要考虑低5位
+      - 如果第5位为0则index不变
+      - 如果第5位为1则index增加一个过去数组的长度
+
+- #### jdk1.8 何时转红黑树
+
+  - Node桶下链表长度超过8转为红黑树
+  - Node桶下红黑树节点数小于6就转回链表
+
+### LinkedHashMap
+
+- #### 应用场景
+
+  - 保证插入的顺序
+
+### Hashtable
+
+- #### 默认大小
+
+  - 11
+
+- #### 线程安全性
+
+  - **安全**
+  - 实现
+    - 方法加synchronized
+
+### ConcurrentHashMap
+
+- #### 线程安全性
+
+  - **安全**
+  - jdk1.7
+    - 采用的是分段锁的机制，ConcurrentHashMap维护了一个Segment数组，Segment这个类继承了重入锁ReentrantLock，并且该类里面维护了一个 HashEntry<K,V>[] table数组，在写操作put，remove，扩容的时候，会对Segment加锁
+  - jdk1.8
+    - 新的版本主要使用了Unsafe类的CAS自旋赋值+synchronized同步+LockSupport阻塞等手段直接操作Node， 取消了分段的概念，实现的高效并发。实现中的优化，**等待的线程会帮助扩容的线程一起完成扩容操作**
+
+### ConcurrentSkipListMap
+
+### ArrayList
+
+- #### 特点
+
+  - 实现标识接口RandomAccess，随机存取，查询效率高，大数据量下迭代效率差
+
+- #### 数据结构
+
+  - 数组
+
+- #### 线程安全性
+
+  - 不安全
+  - 线程安全的替代
+    - List list = Collections.synchronizedList(new ArrayList())
+    - CopyOnWriteArrayList
+
+- #### 默认大小
+
+  - 有个懒加载设计，new ArrayList() 返回的是一个空的默认数组
+  - 当第一次add操作之后扩容成10
+
+- #### 何时扩容
+
+  - 装不下就扩容
+  - newCapacity = oldCapacity + (oldCapacity >> 1) 每次1.5倍扩容
+
+- #### 扩容机制
+
+  - 调用 Arrays.copyOf() 方法， 改方法是 native （System.arraycopy）实现
+
+- #### 克隆
+
+  - 深拷贝
+
+### CopyOnWriteArrayList
+
+- #### 数据结构
+
+  - 数组
+
+- #### 线程安全性
+
+  - 安全
+  - 实现
+    - 读操作不加锁，写操作是在副本上执行的，执行完了再去替换原先的值
+    - 在写操作时，使用ReentrantLock保证了同步，然后开始做复制，以及写操作
+
+- #### 特点
+
+  - 读取是完全不用加锁的
+  - 写入也不会阻塞读取操作
+  - 只有写入和写入之间需要进行同步等待
+
+### LinkedList
+
+- #### 数据结构
+
+  - 双端链表
+
+- #### 线程安全性
+
+  - 不安全
+  - 线程安全的替代
+    - List list = Collections.synchronizedList(new LinkedList())
+    - ConcurrentLinkedQueue
+
+- #### 克隆
+
+  - 浅拷贝
+
+### ConcurrentLinkedQueue
+
+- #### 应用场景
+
+  - 适合在对性能要求相对较高，同时对队列的读写存在多个线程同时进行的场景
+  - 非阻塞
+
+- #### 数据结构
+
+  - 链表
+
+- #### 线程安全性
+
+  - 安全
+  - 实现
+    - 通过 循环CAS 操作实现
+
+### PriorityQueue
+
+- #### 应用场景
+
+  - 找最大最小元素
+
+- #### 数据结构
+
+  - 堆
+
+- #### 线程安全性
+
+  - 不安全
+  - 线程安全的替代
+    - **PriorityBlockingQueue**
+
+### BlockingQueue
+
+- #### 应用场景
+
+  - 生产者-消费者
+
+- #### 线程安全性
+
+  - 安全
+
+- #### 特点
+
+  - 对插入操作、移除操作、获取元素操作提供了四种不同的方法用于不同的场景中使用
+
+    - |             | *Throws exception* | *Special value* | *Blocks*         | *Times out*          |
+      | ----------- | ------------------ | --------------- | ---------------- | -------------------- |
+      | **Insert**  | add(e)             | offer(e)        | **put(e)**       | offer(e, time, unit) |
+      | **Remove**  | remove()           | poll()          | **take()**       | poll(time, unit)     |
+      | **Examine** | element()          | peek()          | *not applicable* | *not applicable*     |
+
+  - 不能插入null
+
+- #### 主要实现
+
+  - **ArrayBlockingQueue**
+
+    - 数据结构
+
+      - 数组
+
+    - 线程安全性
+
+      - 实现
+
+        - 可重入锁，Condition
+
+          - ```java
+            final ReentrantLock lock;
+            private final Condition notEmpty;
+            private final Condition notFull;
+            ```
+
+        - 插入或读取操作都需要拿锁
+
+    - 特点
+
+      - 容量不能改变
+      - 默认情况不能保证公平性
+
+    - 参数
+
+      - 队列容量，其限制了队列中最多允许的元素个数
+      - 指定独占锁是公平锁还是非公平锁。非公平锁的吞吐量比较高，公平锁可以保证每次都是等待最久的线程获取到锁
+      - 可以指定用一个集合来初始化，将此集合中的元素在构造方法期间就先添加到队列中
+
+  - **LinkedBlockingQueue**
+
+    - 数据结构
+
+      - 单向链表
+
+    - 线程安全性
+
+      - 可重入锁，Condition
+
+        - ```java
+          // take, poll, peek 等读操作的方法需要获取到这个锁
+          private final ReentrantLock takeLock = new ReentrantLock();
+          
+          // 如果读操作的时候队列是空的，那么等待 notEmpty 条件
+          private final Condition notEmpty = takeLock.newCondition();
+          
+          // put, offer 等写操作的方法需要获取到这个锁
+          private final ReentrantLock putLock = new ReentrantLock();
+          
+          // 如果写操作的时候队列是满的，那么等待 notFull 条件
+          private final Condition notFull = putLock.newCondition();
+          ```
+
+  - **PriorityBlockingQueue** 
+
+    - 数据结构
+      - 堆
+    - 线程安全性
+      - 实现
+        - **ReentrantLock**
+    - 特点
+      - 自动扩容
+
+### TreeSet
+
+- #### 应用场景
+
+  - 自动排序
+
+- #### 线程安全性
+
+  - 不安全
+  - 线程安全的替代
+    - CopyOnWriteArraySet
+    - ConcurrentSkipListSet
+
+### 重写equals
+
+- 四大原则，自反性，对称性，传递性，一致性，非空性
+- 如果继承一个类，并且新增了值属性，重写equals会变得很麻烦，这时候推荐用组合
+- 如果重写了equals但是没有重写hashcode有可能出现equals返回true但是hashcode不相等的情况
+
+### 异常处理一般规范
+
+- 在Finally块中清理资源或者使用Try-With-Resource语句
+- 抛出明确的异常，避免抛出Exception这种
+- 在注释Javadoc里边添加@throws声明并且描述什么样的情况会导致异常
+- 将异常与它的描述信息一并抛出
+- 优先catch捕获更明确的异常
+- 不要捕获Throwable
+- 别忽略异常
+- 不要打印异常日志的同时将其抛出
+- 自定义异常包裹某个异常的同时不要丢弃它原本的信息
+
+### BIO,NIO,AIO的区别
+
+- **BIO**
+  - 基于字节流(InputStream,OutputStream)，字符流(Reader,Writer)
+  - 同步阻塞I/O操作
+  - 一个连接对应一个线程
+- **NIO**（>jdk4）
+  - 多路复用，同步非阻塞I/O操作
+  - 增加了Channel,Buffer,Selector等组件
+  - 多个连接对应一个线程
+- **AIO**（>jdk7）
+  - 异步非阻塞I/O操作
+  - 基于事件和回调机制
+  - 请求立即返回，连接和线程无对应关系
+
+### Java泛型参数
+
+生产者用extends，消费者用super
+
+```java
+public class NewStack<T>{
+    public void pushAll(Iterable <? extends T> src) {
+        for (T t : src) {
+            push(t);
+        }
+    }
+    
+    public void popAll(Collection <? super T> dst){
+        while (!isEmpty()){
+            dst.add(pop());
+        }
+    }    
+}
+
+```
 
 ### J.U.C总览图
 
@@ -973,6 +1340,7 @@ docker rmi --force $(docker images -q)
 - 大名鼎鼎的AQS，这里涉及源码较多，就贴连接吧
 - [一行一行源码分析清楚AbstractQueuedSynchronizer](https://www.javadoop.com/post/AbstractQueuedSynchronizer)
 - [一行一行源码分析清楚AbstractQueuedSynchronizer-2](https://www.javadoop.com/post/AbstractQueuedSynchronizer-2)
+- [一行一行源码分析清楚AbstractQueuedSynchronizer-3](https://www.javadoop.com/post/AbstractQueuedSynchronizer-3)
 
 ### ReentrantLock
 
@@ -1485,342 +1853,6 @@ elementData[elementCount] = null; /* to let gc do its work
 - 将对象引用放入了缓存，可以用WeakHashMap作为引用外键
 
 - 监听器和其他回调，可以用WeakHashMap作为引用外键
-
-
-
-## JavaIO
-
-### BIO,NIO,AIO的区别
-
-- **BIO**
-  - 基于字节流(InputStream,OutputStream)，字符流(Reader,Writer)
-  - 同步阻塞I/O操作
-  - 一个连接对应一个线程
-- **NIO**（>jdk4）
-  - 多路复用，同步非阻塞I/O操作
-  - 增加了Channel,Buffer,Selector等组件
-  - 多个连接对应一个线程
-- **AIO**（>jdk7）
-  - 异步非阻塞I/O操作
-  - 基于事件和回调机制
-  - 请求立即返回，连接和线程无对应关系
-
-## 核心
-
-### HashMap
-
-- #### 应用场景
-
-  - 键值对高效存取
-
-- #### 数据结构
-
-  - 1.7数组加链表
-  - 1.8数组加链表加红黑树
-
-- #### 线程安全
-
-  - **不安全**
-  - 多线程下使用扩容步骤存在问题
-  - 线程安全的替代
-    - Hashtable
-    - ConcurrentHashMap
-    - ConcurrentSkipListMap
-
-- #### 默认大小
-
-  - 初始数组默认长度16
-
-- #### 何时扩容
-
-  - HashMap.Size   >=  Capacity * LoadFactor当前容量超过总容量乘以散列因子（默认0.75）就扩容，每次2倍扩容
-
-- #### 扩容机制
-
-  - jdk1.7
-    - 对于扩容操作，底层实现都需要新生成一个数组，然后拷贝旧数组里面的每一个Entry链表到新数组里面，这个方法在单线程下执行是没有任何问题的，但是在多线程下面却有很大问题，主要的问题在于基于**头插法**的数据迁移，会有几率造成链表倒置，从而引发链表闭链，当map.get(key)落到这个Entry时候就会进入死循环，导致程序死循环，并吃满CPU
-  - jdk1.8
-    - 没有使用**头插法**，而是保留了元素的顺序位置，把要迁移的元素分类之后，最后在分别放到新数组对应的位置上
-
-- #### 为什么数组的长度为2的幂次方
-
-  - **计算桶中位置**
-
-    - 求出 对象的hashcode之后模一个数组长度就可以映射到具体的桶中
-
-      ```java
-      index = hashCode % Length
-      ```
-
-    - 取余操作的性能是不如与运算的，**当长度为2的幂次方时，就可以等价成下面的与运算**
-
-      ```java
-      index = hashCode & (Length - 1)
-      ```
-
-      - 例如
-        - Length是16，对应二进制 10000
-        - 那么(Length - 1)，对应二进制 1111
-        - 被计算出的hash值，高位忽略，只考虑低4位与运算的结果就是对应的桶
-
-    - jdk1.8继续做了优化
-
-      ```java
-      index = hashCode ^ (hashCode >>> 16) & (Length - 1)
-      ```
-
-      - 因为我们只用到了后四位去计算index，所以高位就全忽略了产生冲突的概率大，这时我们把高16位右移并且和原值做异或运算，已最小的代价让高位也参与到计算中来
-
-  - **扩容方面**
-
-    - 扩容需要重计算桶中位置
-    - 接上例
-      - 由于默认扩容2倍，length变为32
-      - 此时(Length - 1)，对应二进制 11111
-      - 高位依旧忽略，现在需要考虑低5位
-      - 如果第5位为0则index不变
-      - 如果第5位为1则index增加一个过去数组的长度
-
-- #### jdk1.8 何时转红黑树
-
-  - Node桶下链表长度超过8转为红黑树
-  - Node桶下红黑树节点数小于6就转回链表
-
-### LinkedHashMap
-
-- #### 应用场景
-
-  - 保证插入的顺序
-
-### Hashtable
-
-- #### 默认大小
-
-  - 11
-
-- #### 线程安全性
-
-  - **安全**
-  - 实现
-    - 方法加synchronized
-
-### ConcurrentHashMap
-
-- #### 线程安全性
-
-  - **安全**
-  - jdk1.7
-    - 采用的是分段锁的机制，ConcurrentHashMap维护了一个Segment数组，Segment这个类继承了重入锁ReentrantLock，并且该类里面维护了一个 HashEntry<K,V>[] table数组，在写操作put，remove，扩容的时候，会对Segment加锁
-  - jdk1.8
-    - 新的版本主要使用了Unsafe类的CAS自旋赋值+synchronized同步+LockSupport阻塞等手段直接操作Node， 取消了分段的概念，实现的高效并发。实现中的优化，**等待的线程会帮助扩容的线程一起完成扩容操作**
-
-### ConcurrentSkipListMap
-
-### ArrayList
-
-- #### 特点
-
-  - 实现标识接口RandomAccess，随机存取，查询效率高，大数据量下迭代效率差
-
-- #### 数据结构
-
-  - 数组
-
-- #### 线程安全性
-
-  - 不安全
-  - 线程安全的替代
-    - List list = Collections.synchronizedList(new ArrayList())
-    - CopyOnWriteArrayList
-
-- #### 默认大小
-
-  - 有个懒加载设计，new ArrayList() 返回的是一个空的默认数组
-  - 当第一次add操作之后扩容成10
-
-- #### 何时扩容
-
-  - 装不下就扩容
-  - newCapacity = oldCapacity + (oldCapacity >> 1) 每次1.5倍扩容
-
-- #### 扩容机制
-
-  - 调用 Arrays.copyOf() 方法， 改方法是 native （System.arraycopy）实现
-
-- #### 克隆
-
-  - 深拷贝
-
-### CopyOnWriteArrayList
-
-- #### 数据结构
-
-  - 数组
-
-- #### 线程安全性
-
-  - 安全
-  - 实现
-    - 读操作不加锁，写操作是在副本上执行的，执行完了再去替换原先的值
-    - 在写操作时，使用ReentrantLock保证了同步，然后开始做复制，以及写操作
-
-- #### 特点
-
-  - 读取是完全不用加锁的
-  - 写入也不会阻塞读取操作
-  - 只有写入和写入之间需要进行同步等待
-
-### LinkedList
-
-- #### 数据结构
-
-  - 双端链表
-
-- #### 线程安全性
-
-  - 不安全
-  - 线程安全的替代
-    - List list = Collections.synchronizedList(new LinkedList())
-    - ConcurrentLinkedQueue
-
-- #### 克隆
-
-  - 浅拷贝
-
-### ConcurrentLinkedQueue
-
-- #### 应用场景
-
-  - 适合在对性能要求相对较高，同时对队列的读写存在多个线程同时进行的场景
-  - 非阻塞
-
-- #### 数据结构
-
-  - 链表
-
-- #### 线程安全性
-
-  - 安全
-  - 实现
-    - 通过 循环CAS 操作实现
-
-### PriorityQueue
-
-- #### 应用场景
-
-  - 找最大最小元素
-
-- #### 数据结构
-
-  - 堆
-
-- #### 线程安全性
-
-  - 不安全
-  - 线程安全的替代
-    - **PriorityBlockingQueue**
-
-### BlockingQueue
-
-- #### 应用场景
-
-  - 生产者-消费者
-
-- #### 线程安全性
-
-  - 安全
-
-- #### 特点
-
-  - 对插入操作、移除操作、获取元素操作提供了四种不同的方法用于不同的场景中使用
-
-    - |             | *Throws exception* | *Special value* | *Blocks*         | *Times out*          |
-      | ----------- | ------------------ | --------------- | ---------------- | -------------------- |
-      | **Insert**  | add(e)             | offer(e)        | **put(e)**       | offer(e, time, unit) |
-      | **Remove**  | remove()           | poll()          | **take()**       | poll(time, unit)     |
-      | **Examine** | element()          | peek()          | *not applicable* | *not applicable*     |
-
-  - 不能插入null
-
-- #### 主要实现
-
-  - **ArrayBlockingQueue**
-    - 数据结构
-      - 数组
-    - 线程安全性
-      - 实现
-        - 可重入锁
-        - 插入或读取操作都需要拿锁
-    - 特点
-      - 容量不能改变
-      - 默认情况不能保证公平性
-  - **LinkedBlockingQueue**
-    - 数据结构
-      - 单向链表
-  - **PriorityBlockingQueue** 
-    - 数据结构
-      - 堆
-    - 线程安全性
-      - 实现
-        - **ReentrantLock**
-    - 特点
-      - 自动扩容
-
-### TreeSet
-
-- #### 应用场景
-
-  - 自动排序
-
-- #### 线程安全性
-
-  - 不安全
-  - 线程安全的替代
-    - CopyOnWriteArraySet
-    - ConcurrentSkipListSet
-
-### 重写equals
-
-- 四大原则，自反性，对称性，传递性，一致性，非空性
-
-- 如果继承一个类，并且新增了值属性，重写equals会变得很麻烦，这时候推荐用组合
-
-- 如果重写了equals但是没有重写hashcode有可能出现equals返回true但是hashcode不相等的情况
-
-### 异常处理一般规范
-
-- 在Finally块中清理资源或者使用Try-With-Resource语句
-- 抛出明确的异常，避免抛出Exception这种
-- 在注释Javadoc里边添加@throws声明并且描述什么样的情况会导致异常
-- 将异常与它的描述信息一并抛出
-- 优先catch捕获更明确的异常
-- 不要捕获Throwable
-- 别忽略异常
-- 不要打印异常日志的同时将其抛出
-- 自定义异常包裹某个异常的同时不要丢弃它原本的信息
-
-
-
-### Java泛型参数
-
-生产者用extends，消费者用super
-
-```java
-public class NewStack<T>{
-    public void pushAll(Iterable <? extends T> src) {
-        for (T t : src) {
-            push(t);
-        }
-    }
-    
-    public void popAll(Collection <? super T> dst){
-        while (!isEmpty()){
-            dst.add(pop());
-        }
-    }    
-}
-
-```
 
 
 
