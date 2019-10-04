@@ -964,8 +964,15 @@ docker rmi --force $(docker images -q)
 
 ### AbstractQueuedSynchronizer(AQS)
 
+- 大致原理
+  - CAS
+  - CLH
+  - LockSupport
+  - Condition
+
 - 大名鼎鼎的AQS，这里涉及源码较多，就贴连接吧
 - [一行一行源码分析清楚AbstractQueuedSynchronizer](https://www.javadoop.com/post/AbstractQueuedSynchronizer)
+- [一行一行源码分析清楚AbstractQueuedSynchronizer-2](https://www.javadoop.com/post/AbstractQueuedSynchronizer-2)
 
 ### ReentrantLock
 

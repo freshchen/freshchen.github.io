@@ -10,7 +10,7 @@
 
 - ### 个人博客
 
-  - [Blog](others/blog_index.md)
+  - [Blog](notes/blog_index.md)
 
 - ###  常用链接任务清单
 
@@ -22,5 +22,5 @@
   
 - ### 个人简介
 
-  - [Resume](others/introduction.md)
+  - [Resume](notes/introduction.md)
 
