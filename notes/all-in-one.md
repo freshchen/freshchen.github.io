@@ -1404,8 +1404,9 @@ public class NewStack<T>{
 ### 如何创建线程池
 
 - 结构图
-  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/thread-pool.jpg)
-
+  
+- ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/thread-pool.jpg)
+  
 - 直接通过new ThreadPoolExecutor()创建（推荐，可以定制化，控制细节）
   - 构造参数：
     - int corePoolSize：线程池正常运行时的核心线程数，即使空闲也会等待任务在线程数少于核心数量时，有新任务进来就新建一个线程，即使有的线程没事干，等超出核心数量后，就不会新建线程了，空闲的线程就得去任务队列里取任务执行了
@@ -1508,6 +1509,10 @@ public class NewStack<T>{
 
 ### synchronized关键字
 
+- 作用：
+  - 同步
+  - 可见性
+
 - 使用方式
   - 获取对象锁
     - 同步代码块: 指定加锁对象，对给定对象加锁
@@ -1522,6 +1527,7 @@ public class NewStack<T>{
 - 实现方式
   - 同步代码块：使用了monitorenter和monitorexit指令
   - 同步方法：通过方法修饰符上的ACC_AYNCHRONIZED实现
+  - monitorexit结束时会把更新直接刷入主内存
 - JVM中锁升级流程
   
   ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/synchronized.png)
@@ -1600,7 +1606,14 @@ public class NewStack<T>{
   - 将对象的引用保存到某个正确构造对象的final类型域中
   - 将对象的引用保存到一个由锁保护的域中
 
+### final语义
 
+- 用 final 修饰的类不可以被继承
+- 用 final 修饰的方法不可以被覆写
+- 用 final 修饰的属性一旦初始化以后不可以被修改
+- 如果一个对象**完全初始化**以后，一个线程持有该对象的引用，那么这个线程一定可以看到正确初始化的 final 属性的值（也就是不加final可能看到的是默认的0值）
+- final 属性的 freeze 操作发生于被调用的构造方法结束的时候
+- final 属性可以通过反射和其他方法来改变
 
 ## JVM
 
