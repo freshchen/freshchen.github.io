@@ -408,6 +408,28 @@ docker rmi --force $(docker images -q)
   - 发送端将每个数据包封装为固定长度（不够的可以通过补0填充），这样接收端每次从接收缓冲区中读取固定长度的数据就自然而然的把每个数据包拆分开来
   - 可以在数据包之间设置边界，如添加特殊符号，这样，接收端通过这个边界就可以将不同的数据包拆分开
 
+### TCP滑动窗口
+
+- 作用
+  - 保证可靠性
+  - 拥塞控制
+- 目的
+  - 为了增加网络的吞吐量，想讲数据包一起发送过去，这时候便产生了“滑动窗口”这种协议。有了“滑动窗口”这个概念，我们又解决了其中出现的一些问题。例如丢包，我们又通过重发的机制去解决了
+- 过程
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/tcp-window1.png)
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/tcp-window2.png)
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/tcp-window3.png)
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/tcp-window4.png)
+
+### UDP特点
+
+- 面向非连接
+- 支持同时向多个客户端传输相同的消息
+- 数据包报头8字节，额外开销小（TCP包头20字节）
+- 吞吐量只受限于数据生成速率，传输速率，机器性能
+- 不保证可靠交付
+- 面向报文，不对应用程序提交的报文信息进行拆分和合并
+
 ### 浏览器中输入URL到页面返回的过程
 
 - **浏览器中输入域名例如www.baidu.com**
