@@ -1192,11 +1192,11 @@ docker rmi --force $(docker images -q)
 
   - 对插入操作、移除操作、获取元素操作提供了四种不同的方法用于不同的场景中使用
 
-    - |             | *Throws exception* | *Special value* | *Blocks*         | *Times out*          |
-      | ----------- | ------------------ | --------------- | ---------------- | -------------------- |
-      | **Insert**  | add(e)             | offer(e)        | **put(e)**       | offer(e, time, unit) |
-      | **Remove**  | remove()           | poll()          | **take()**       | poll(time, unit)     |
-      | **Examine** | element()          | peek()          | *not applicable* | *not applicable*     |
+    - | | *Throws exception* | *Special value* | *Blocks* | *Times out*|
+      | --- | --- | --- | --- | --- |
+      | Insert  | add(e) | offer(e)| put(e) | offer(e, time, unit) |
+      | Remove | remove() | poll()| take()| poll(time, unit)|
+      | Examine | element()| peek()| not applicable | not applicable|
 
   - 不能插入null
 
