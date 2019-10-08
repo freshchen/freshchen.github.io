@@ -1083,7 +1083,7 @@ docker rmi --force $(docker images -q)
   - jdk1.8
     - 新的版本主要使用了Unsafe类的CAS自旋赋值+synchronized同步+LockSupport阻塞等手段直接操作Node， 取消了分段的概念，实现的高效并发。实现中的优化，**等待的线程会帮助扩容的线程一起完成扩容操作**
 
-#### TreeMap
+### TreeMap
 
 - #### 应用场景
 
@@ -1233,13 +1233,20 @@ docker rmi --force $(docker images -q)
 - #### 特点
 
   - 对插入操作、移除操作、获取元素操作提供了四种不同的方法用于不同的场景中使用
-
-      | | *Throws exception* | *Special value* | *Blocks* | *Times out*|
-      | --- | --- | --- | --- | --- |
-      | Insert  | add(e) | offer(e)| put(e) | offer(e, time, unit) |
-      | Remove | remove() | poll()| take()| poll(time, unit)|
-      | Examine | element()| peek()| not applicable | not applicable|
-
+      - Throws exception抛异常
+          - add(e)
+          - remove()
+          - element()
+      - Special value回特殊值
+          - offer(e)
+          - poll()
+          - peek()
+      - Blocks阻塞
+          - put(e)
+          - take()
+      - Times out超时
+          - offer(e, time, unit)
+          - poll(time, unit)
   - 不能插入null
 
 - #### 主要实现
