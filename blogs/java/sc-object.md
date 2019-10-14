@@ -1,6 +1,8 @@
-# JDK1.8源码分析1 Object
+# Java读源码之Object
 
 ### 前言
+
+> JDK版本: 1.8 
 
 最近想看看jdk源码提高下技术深度（比较闲），万物皆对象，虽然Object大多native方法但还是很重要的。
 
