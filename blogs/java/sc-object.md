@@ -1,12 +1,12 @@
 # Java读源码之Object
 
-### 前言
+## 前言
 
 > JDK版本: 1.8 
 
 最近想看看jdk源码提高下技术深度（比较闲），万物皆对象，虽然Object大多native方法但还是很重要的。
 
-### 源码
+## 源码
 
 ```java
 package java.lang;
@@ -147,7 +147,7 @@ public class Object {
 
 ```
 
-### 实践
+## 实践
 
 #### clone()
 
