@@ -4,221 +4,47 @@
 
 > JDK版本: 1.8 
 
-Thread类源码中已经明确弃用了 suspend()和resume()两个方法，一定有类似的替代吧？没错就是LockSupport类中的pack()和unpark()方法，LockSupport中基本都是native方法，而且明确告诉我们这个类是为拥有更高级别抽象的并发类服务的，开发中我们不会用到这个类，是否意为中我们不用掌握这个类？
+### 作用
 
-了解LockSupport可以帮助我们更好理解并发，而且大家熟悉的并发中最核心的AQS类中也大量的使用了LockSupport，所以还是有必要看一看的，至少熟悉其中的概念
+LockSupport类主要提供了park和unpark两个native方法，用于阻塞和唤醒线程。注释中有这么一段：
 
-### 为什么要用LockSupport
+**这个类是为拥有更高级别抽象的并发类服务的，开发中我们不会用到这个类**
 
-首先我们来看一下为什么suspend和resume会被抛弃的原因
+既然只是native方法，开发中也用不到，那么还有必要去看么？
+
+了解LockSupport可以帮助我们更好理解并发，而且大家熟悉的并发中最核心的AQS类中也大量的使用了LockSupport，所以还是有必要看一看的，至少熟悉其中的概念。
+
+### 为什么需要LockSupport
+
+已经知道了这个类就是阻塞唤醒，Object.wait和Object.notify，Thread.suspend和Thread.resume这两对方法也是类似效果，那么还有必要去看么？？？
+
+#### Thread.suspend和Thread.resume为什么被弃用
 
 - suspend将线程挂起，从运行状态阻塞状态，但是并不释放所占用的锁
 - suspend方法至少已经满足互斥，不可剥夺两个死锁的条件了
 - resume将线程解除挂起，从阻塞状态到运行状态，通常是等待其他任务完成， 请求与保持条件也成立了
 - 最后只差 循环等待条件 就死锁了，这实在太危险了，一不小心就容易死锁，而且死锁的问题是很难排查的
 
-LockSupport就不会
+#### Object.wait和Object.notify存在什么问题
 
-suspend将线程挂起，运行->阻塞；调用后并不释放所占用的锁
+- 不满足条件时我们需要在代码中保证拿到锁才能调用，把线程放到等待队列中
+- notify是从等待池中随机放一个线程出来，当需要唤醒特定线程时，只能notifyAll
 
-resume将线程解挂，阻塞->就绪
+LockSupport会有上面的问题么，又有哪些特点呢，让我们进入源码
 
-2、suspend和resume这两种方法不建议使用，因为存在很多弊端。
+## 源码
 
-（1）独占：因为suspend在调用过程中不会释放所占用的锁，所以如果使用不当会造成对公共对象的独占，使得其他线程无法访问公共对象，严重的话造成死锁。
-
-
-
-
-
- 创建锁和其他同步类的基本线程阻塞原语。 
-
- 这个类与使用它的每个线程关联一个许可证 
-
- 如果获得许可证，对公园的呼叫将立即返回，并在此过程中消耗掉它;否则它可能阻塞。如果尚未获得许可证，则调用unpark将使许可证可用。 
-
- 最多只有一个 许可证
-
-
-
- 这个对象在线程被阻塞时进行记录，以允许监视和诊断工具识别线程被阻塞的原因。 
-
-
-
-public static void unpark(线程线程)
-提供给定线程的许可证(如果它还没有可用)。如果线程在park上被阻塞，那么它将解锁。否则，它的下一个调用park是保证不阻塞。如果没有启动给定的线程，则不能保证此操作有任何效果。
-
-
-
-
-
-公共静态空间公园(对象阻挡器)
-为线程调度的目的禁用当前线程，除非许可证可用。
-
-如果许可证可用，则使用许可证并立即返回;否则，当前线程将出于线程调度的目的而被禁用，并处于休眠状态，直到发生以下三种情况之一:
-其他一些线程以当前线程为目标调用unpark;或
-
-其他一些线程中断当前线程;或
-虚假的调用(也就是说，没有任何理由)返回。
-
-此方法不报告是哪些原因导致该方法返回
-
-
-
-public static void parkNanos(Object blocker，
-长nano)
-
-除非有许可证，否则在指定的等待时间内，禁止当前线程用于线程调度。
-如果许可证可用，则使用许可证并立即返回;否则，当前线程将出于线程调度的目的而被禁用，并处于休眠状态，直到发生以下四种情况之一:
-
-其他一些线程以当前线程为目标调用unpark;或
-其他一些线程中断当前线程;或
-
-指定的等候时间已过;或
-
-
-
-public static void parktill (Object blocker，
-长期限)
-
-为了线程调度的目的，在指定的截止日期之前禁用当前线程，除非许可证可用。
-如果许可证可用，则使用许可证并立即返回;否则，当前线程将出于线程调度的目的而被禁用，并处于休眠状态，直到发生以下四种情况之一:
-
-其他一些线程以当前线程为目标调用unpark;或
-其他一些线程中断当前线程;或
-
-超过指定期限;或
-叫年代
-
-
-
-
-
-公共静态对象getBlocker(线程t)
-返回提供给park方法的最近一次调用的blocker对象，该方法尚未被解除阻塞，如果未被阻塞，则返回null。返回的值只是一个瞬时快照——线程可能在不同的blocker对象上解除了阻塞或阻塞。
-
-
-
-
-
-公众静态空间公园()
-为线程调度的目的禁用当前线程，除非许可证可用。
-
-如果许可证可用，则使用许可证并立即返回;否则，当前线程将出于线程调度的目的而被禁用，并处于休眠状态，直到发生以下三种情况之一:
-其他一些线程以当前线程为目标调用unpark;或
-
-其他一些线程中断当前线程;或
-虚假的调用(也就是说，没有任何理由)返回。
-
-此方法不报告是哪些原因导致该方法返回。调用者寿
-
-
-
-
-
-public static void parkNanos(long nanos)
-除非有许可证，否则在指定的等待时间内，禁止当前线程用于线程调度。
-
-如果许可证可用，则使用许可证并立即返回;否则，当前线程将出于线程调度的目的而被禁用，并处于休眠状态，直到发生以下四种情况之一:
-其他一些线程以当前线程为目标调用unpark;或
-
-其他一些线程中断当前线程;或
-指定的等候时间已过;或
-
-那个假的(也就是没有理由的)叫r
-
-
-
-
-
-public static void parktill(截止时间长)
-为了线程调度的目的，在指定的截止日期之前禁用当前线程，除非许可证可用。
-
-如果许可证可用，则使用许可证并立即返回;否则，当前线程将出于线程调度的目的而被禁用，并处于休眠状态，直到发生以下四种情况之一:
-其他一些线程以当前线程为目标调用unpark;或
-
-其他一些线程中断当前线程;或
-超过指定期限;或
-
-虚假的调用(也就是说，没有任何理由)返回。
-T
-
-
+### 类声明和属性
 
 ```java
 package java.util.concurrent.locks;
 
 public class LockSupport {
-    private LockSupport() {} // Cannot be instantiated.
-
-    private static void setBlocker(Thread t, Object arg) {
-        // Even though volatile, hotspot doesn't need a write barrier here.
-        UNSAFE.putObject(t, parkBlockerOffset, arg);
-    }
-
-    public static void unpark(Thread thread) {
-        if (thread != null)
-            UNSAFE.unpark(thread);
-    }
-
-    public static void park(Object blocker) {
-        Thread t = Thread.currentThread();
-        setBlocker(t, blocker);
-        UNSAFE.park(false, 0L);
-        setBlocker(t, null);
-    }
-
-    public static void parkNanos(Object blocker, long nanos) {
-        if (nanos > 0) {
-            Thread t = Thread.currentThread();
-            setBlocker(t, blocker);
-            UNSAFE.park(false, nanos);
-            setBlocker(t, null);
-        }
-    }
-
-    public static void parkUntil(Object blocker, long deadline) {
-        Thread t = Thread.currentThread();
-        setBlocker(t, blocker);
-        UNSAFE.park(true, deadline);
-        setBlocker(t, null);
-    }
-
-    public static Object getBlocker(Thread t) {
-        if (t == null)
-            throw new NullPointerException();
-        return UNSAFE.getObjectVolatile(t, parkBlockerOffset);
-    }
-
-    public static void park() {
-        UNSAFE.park(false, 0L);
-    }
-
-    public static void parkNanos(long nanos) {
-        if (nanos > 0)
-            UNSAFE.park(false, nanos);
-    }
-
-    public static void parkUntil(long deadline) {
-        UNSAFE.park(true, deadline);
-    }
-
-    static final int nextSecondarySeed() {
-        int r;
-        Thread t = Thread.currentThread();
-        if ((r = UNSAFE.getInt(t, SECONDARY)) != 0) {
-            r ^= r << 13;   // xorshift
-            r ^= r >>> 17;
-            r ^= r << 5;
-        }
-        else if ((r = java.util.concurrent.ThreadLocalRandom.current().nextInt()) == 0)
-            r = 1; // avoid zero
-        UNSAFE.putInt(t, SECONDARY, r);
-        return r;
-    }
-
-    // Hotspot implementation via intrinsics API
+    // 工具类，ban掉构造
+    private LockSupport() {}
+    
     private static final sun.misc.Unsafe UNSAFE;
+    // parkBlocker的内存偏移量
     private static final long parkBlockerOffset;
     private static final long SEED;
     private static final long PROBE;
@@ -227,6 +53,7 @@ public class LockSupport {
         try {
             UNSAFE = sun.misc.Unsafe.getUnsafe();
             Class<?> tk = Thread.class;
+            // 反射拿到Thread类中的parkBlocker属性，然后获取其在内存中的偏移量
             parkBlockerOffset = UNSAFE.objectFieldOffset
                 (tk.getDeclaredField("parkBlocker"));
             SEED = UNSAFE.objectFieldOffset
@@ -238,6 +65,135 @@ public class LockSupport {
         } catch (Exception ex) { throw new Error(ex); }
     }
 
+}
+```
+
+### park()
+
+```java
+// 最简单的方式，但是不推荐
+public static void park() {
+    /**
+     * 将当前线程挂起，是通过二元信号量，获取许可证实现的，拿到许可证后才执行挂起
+     * 不是基于对象的监视器锁，所以不需要显示的同步
+     * 如果超时了，被中断了或者unpark了就会return并且释放许可证
+     * 需要注意的是和wait一样也会因为JVM内部未知原因return，所以我们如果使用也需要放在循环内
+     * 第一个参数 flase代表纳秒级别超时控制，此级别下第二个参数timeout为0代表无限等待
+     * 第一个参数 true代表毫秒级别超时控制，此级别下第二个参数timeout为0会立即返回
+     */ 
+    UNSAFE.park(false, 0L);
+}
+
+// 推荐方式，blocker是个辅助对象，用于跟踪许可证的获取，以及定位一些阻塞问题，一般情况park(this)就行
+public static void park(Object blocker) {
+    Thread t = Thread.currentThread();
+    // 标记对于当前线程t，blocker正在获取许可证，出问题通过getBlocker方法去定位
+    setBlocker(t, blocker);
+    UNSAFE.park(false, 0L);
+    // park操作return了，标记许可证已经释放
+    setBlocker(t, null);
+}
+
+private static void setBlocker(Thread t, Object arg) {
+    // 通过偏移量，把给当前线程t的parkBlocker属性赋值为arg
+    UNSAFE.putObject(t, parkBlockerOffset, arg);
+}
+```
+
+相信大家已经基本了解park操作了，LockSupport还给我们提供了其他功能
+
+```java
+// 推荐，纳秒级别timeout后return
+public static void parkNanos(Object blocker, long nanos) {
+    if (nanos > 0) {
+        Thread t = Thread.currentThread();
+        setBlocker(t, blocker);
+        UNSAFE.park(false, nanos);
+        setBlocker(t, null);
+    }
+}
+
+// 推荐，毫秒级别timeout后return
+public static void parkUntil(Object blocker, long deadline) {
+    Thread t = Thread.currentThread();
+    setBlocker(t, blocker);
+    UNSAFE.park(true, deadline);
+    setBlocker(t, null);
+}
+
+// 不推荐，纳秒级别timeout后return
+public static void parkNanos(long nanos) {
+    if (nanos > 0)
+        UNSAFE.park(false, nanos);
+}
+
+// 不推荐，毫秒级别timeout后return
+public static void parkUntil(long deadline) {
+    UNSAFE.park(true, deadline);
+}
+```
+
+### unpark
+
+```java
+public static void unpark(Thread thread) {
+    if (thread != null)     
+        //释放线程thread的许可证，如果已经是释放状态那就什么都不会发生，因为总共就1个许可，所以unpark可以先于park执行没有任务问题
+        UNSAFE.unpark(thread);
+}
+```
+
+### 其他方法
+
+```java
+// 由于包权限问题从ThreadLocalRandom类中copy过来的，用于生成随机数种子
+static final int nextSecondarySeed() {
+    int r;
+    Thread t = Thread.currentThread();
+    if ((r = UNSAFE.getInt(t, SECONDARY)) != 0) {
+        r ^= r << 13;   // xorshift
+        r ^= r >>> 17;
+        r ^= r << 5;
+    }
+    else if ((r = java.util.concurrent.ThreadLocalRandom.current().nextInt()) == 0)
+        r = 1; // avoid zero
+    UNSAFE.putInt(t, SECONDARY, r);
+    return r;
+}
+```
+
+## 实践
+
+```java
+public class LockSupportTest {
+    
+    public static void main(String[] args) {
+        AtomicBoolean flag = new AtomicBoolean(true);
+        Thread thread = new Thread(() -> {
+            Thread curr = Thread.currentThread();
+            System.out.println("线程1 即将被阻塞");
+            while (flag.get()) {
+                LockSupport.park(curr);
+                System.out.println("线程1 复活");
+            }
+            System.out.println("线程1 结束使命");
+        });
+        thread.start();
+
+        new Thread(() -> {
+            System.out.println("唤醒线程1");
+            flag.compareAndSet(true, false);
+            LockSupport.unpark(thread);
+        }).start();
+    }
+    
+    /**
+     * 输出：
+     * 线程1 即将被阻塞
+     * 唤醒线程1
+     * 线程1 复活
+     * 线程1 结束使命
+     */
 }
 ```
 
