@@ -7,7 +7,7 @@
   - [Queens版本Openstack安装记录](../blogs/os/openstack/openstack-queens-install.md)
   
   - [Nginx安装-基于腾讯云Centos7](../blogs/os/nginx-install.md)
-  - [自签的SSL证书创建与验证过程](../blogs/os/self-ssl-signing.md)
+  - [自签的SSL证书创建与验证过程](../blogs/os/self-ssl-certificate.md)
   - [Apache支持HTTPS](../blogs/os/apache-self-ssl.md)
   - [自己制作Yum源](../blogs/os/yumsource.md)
   
