@@ -1,12 +1,12 @@
 # Java8新特性之Lambda
 
-## Lambda是什么
+## 为什么要Lambda
 
-Java8应该是目前最大的一次更新了，更新后我们迎来了很多新特性，其中便包括Lambda表达式，可以让我们进行函数式编程，看过一些经典案例之后，平时也开始大量用Lambda表达式，毕竟是真的短真的易读，语法糖真的香！
+Java8应该是目前最大的一次更新了，更新后我们迎来了很多新特性，其中便包括Lambda表达式，函数式编程的思想正式进入Java，让我们看一个经典案例。
 
 ### 例1 按照两个人的年龄排序的功能
 
-过去的写法：
+采用匿名内部类已经算简介了，如果专门用一个类去实现Comparator再new出来就更烦了，过去的写法：
 
 ```java
 # 已经创建好了三个Person实例
@@ -32,11 +32,91 @@ Collections.sort(people, (p1, p2) -> p1.getAge().compareTo(p2.getAge()));
 Collections.sort(people, Comparator.comparing(Person::getAge));
 ```
 
-9102年了，函数式编程被提到的越来越多，深谙照猫画虎已经行不通了，现在函数式编程和设计模式的碰撞也很多，真的有必要了解下相关概念
+是不是真的短真的易读，语法糖真的甜！已经9102年了，函数式编程被提到的越来越多，深谙照猫画虎已经行不通了，而且函数式编程和设计模式的碰撞也很多，真的有必要了解下相关概念
 
-### 函数式编程解决什么问题
+## 哪里用Lambda
 
-函数式编程主要引入了**行为参数化**，我们可以把一段代码和值一样传递给方法，传入不同的代码实现不同的功能。这是不是很像策略模式以及模板模式？
+### 函数式编程
+
+>  函数式编程是一种思想，核心是**行为参数化**，把一段代码像值一样传递给方法，传入不同的代码实现不同的功能
+
+这是不是很像策略模式以及模板模式？如例1所示，不需要大量的套路代码了，也不需要把代码写到一个类中然后新建实例对象最后把实例对象传递
+
+### 函数式接口
+
+>  函数式接口就是只定义一个抽象方法的接口来表示行为，抽象方法不允许抛出受检异常，Java8接口可以有default方法了，函数式接口是允许有default方法的
+
+Lambda表达式看上去确实很有吸引力，我能在任何地方都使用么？答案是不能的，我们只能通过Lambda表达式把代码传到函数式接口中，拿例1中的Comparator接口来看
+
+```java
+@FunctionalInterface
+public interface Comparator<T> {
+    int compare(T o1, T o2);
+}
+```
+
+Comparator接口只有compare一个抽象方法，Java8特意给它加了注解告诉我们这就是个函数式接口，其实也很好理解，我们没用创建任何类，只传了一串代码，如果Comparator有两个抽象方法，编译器怎么知道我们实现的是compare方法呢
+
+## 怎么用Lambda
+
+上面都是说的函数式编程，那么什么是Lambda
+
+> Lambda就是匿名的行为参数化的一种语法实现，它没有名称，但它有参数列表、函数主体、返回类型，可能还有一个可以抛出的异常列表
+
+语法如下：
+
+- (parameters) -> expression
+  - 默认Return的，expression只能是一句代码
+- (parameters) -> { statements; }
+  - 没有默认Retrun，就相当于Comparator.compare( statements; )，statements可以是好多行
+
+tips：如果statements很长，那么我们就不应该用Lambda，而应该单独实现一个方法，继续例1
+
+```java
+public static Integer sortPersonByAge(Person person1, Person person2) {
+    return person1.getAge() - person2.getAge();
+}
+```
+
+
+
+## 凭什么Lambda
+
+
+
+
+
+函数描述符
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+函数式接口的抽象方法的签名基本上就是Lambda表达式的签名。我们将这种抽象方法叫作
+函数描述符。例如，Runnable接口可以看作一个什么也不接受什么也不返回（void）的函数的
+签名，因为它只有一个叫作run的抽象方法，这个方法什么也不接受，什么也不返回（void）。①
+我们在本章中使用了一个特殊表示法来描述Lambda和函数式接口的签名。() -> void代表
+了参数列表为空，且返回void的函数。这正是Runnable接口所代表的。 举另一个例子，(Apple,
+Apple) -> int代表接受两个Apple作为参数且返回int的函数。我们会在3.4节和本章后面的
+表3-2中提供关于函数描述符的更多信息。
+
+
+
+
+
+
+
+
 
 
 
@@ -72,12 +152,7 @@ boolean）给filterApples，后者则希望接受一个Predicate<Apple>参数。
 
 
 
-行为参数化，就是一个方法接受多个不同的行为作为参数，并在内部使用它们，完成不
-同行为的能力。
- 行为参数化可让代码更好地适应不断变化的要求，减轻未来的工作量。
- 传递代码，就是将新行为作为参数传递给方法。但在Java 8之前这实现起来很啰嗦。为接
-口声明许多只用一次的实体类而造成的啰嗦代码，在Java 8之前可以用匿名类来减少。
- Java API包含很多可以用不同行为进行参数化的方法，包括排序、线程和GUI处理。
+
 
 
 
@@ -88,34 +163,7 @@ boolean）给filterApples，后者则希望接受一个Predicate<Apple>参数。
 
 
 
-Lambda
-的基本语法是
-(parameters) -> expression
-或（请注意语句的花括号）
-(parameters) -> { statements; }
 
-
-
-
-
-一言以蔽之，函数式接口就是只定义一个抽象方法的接口。你已经知道了Java API中的一些
-其他函数式接口，如我们在第2章中谈到的Comparator和Runnable。
-
-
-
-你将会在第9章中看到，接口现在还可以拥有默认方法（即在类没有对方法进行实现时，
-其主体为方法提供默认实现的方法）。哪怕有很多默认方法，只要接口只定义了一个抽象
-方法，它就仍然是一个函数式接口。
-
-
-
-函数式接口的抽象方法的签名基本上就是Lambda表达式的签名。我们将这种抽象方法叫作
-函数描述符。例如，Runnable接口可以看作一个什么也不接受什么也不返回（void）的函数的
-签名，因为它只有一个叫作run的抽象方法，这个方法什么也不接受，什么也不返回（void）。①
-我们在本章中使用了一个特殊表示法来描述Lambda和函数式接口的签名。() -> void代表
-了参数列表为空，且返回void的函数。这正是Runnable接口所代表的。 举另一个例子，(Apple,
-Apple) -> int代表接受两个Apple作为参数且返回int的函数。我们会在3.4节和本章后面的
-表3-2中提供关于函数描述符的更多信息。
 
 
 
@@ -146,15 +194,6 @@ Integer，这和Predicate<Apple>:(Apple) -> boolean中定义的test方法的签�
 ：“为什么只有在需要函数式接口的时候才可以传递Lambda呢？”
 
 
-
-@FunctionalInterface又是怎么回事？
-如果你去看看新的Java API，会发现函数式接口带有@FunctionalInterface的标注（3.4
-节中会深入研究函数式接口，并会给出一个长长的列表）。这个标注用于表示该接口会设计成
-一个函数式接口。如果你用@FunctionalInterface定义了一个接口，而它却不是函数式接
-口的话，编译器将返回一个提示原因的错误。例如，错误消息可能是“Multiple non-overriding
-abstract methods found in interface Foo”，表明存在多个抽象方法。请注意，@FunctionalInterface
-不是必需的，但对于为此设计的接口而言，使用它是比较好的做法。它就像是@Override
-标注表示方法被重写了。
 
 
 
