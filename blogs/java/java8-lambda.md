@@ -4,21 +4,39 @@
 
 Java8应该是目前最大的一次更新了，更新后我们迎来了很多新特性，其中便包括Lambda表达式，可以让我们进行函数式编程，看过一些经典案例之后，平时也开始大量用Lambda表达式，毕竟是真的短真的易读，语法糖真的香！
 
-举例说明：如果我们要实现按照两个人的年龄排序的功能
+### 例1 按照两个人的年龄排序的功能
 
-9102年了，函数式编程被提到的越来越多并且目前主流语言包括JS，Golang，Python等都一定程度的支持了函数式编程，当然Java也不例外。
+过去的写法：
 
-Stream<T>就是
-系列T类型的项目。你现在可以把它看成一种比较花哨的迭代器。Stream API的很多方法可以链
-接起来形成一个复杂的流水线，就像先前例子里面链接起来的Unix命令一样。
+```java
+# 已经创建好了三个Person实例
+List<Person> people = Arrays.asList(person1, person2, person3);
 
-你的行为必须能够同时对不同的输入安全
-地执行。一般情况下这就意味着，你写代码时不能访问共享的可变数据。这些函数有时被称为“纯
-函数”或“无副作用函数”或“无状态函数”，
+Collections.sort(people, new Comparator<Person>() {
+    @Override
+    public int compare(Person o1, Person o2) {
+        return o1.getAge().compareTo(o2.getAge());
+    }
+});
+```
 
+Lambda版本写法：
 
+```java
+Collections.sort(people, (p1, p2) -> p1.getAge().compareTo(p2.getAge()));
+```
 
-用行为参数化把代码传递给方法
+还有更简介的方法引用写法：
+
+```java
+Collections.sort(people, Comparator.comparing(Person::getAge));
+```
+
+9102年了，函数式编程被提到的越来越多，深谙照猫画虎已经行不通了，现在函数式编程和设计模式的碰撞也很多，真的有必要了解下相关概念
+
+### 函数式编程解决什么问题
+
+函数式编程主要引入了**行为参数化**，我们可以把一段代码和值一样传递给方法，传入不同的代码实现不同的功能。这是不是很像策略模式以及模板模式？
 
 
 
@@ -51,88 +69,6 @@ boolean）给filterApples，后者则希望接受一个Predicate<Apple>参数。
 但要是Lambda的长度多于几行（它的行为也不是一目了然）的话，
 那你还是应该用方法引用来指向一个有描述性名称的方法，而不是使用匿名的Lambda。你应该
 以代码的清晰度为准绳。
-
-
-
-
-
-和Collection API相比，Stream API处理数据的方式非常不同。用集合的话，你得
-自己去做迭代的过程。你得用for-each循环一个个去迭代元素，然后再处理元素。我们把这种
-数据迭代的方法称为外部迭代。相反，有了Stream API，你根本用不着操心循环的事情。数据处
-理完全是在库内部进行的。我们把这种思想叫作内部迭代
-
-
-
-
-
-问题在于，通过多线程代码来利用并行（使用先前Java版本中的Thread API）并非易事。你
-得换一种思路：线程可能会同时访问并更新共享变量。因此，如果没有协调好②，数据可能会被
-意外改变。相比一步步执行的顺序模型，这个模型不太好理解③。比如，图1-5就展示了如果没有
-同步好，两个线程同时向共享变量sum加上一个数时，可能出现的问题。
-
-
-
-
-
-，Collection主要是为了存储和访问数据，而Stream则主要用
-于描述对数据的计算
-
-
-
-Java 8的解决方法就是打破最后一环——接口如今可以包含实现类没有提供实现的方法签名
-了！那谁来实现它呢？缺失的方法主体随接口提供了（因此就有了默认实现），而不是由实现类
-提供。
-
-
-
-
-
-我把它叫作我的“价值亿万美金的错误”。就是在1965年发明了空引用……我无法
-抗拒放进一个空引用的诱惑，仅仅是因为它实现起来非常容易。
-
-
-
-
-
-你需要一种比添加很多参数更好的方法来应对变化的需求
-
-
-
-你可以把这些标准看作filter方法的不同行为。你刚做的这些和“策略设计模式”①相关，
-它让你定义一族算法，把它们封装起来（称为“策略”），然后在运行时选择一个算法。在这里，
-算法族就是ApplePredicate，不同的策略就是AppleHeavyWeightPredicate和AppleGreen-
-ColorPredicate。
-
-
-
-
-
-匿名类和你熟悉的Java局部类（块中定义的类）差不多，但匿名类没有名字。它允许你同时
-声明并实例化一个类。换句话说，它允许你随用随建。
-
-
-
-在通往抽象的路上，我们还可以更进一步。目前，filterApples方法还只适用于Apple。
-你还可以将List类型抽象化，从而超越你眼前要处理的问题：
-public interface Predicate<T>{
-boolean test(T t);
-}
-public static <T> List<T> filter(List<T> list, Predicate<T> p){
-List<T> result = new ArrayList<>();
-for(T e: list){
-if(p.test(e)){
-result.add(e);
-}
-}
-return result;
-}
-现在你可以把filter方法用在香蕉、桔子、Integer或是String的列表上了。这里有一个
-使用Lambda表达式的例子：
-List<Apple> redApples =
-filter(inventory, (Apple apple) -> "red".equals(apple.getColor()));
-List<Integer> evenNumbers =
-filter(numbers, (Integer i) -> i % 2 == 0);
-酷不酷？你现在在灵活性和简洁性之间找到了最佳平衡点，这在Java 8之前是不可能做到的！
 
 
 
