@@ -2075,6 +2075,35 @@ Spring事务的本质其实就是数据库对事务的支持，没有数据库�
 
 
 
+### MyBatis
+
+#### 执行流程
+
+- 通过XML配置
+  - 创建SqlSessionFactory
+    - SqlSessionFactoryBuilder通过XPathParser解析主配置文件
+      - SqlSessionFactoryBuilder和配置文件是一对一的，只能解析一次
+      - 解析完成之后配置文件信息保存在了Configuration对象实例
+      - 将configuration交给DefaultSqlSessionFactory创建实例
+    - 获取SqlSession
+        - SqlSessionFactory从configuration中拿到执行器类型
+        - 然后openSessionFromDataSource生成DefaultSqlSession
+            - 获取environment（数据库连接地址用户密码等）
+            - 获取transactionFactory
+            - 创建一个事务
+            - 用上面创建的事务，以及传入的执行器类型创建执行器executor
+            - 最后根据executor，configuration，是否自动提交创建DefaultSqlSession
+    - 有了SqlSession就可以向数据库发送请求了
+        - 根据传入的ID到mapping配置文件中找到要执行的sql语句
+
+
+
+
+
+
+
+
+
 ### Netty
 
 #### Netty的特点
