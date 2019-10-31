@@ -39,11 +39,11 @@
 
 
 
-# 基础
+## 基础
 
-## 操作系统
+### 操作系统
 
-### I/O 模型
+#### I/O 模型
 
 - **阻塞式 I/O 模型(blocking I/O）**
   - 描述：在阻塞式 I/O 模型中，应用程序在从调用 recvfrom 开始到它返回有数据报准备好这段时间是阻塞的，recvfrom 返回成功后，应用进程开始处理数据报
@@ -77,7 +77,7 @@
 
 ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/io-model.jpg)
 
-### I/O处理线程模型
+#### I/O处理线程模型
 
 - **传统阻塞 I/O 服务模型**
 
@@ -123,7 +123,7 @@
 
 
 
-### I/O多路复用技术select、poll、epoll之间的区别
+#### I/O多路复用技术select、poll、epoll之间的区别
 
 - **select**
   - 单个进程所能打开的最大连接数有FD_SETSIZE宏定义，其大小是32个整数的大小（在32位的机器上，大小就是32 * 32，同理64位机器上FD_SETSIZE为32 * 64）
@@ -136,7 +136,7 @@
   - 因为epoll内核中实现是根据每个fd上的callback函数来实现的，只有活跃的socket才会主动调用callback，所以在活跃socket较少的情况下，使用epoll没有前面两者的线性下降的性能问题，但是所有socket都很活跃的情况下，可能会有性能问题
   - epoll通过内核和用户空间共享一块内存来实现的消息传递
 
-### 进程间共享内存的8种方式
+#### 进程间共享内存的8种方式
 
 - 无名管道( pipe )：管道是一种半双工的通信方式，数据只能单向流动，而且只能在父子进程间使用
 - 高级管道(popen)：将另一个程序当做一个新的进程在当前程序进程中启动，则它算是当前程序的子进程
@@ -149,13 +149,13 @@
 
 
 
-## Linux
+### Linux
 
-### Linux常用命令
+#### Linux常用命令
 
 ```bash
 ########################      文本操作      ########################
-# 升序排列
+## 升序排列
 ls -lrt
 # 目录dos2unix转换格式
 find . -type f -exec dos2unix {} \;
@@ -355,9 +355,9 @@ docker rmi --force $(docker images -q)
 
 
 
-## 网络
+### 网络
 
-### 网络模型
+#### 网络模型
 
 - 常说的模型主要有3中，TCP/IP模型是OSI模型的一种商用实现
 
@@ -369,7 +369,7 @@ docker rmi --force $(docker images -q)
 
 
 
-### TCP建立连接三次握手
+#### TCP建立连接三次握手
 
 - 第一次握手：建立连接时，客户端发送syn包（seq=x）到服务器，并进入**SYN_SENT**状态，等待服务器确认；SYN：同步序列编号
 - 第二次握手：服务器收到syn包，必须确认客户的SYN（ack=x+1），同时自己也发送一个SYN包（seq=y），即SYN+ACK包，此时服务器进入**SYN_RECV**状态
@@ -377,7 +377,7 @@ docker rmi --force $(docker images -q)
 
 ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/tcp-3.png)
 
-### TCP结束连接四次挥手
+#### TCP结束连接四次挥手
 
 - 第一次挥手：客户端进程发出连接释放报文，并且停止发送数据。释放数据报文首部，FIN=1，其序列号为seq=u（等于前面已经传送过来的数据的最后一个字节的序号加1），此时，客户端进入FIN-WAIT-1（终止等待1）状态。 TCP规定，FIN报文段即使不携带数据，也要消耗一个序号
 - 第二次挥手：服务器收到连接释放报文，发出确认报文，ACK=1，ack=u+1，并且带上自己的序列号seq=v，此时，服务端就进入了CLOSE-WAIT（关闭等待）状态。TCP服务器通知高层的应用进程，客户端向服务器的方向就释放了，这时候处于半关闭状态，即客户端已经没有数据要发送了，但是服务器若发送数据，客户端依然要接受。这个状态还要持续一段时间，也就是整个CLOSE-WAIT状态持续的时间，客户端收到服务器的确认请求后，此时，客户端就进入FIN-WAIT-2（终止等待2）状态，等待服务器发送连接释放报文（在这之前还需要接受服务器发送的最后的数据）
@@ -386,7 +386,7 @@ docker rmi --force $(docker images -q)
 
 ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/tcp-4.png)
 
-### TCP粘包，拆包
+#### TCP粘包，拆包
 
 粘包拆包问题是处于网络比较底层的问题，在数据链路层、网络层以及传输层都有可能发生。我们日常的网络应用开发大都在传输层进行，由于UDP有消息保护边界，不会发生粘包拆包问题，因此粘包拆包问题只发生在TCP协议中
 
@@ -408,7 +408,7 @@ docker rmi --force $(docker images -q)
   - 发送端将每个数据包封装为固定长度（不够的可以通过补0填充），这样接收端每次从接收缓冲区中读取固定长度的数据就自然而然的把每个数据包拆分开来
   - 可以在数据包之间设置边界，如添加特殊符号，这样，接收端通过这个边界就可以将不同的数据包拆分开
 
-### TCP滑动窗口
+#### TCP滑动窗口
 
 - 作用
   - 保证可靠性
@@ -421,7 +421,7 @@ docker rmi --force $(docker images -q)
   - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/tcp-window3.png)
   - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/tcp-window4.png)
 
-### UDP特点
+#### UDP特点
 
 - 面向非连接
 - 支持同时向多个客户端传输相同的消息
@@ -430,7 +430,7 @@ docker rmi --force $(docker images -q)
 - 不保证可靠交付
 - 面向报文，不对应用程序提交的报文信息进行拆分和合并
 
-### 浏览器中输入URL到页面返回的过程
+#### 浏览器中输入URL到页面返回的过程
 
 - **浏览器中输入域名例如www.baidu.com**
 - **DNS域名解析**
@@ -450,7 +450,7 @@ docker rmi --force $(docker images -q)
 - **TCP释放链接**
 - **浏览器显示页面中所有文本**
 
-### HTTPS过程解析
+#### HTTPS过程解析
 
 - 概述
   - HTTPS：Hypertext Transfer Protocol Secure 超文本传输安全协议
@@ -501,7 +501,7 @@ docker rmi --force $(docker images -q)
   - sever端使用会话密钥加密（生成方式与客户端相同，使用握手过程中获得的服务器随机数、客户端随机数、Premaster secret计算生成）之前所有收发握手消息的Hash和MAC值，发送给客户端去校验。若客户端服务器都校验成功，握手阶段完成，双方将按照SSL记录协议的规范使用协商生成的会话密钥加密发送数据
   - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/tls.png)
 
-### ARP地址解析协议（链路层）
+#### ARP地址解析协议（链路层）
 
 - 介绍
   - ARP协议提供了网络层地址（IP地址）到物理地址（mac地址）之间的动态映射
@@ -525,9 +525,9 @@ docker rmi --force $(docker images -q)
 
 
 
-## 数据结构与算法
+### 数据结构与算法
 
-### 常用排序算法
+#### 常用排序算法
 
 实现比较丑陋，勿喷啊
 
@@ -730,7 +730,7 @@ docker rmi --force $(docker images -q)
   }
   ```
 
-### 二叉树
+#### 二叉树
 
 前序 中序 后续 层级遍历
 
@@ -848,13 +848,13 @@ docker rmi --force $(docker images -q)
   }
   ```
 
-### 算法验证对数器
+#### 算法验证对数器
 
 - 准备样本随机生成器
 - 准备一个绝对正确但是复杂度不好的算法
 - 将待验证算法和绝对正确算法压测，比较
 
-### 主定理与递归时间复杂度的计算
+#### 主定理与递归时间复杂度的计算
 
 - 主定理：如果有一个问题规模为 n，递推的子问题数量为 a，每个子问题的规模为n/b（假设每个子问题的规模基本一样），递推以外进行的计算工作为 f(n)（比如归并排序，需要合并序列，则 f(n)就是合并序列需要的运算量），那么对于这个问题有如下递推关系式：
 - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/main1.jpe)
@@ -863,7 +863,7 @@ docker rmi --force $(docker images -q)
 
 
 
-### B树和B+树定义与区别
+#### B树和B+树定义与区别
 
 - M阶B树
   - 定义
@@ -890,7 +890,7 @@ docker rmi --force $(docker images -q)
     - b+树查询必须查找到叶子节点，b树只要匹配到即可不用管元素位置，因此b+树查找更稳定（并不慢）
     - 对于范围查找来说，b+树只需遍历叶子节点链表即可，b树却需要重复地中序遍历
 
-### 并查集
+#### 并查集
 
 - 用于解决
   - 两个元素是否在同一个集合（优化，查的过程中把路过的节点直接连头节点）
@@ -899,7 +899,7 @@ docker rmi --force $(docker images -q)
   - 数组
   - 双HashMap
 
-### 红黑树
+#### 红黑树
 
 - 特点
   - 每个节点非红即黑
@@ -908,7 +908,7 @@ docker rmi --force $(docker images -q)
   - 每个叶子节点都是黑色的空节点
   - 从根节点到叶节点或空子节点的每条路径，必须包含相同数目的黑色节点（即相同的黑色高度）
 
-### 跳跃表
+#### 跳跃表
 
 - 特点
 
@@ -919,7 +919,7 @@ docker rmi --force $(docker images -q)
 
   ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/skip-list.jpg)
 
-### 前缀树/字典树（Trie）
+#### 前缀树/字典树（Trie）
 
 - 用于解决
   - 常用于快速检索
@@ -929,7 +929,7 @@ docker rmi --force $(docker images -q)
   - 从根节点到某个节点，路径上所有的字符连接起来，就是这个节点所对应的字符串
   - 每个节点的子节点所包含的字符都不同
 
-### 如何从暴力递归改动态规范
+#### 如何从暴力递归改动态规范
 
 - 首先写好一个暴力递归
   - 分析这个递归是否有重复计算
@@ -942,7 +942,7 @@ docker rmi --force $(docker images -q)
   - 抽象出一次递归的步骤，分析步骤和已经固定的边界的关系
   - 找出规律后coding
 
-### 布隆过滤（Bloom Filter）
+#### 布隆过滤（Bloom Filter）
 
 - **解决问题**：判断一个元素是否在一个集合中，优势是只需要占用很小的内存空间以及有着高效的查询效率
 
@@ -973,22 +973,22 @@ docker rmi --force $(docker images -q)
 
     ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/bloom3.png)
 
-# Java
+## Java
 
-## 核心
+### 核心
 
-### HashMap
+#### HashMap
 
-- #### 应用场景
+- ##### 应用场景
 
   - 键值对高效存取
 
-- #### 数据结构
+- ##### 数据结构
 
   - 1.7数组加链表
   - 1.8数组加链表加红黑树
 
-- #### 线程安全
+- ##### 线程安全
 
   - **不安全**
   - 多线程下使用扩容步骤存在问题
@@ -996,22 +996,22 @@ docker rmi --force $(docker images -q)
     - Hashtable
     - ConcurrentHashMap
   
-- #### 默认大小
+- ##### 默认大小
 
   - 初始数组默认长度16
 
-- #### 何时扩容
+- ##### 何时扩容
 
   - HashMap.Size   >=  Capacity * LoadFactor当前容量超过总容量乘以散列因子（默认0.75）就扩容，每次2倍扩容
 
-- #### 扩容机制
+- ##### 扩容机制
 
   - jdk1.7
     - 对于扩容操作，底层实现都需要新生成一个数组，然后拷贝旧数组里面的每一个Entry链表到新数组里面，这个方法在单线程下执行是没有任何问题的，但是在多线程下面却有很大问题，主要的问题在于基于**头插法**的数据迁移，会有几率造成链表倒置，从而引发链表闭链，当map.get(key)落到这个Entry时候就会进入死循环，导致程序死循环，并吃满CPU
   - jdk1.8
     - 没有使用**头插法**，而是保留了元素的顺序位置，把要迁移的元素分类之后，最后在分别放到新数组对应的位置上
 
-- #### 为什么数组的长度为2的幂次方
+- ##### 为什么数组的长度为2的幂次方
 
   - **计算桶中位置**
 
@@ -1050,32 +1050,32 @@ docker rmi --force $(docker images -q)
       - 如果第5位为0则index不变
       - 如果第5位为1则index增加一个过去数组的长度
 
-- #### jdk1.8 何时转红黑树
+- ##### jdk1.8 何时转红黑树
 
   - Node桶下链表长度超过8转为红黑树
   - Node桶下红黑树节点数小于6就转回链表
 
-### LinkedHashMap
+#### LinkedHashMap
 
-- #### 应用场景
+- ##### 应用场景
 
   - 保证插入的顺序
 
-### Hashtable
+#### Hashtable
 
-- #### 默认大小
+- ##### 默认大小
 
   - 11
 
-- #### 线程安全性
+- ##### 线程安全性
 
   - **安全**
   - 实现
     - 方法加synchronized
 
-### ConcurrentHashMap
+#### ConcurrentHashMap
 
-- #### 线程安全性
+- ##### 线程安全性
 
   - **安全**
   - jdk1.7
@@ -1083,154 +1083,154 @@ docker rmi --force $(docker images -q)
   - jdk1.8
     - 新的版本主要使用了Unsafe类的CAS自旋赋值+synchronized同步+LockSupport阻塞等手段直接操作Node， 取消了分段的概念，实现的高效并发。实现中的优化，**等待的线程会帮助扩容的线程一起完成扩容操作**
 
-### TreeMap
+#### TreeMap
 
-- #### 应用场景
+- ##### 应用场景
 
   - 保证map的内部有序性
 
-- #### 数据结构
+- ##### 数据结构
 
   - 红黑树
 
-- #### 线程安全性
+- ##### 线程安全性
 
   - 不安全
   - 线程安全的替代
     - ConcurrentSkipListMap
 
-### ConcurrentSkipListMap
+#### ConcurrentSkipListMap
 
-- #### 应用场景
+- ##### 应用场景
 
   - 保证map的内部有序性
   - 并发的线程越多，ConcurrentSkipListMap越能体现出他的优势
 
-- #### 数据结构
+- ##### 数据结构
 
   - 跳跃表
 
-- #### 线程安全性
+- ##### 线程安全性
 
   - 安全
   - 实现
     - CAS自旋操作
 
-### ArrayList
+#### ArrayList
 
-- #### 特点
+- ##### 特点
 
   - 实现标识接口RandomAccess，随机存取，查询效率高，大数据量下迭代效率差
 
-- #### 数据结构
+- ##### 数据结构
 
   - 数组
 
-- #### 线程安全性
+- ##### 线程安全性
 
   - 不安全
   - 线程安全的替代
     - List list = Collections.synchronizedList(new ArrayList())
     - CopyOnWriteArrayList
 
-- #### 默认大小
+- ##### 默认大小
 
   - 有个懒加载设计，new ArrayList() 返回的是一个空的默认数组
   - 当第一次add操作之后扩容成10
 
-- #### 何时扩容
+- ##### 何时扩容
 
   - 装不下就扩容
   - newCapacity = oldCapacity + (oldCapacity >> 1) 每次1.5倍扩容
 
-- #### 扩容机制
+- ##### 扩容机制
 
   - 调用 Arrays.copyOf() 方法， 改方法是 native （System.arraycopy）实现
 
-- #### 克隆
+- ##### 克隆
 
   - 深拷贝
 
-### CopyOnWriteArrayList
+#### CopyOnWriteArrayList
 
-- #### 数据结构
+- ##### 数据结构
 
   - 数组
 
-- #### 线程安全性
+- ##### 线程安全性
 
   - 安全
   - 实现
     - 读操作不加锁，写操作是在副本上执行的，执行完了再去替换原先的值
     - 在写操作时，使用ReentrantLock保证了同步，然后开始做复制，以及写操作
 
-- #### 特点
+- ##### 特点
 
   - 读取是完全不用加锁的
   - 写入也不会阻塞读取操作
   - 只有写入和写入之间需要进行同步等待
 
-### LinkedList
+#### LinkedList
 
-- #### 数据结构
+- ##### 数据结构
 
   - 双端链表
 
-- #### 线程安全性
+- ##### 线程安全性
 
   - 不安全
   - 线程安全的替代
     - List list = Collections.synchronizedList(new LinkedList())
     - ConcurrentLinkedQueue
 
-- #### 克隆
+- ##### 克隆
 
   - 浅拷贝
 
-### ConcurrentLinkedQueue
+#### ConcurrentLinkedQueue
 
-- #### 应用场景
+- ##### 应用场景
 
   - 适合在对性能要求相对较高，同时对队列的读写存在多个线程同时进行的场景
   - 非阻塞
 
-- #### 数据结构
+- ##### 数据结构
 
   - 链表
 
-- #### 线程安全性
+- ##### 线程安全性
 
   - 安全
   - 实现
     - 通过 循环CAS 操作实现
 
-### PriorityQueue
+#### PriorityQueue
 
-- #### 应用场景
+- ##### 应用场景
 
   - 找最大最小元素
 
-- #### 数据结构
+- ##### 数据结构
 
   - 堆
 
-- #### 线程安全性
+- ##### 线程安全性
 
   - 不安全
   - 线程安全的替代
     - **PriorityBlockingQueue**
 
-### BlockingQueue
+#### BlockingQueue
 
-- #### 应用场景
+- ##### 应用场景
 
   - 生产者-消费者
 
-- #### 线程安全性
+- ##### 线程安全性
 
   - 安全
 
-- #### 特点
+- ##### 特点
 
   - 对插入操作、移除操作、获取元素操作提供了四种不同的方法用于不同的场景中使用
       - Throws exception抛异常
@@ -1249,7 +1249,7 @@ docker rmi --force $(docker images -q)
           - poll(time, unit)
   - 不能插入null
 
-- #### 主要实现
+- ##### 主要实现
 
   - **ArrayBlockingQueue**
 
@@ -1323,26 +1323,26 @@ docker rmi --force $(docker images -q)
       - TransferStack
       - TransferQueue（默认 非公平模式）
 
-### TreeSet
+#### TreeSet
 
-- #### 应用场景
+- ##### 应用场景
 
   - 自动排序
 
-- #### 线程安全性
+- ##### 线程安全性
 
   - 不安全
   - 线程安全的替代
     - CopyOnWriteArraySet
     - ConcurrentSkipListSet
 
-### 重写equals
+#### 重写equals
 
 - 四大原则，自反性，对称性，传递性，一致性，非空性
 - 如果继承一个类，并且新增了值属性，重写equals会变得很麻烦，这时候推荐用组合
 - 如果重写了equals但是没有重写hashcode有可能出现equals返回true但是hashcode不相等的情况
 
-### 异常处理一般规范
+#### 异常处理一般规范
 
 - 在Finally块中清理资源或者使用Try-With-Resource语句
 - 抛出明确的异常，避免抛出Exception这种
@@ -1354,7 +1354,7 @@ docker rmi --force $(docker images -q)
 - 不要打印异常日志的同时将其抛出
 - 自定义异常包裹某个异常的同时不要丢弃它原本的信息
 
-### BIO,NIO,AIO的区别
+#### BIO,NIO,AIO的区别
 
 - **BIO**
   - 基于字节流(InputStream,OutputStream)，字符流(Reader,Writer)
@@ -1369,7 +1369,7 @@ docker rmi --force $(docker images -q)
   - 基于事件和回调机制
   - 请求立即返回，连接和线程无对应关系
 
-### Java泛型参数
+#### Java泛型参数
 
 生产者用extends，消费者用super
 
@@ -1390,11 +1390,11 @@ public class NewStack<T>{
 
 ```
 
-### J.U.C总览图
+#### J.U.C总览图
 
 ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/juc.png)
 
-### J.U.C常用同步器
+#### J.U.C常用同步器
 
 - **CountDownLatch**
   - 作用：主要用于线程要等待其他线程任务执行完再执行，等到条件满足之后一起起跑
@@ -1407,7 +1407,7 @@ public class NewStack<T>{
 - **Exchanger**
   - 作用：主要用于两个线程之间交换数据
 
-### AbstractQueuedSynchronizer(AQS)
+#### AbstractQueuedSynchronizer(AQS)
 
 - 大致原理
   - CAS
@@ -1420,7 +1420,7 @@ public class NewStack<T>{
 - [一行一行源码分析清楚AbstractQueuedSynchronizer-2](https://www.javadoop.com/post/AbstractQueuedSynchronizer-2)
 - [一行一行源码分析清楚AbstractQueuedSynchronizer-3](https://www.javadoop.com/post/AbstractQueuedSynchronizer-3)
 
-### ReentrantLock
+#### ReentrantLock
 
 - 特征
   - 公平锁
@@ -1451,7 +1451,7 @@ public class NewStack<T>{
 
   
 
-### J.U.C阻塞队列BlockingQueue
+#### J.U.C阻塞队列BlockingQueue
 
 - ArrayBlockingQueue
   - 结构：由数组组成的有界阻塞队列
@@ -1468,11 +1468,11 @@ public class NewStack<T>{
 - SynchronousQueue
   - 结构：不存储元素的阻塞队列
 
-### 线程池的五种状态
+#### 线程池的五种状态
 
 ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/threadpoolstatus.jpg)
 
-### 如何创建线程池
+#### 如何创建线程池
 
 - 结构图
   
@@ -1578,7 +1578,7 @@ public class NewStack<T>{
 
 ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/threadpool.jpg)
 
-### synchronized关键字
+#### synchronized关键字
 
 - 作用：
   - 同步
@@ -1603,7 +1603,7 @@ public class NewStack<T>{
   
   ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/synchronized.png)
 
-### volatile关键字
+#### volatile关键字
 
 - 作用：
   - 保证数据线程可见性
@@ -1614,7 +1614,7 @@ public class NewStack<T>{
     - lock后的写操作会把已修改的数据写回内存，同时让其它线程相关缓存行失效，从而重新从主存中加载最新的数据
     - 不是内存屏障却能完成类似内存屏障的功能，阻止屏障两边的指令重排序
 
-### 如何终止线程
+#### 如何终止线程
 
 - stop方法（别用）
   - 立刻终止线程，过于粗鲁
@@ -1623,21 +1623,21 @@ public class NewStack<T>{
 - interrupt方法
   - 阻塞状态下会推出阻塞状态，抛出InterruptedException；运行状态下设置中断标志位为true，继续运行，线程自行检查标志位主动终止，相对温柔
 
-### 线程如何通信
+#### 线程如何通信
 
 线程的通信是指线程之间以何种机制来交换信息，在编程中，线程之间的通信机制有两种，共享内存和消息传递
 
 - 共享内存：线程之间共享程序的公共状态，线程之间通过写-读内存中的公共状态来隐式进行通信，典型的共享内存通信方式就是通过共享对象进行通信
 - 消息传递：线程之间没有公共状态，线程之间必须通过明确的发送消息来显式进行通信，在java中典型的消息传递方式就是wait()和notify()
 
-### notify方法和notifyAll方法的区别
+#### notify方法和notifyAll方法的区别
 
 当调用wait方法后，线程会被放到对象内部的等待池中，在等待池中的线程不会去竞争CPU，只有调用Notify或者NotifyAll才会从等待池中，放入锁池中，等待对象锁的释放从而竞争CPU以执行。
 
 - notify从等待池中随机选一个线程放入锁池
 - notifyAll把所有等待池全放入锁池
 
-### Java中sleep方法和wait方法的区别
+#### Java中sleep方法和wait方法的区别
 
 - sleep
   - Thread类方法
@@ -1649,7 +1649,7 @@ public class NewStack<T>{
   - 让出CPU，释放当前占用的锁
   - 只能在synchronized中的中使用
 
-### ThreadLocal
+#### ThreadLocal
 
 - 作用
   - 主要解决的就是让每个线程绑定自己的值，可以将ThreadLocal类形象的比喻成存放数据的盒子，盒子中可以存储每个线程的私有数据
@@ -1666,7 +1666,7 @@ public class NewStack<T>{
     - 解决方案
       - 使用完 ThreadLocal方法后 最好手动调用remove()方法
 
-### 安全发布对象
+#### 安全发布对象
 
 - 概念
   - 发布对象：使一个对象能被当前范围之外的代码所使用
@@ -1677,7 +1677,7 @@ public class NewStack<T>{
   - 将对象的引用保存到某个正确构造对象的final类型域中
   - 将对象的引用保存到一个由锁保护的域中
 
-### final语义
+#### final语义
 
 - 用 final 修饰的类不可以被继承
 - 用 final 修饰的方法不可以被覆写
@@ -1686,9 +1686,9 @@ public class NewStack<T>{
 - final 属性的 freeze 操作发生于被调用的构造方法结束的时候
 - final 属性可以通过反射和其他方法来改变
 
-## JVM
+### JVM
 
-### 如何分析jvm线程堆栈
+#### 如何分析jvm线程堆栈
 
 ```bash
 # 查运行中的java应用
@@ -1708,7 +1708,7 @@ root@64b47b31317a:/# jstack 1
 # 查看java.lang.Thread.State状态
 ```
 
-### 四种引用类型
+#### 四种引用类型
 
 - 强引用
   - 最普遍的引用：Object obj = new Object();
@@ -1728,7 +1728,7 @@ root@64b47b31317a:/# jstack 1
   - 用于跟踪GC活动，起哨兵作用
   - 必须与引用队列ReferenceQueue联合使用
 
-### 常用的垃圾收集器
+#### 常用的垃圾收集器
 
 - 年轻代
   - Serial收集器（-XX:+UseSerialGC，复制算法）
@@ -1758,7 +1758,7 @@ root@64b47b31317a:/# jstack 1
     - 将Heap堆内存划分成多个大小相等的Region
     - 年轻代和老年代不再物理隔离
 
-### CMS收集器执行步骤
+#### CMS收集器执行步骤
 
 - 初始阶段：stop-the-world
 - 并发标记：并发追溯标记，程序不停顿
@@ -1767,7 +1767,7 @@ root@64b47b31317a:/# jstack 1
 - 并发清理：清理垃圾对象，程序不停顿
 - 并发重置：重置CMS收集器的数据结构，程序不停顿
 
-### JVM常用调优参数
+#### JVM常用调优参数
 
 - -Xss: 规定每个线程虚拟机栈的大小
 - -Xms: 堆的初始值
@@ -1776,7 +1776,7 @@ root@64b47b31317a:/# jstack 1
 - -XX:NewRatio：老年代和新生代比值
 - -XX:MaxTenuringThreshold：对象从年轻代进入老年代经历过GC次数的阈值
 
-### JVM常用的垃圾回收算法
+#### JVM常用的垃圾回收算法
 
 - 标记-清除算法
   - 缺点：容易产生碎片化
@@ -1796,11 +1796,11 @@ root@64b47b31317a:/# jstack 1
     - 调用System.gc()后的某个时刻
     - 使用RMI时，一般每小时执行一次GC
 
-### 何时真正开始Full GC（stop-the-world）
+#### 何时真正开始Full GC（stop-the-world）
 
 程序到达安全点，安全点是对象引用关系不会变化的点，例如方法调用，循环跳转，异常跳转等
 
-### GC如何标记垃圾对象
+#### GC如何标记垃圾对象
 
 没有被任何其他对象引用的对象被视为垃圾。
 
@@ -1823,7 +1823,7 @@ root@64b47b31317a:/# jstack 1
 - 本地方法栈中JNI引用的对象
 - 活跃线程的引用对象
 
-### String.intern()的用法
+#### String.intern()的用法
 
 - 作用
   - 直接使用双引号声明出来的`String`对象会直接存储在常量池中。
@@ -1853,7 +1853,7 @@ root@64b47b31317a:/# jstack 1
 
   - 分析：“1”会在常量池中新建一个1，然后又new了一个String对象赋值给s，调用s.intern()因为1已经在常量池中存在，所以不起效果，所以s和s1持有两个不同的引用。然后拼接两个1，创建出s3，此时常量池中不存在11，调用s3.intern()后，jdk6，会去常量池中新建一个11，而从jdk7开始，直接在常量池中创建一个保存s3地址的引用
 
-### JVM内存模型（jdk8）
+#### JVM内存模型（jdk8）
 
 - 线程私有
   - 程序计数器，唯一不会OOM的区域
@@ -1870,11 +1870,11 @@ root@64b47b31317a:/# jstack 1
     - 常量池
     - 实例对象
 
-### Java内存模型（JMM）
+#### Java内存模型（JMM）
 
 ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/jmm.png)
 
-### Happens-Before原则
+#### Happens-Before原则
 
 保证单线程执行的内存可见性，多线程不能保证
 
@@ -1886,33 +1886,33 @@ root@64b47b31317a:/# jstack 1
 - join()规则：如果线程A执行操作ThreadB.join()并成功返回，那么线程B中的任意操作happens-before于线程A从ThreadB.join()操作成功返回
 - 线程中断规则:对线程interrupt方法的调用happens-before于被中断线程的代码检测到中断事件的发生
 
-### 指令重排
+#### 指令重排
 
 在执行程序时，为了提高性能，编译器和处理器常常会对指令做重排序
 
 - 可以通过内存屏障避免重排序（volatile的实现类似内存屏障）
 - 如果指令执行顺序不会破坏Happens-Before原则，JVM就有可能对指令重排
 
-### 类加载双亲委派机制
+#### 类加载双亲委派机制
 
 - 从底向上检查ClassLoader中类是否加载
 - 从顶向下调用ClassLoader加载类
 
-### 类加载器ClassLoader种类
+#### 类加载器ClassLoader种类
 
 - BootStrapClassLoader：C++编写，加载核心库java.*
 - ExtClassLoader：Java编写，加载扩展库javax.*
 - AppClassLoader：Java编写，加载程序所在目录classpath
 - CustomClassLoader：Java编写，定制化加载
 
-### Java从编写到运行的大致过程
+#### Java从编写到运行的大致过程
 
 - 将写好的.java文件通过javac调用编译器生成JVM可识别指令组成的.class文件（IED可以自动反编译.class文件，也可以通过javap -v 反编译）
 - 通过ClassLoader分三步加载，连接（验证，准备，解析）和初始化 将.class文件加载到JVM中生成Class类
 - 然后用加载的Class类经过内存分配，初始化，init调用构造创建出对象
 - 最后有了对象就可以执行相关方法了
 
-### 不可变对象
+#### 不可变对象
 
 - 对象创建之后状态不能修改
 
@@ -1920,7 +1920,7 @@ root@64b47b31317a:/# jstack 1
 
 - 对象是正确创建的（对象创建过程中，this引用没用逃逸）
 
-### 如何安全发布对象
+#### 如何安全发布对象
 
 - 在静态初始化函数中初始化一个对象引用
 
@@ -1931,7 +1931,7 @@ root@64b47b31317a:/# jstack 1
 - 将对象的引用用volatile关键字修饰，或者保存到AtomicReference对象中
 
 
-### 为什么双检查单例模式实例引用不加volatile不是线程安全的
+#### 为什么双检查单例模式实例引用不加volatile不是线程安全的
 
 - 对象发布主要有三步 1.分配内存空间 2初始化对象 3引用指向分配的内存
 
@@ -1939,7 +1939,7 @@ root@64b47b31317a:/# jstack 1
 
 - 加上 volatile 关键字就可以解决指令重排的问题
 
-### JVM内存泄漏情景
+#### JVM内存泄漏情景
 
 - 类似于栈，内存的管理权不属于JVM而属于栈本身，所有被pop掉的index上还存在着过期的引用Stack.pop()的源码中手动清除了过期引用
 elementData[elementCount] = null; /* to let gc do its work
@@ -1950,11 +1950,11 @@ elementData[elementCount] = null; /* to let gc do its work
 
 
 
-# JavaEE
+## JavaEE
 
-## Spring
+### Spring
 
-### 什么是IoC和DI
+#### 什么是IoC和DI
 
 - IoC（控制反转），控制反转是把传统上由程序代码直接操控的对象的调用权交给IoC容器，通过IoC容器来实现对象组件的依赖注入，依赖检查，自动装配等对象生命周期管理
 - DI（依赖注入）主要是遵循设计模式中依赖倒转原则中的“高层模块不应该依赖底层模块，两个都应该抽象依赖”，依赖注入的方式主要包括，setter方法，interface接口，constructor构造函数，annotation注解
@@ -1962,7 +1962,7 @@ elementData[elementCount] = null; /* to let gc do its work
 
 ![Spring Ioc容器](https://cdn.jsdelivr.net/gh/freshchen/resource/img/spring-ioc.PNG)
 
-### BeanFactory和ApplicationContext
+#### BeanFactory和ApplicationContext
 
 BeanFactory和ApplicationContext是Spring的两大核心接口，都可以当做Spring的容器，ApplicationContext是BeanFactory的子接口
 
@@ -1978,7 +1978,7 @@ BeanFactory和ApplicationContext是Spring的两大核心接口，都可以当做
     - 载入多个（有继承关系）上下文 ，使得每一个上下文都专注于一个特定的层次，比如应用的web层。
   - 在容器启动时，一次性创建了所有的Bean
 
-### Bean的五种作用域
+#### Bean的五种作用域
 
 - singleton：单例模式，在整个Spring IoC容器中，使用singleton定义的Bean将只有一个实例
 - prototype：原型模式，每次通过容器的getBean方法获取prototype定义的Bean时，都将产生一个新的Bean实例
@@ -1986,11 +1986,11 @@ BeanFactory和ApplicationContext是Spring的两大核心接口，都可以当做
 - session：对于每次HTTP Session，使用session定义的Bean豆浆产生一个新实例。同样只有在Web应用中使用Spring时，该作用域才有效
 - globalsession：每个全局的HTTP Session，使用session定义的Bean都将产生一个新实例。典型情况下，仅在使用portlet context的时候有效。同样只有在Web应用中使用Spring时，该作用域才有效
 
-### Bean的生命周期
+#### Bean的生命周期
 
 ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/spring-bean-lifecycle.png)
 
-### AOP（面向切面编程）基础
+#### AOP（面向切面编程）基础
 
 - **通知(Advice)**
 
@@ -2037,7 +2037,7 @@ BeanFactory和ApplicationContext是Spring的两大核心接口，都可以当做
 
   - 运行时：切面在运行的某个时刻被织入,SpringAOP就是以这种方式织入切面的，Spring默认使用了JDK的动态代理技术，如果没有实现接口则转为使用Cglib
 
-### Spring事务
+#### Spring事务
 
 Spring事务的本质其实就是数据库对事务的支持，没有数据库的事务支持，spring是无法提供事务功能的。真正的数据库层的事务提交和回滚是通过binlog或者redo log实现的
 
@@ -2061,13 +2061,13 @@ Spring事务的本质其实就是数据库对事务的支持，没有数据库�
 
 
 
-## SpringMVC
+### SpringMVC
 
-### SpringMVC请求处理流程
+#### SpringMVC请求处理流程
 
 ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/springmvc.png)
 
-### SpringMvc的控制器是不是单例模式是不是线程安全
+#### SpringMvc的控制器是不是单例模式是不是线程安全
 
 - 是单例模式,所以在多线程访问的时候有线程安全问题
 - 不要用同步,会影响性能,解决方案把控制器变为无状态对象
@@ -2075,9 +2075,9 @@ Spring事务的本质其实就是数据库对事务的支持，没有数据库�
 
 
 
-## Netty
+### Netty
 
-### Netty的特点
+#### Netty的特点
 
 - 一个高性能、异步事件驱动的NIO框架，它提供了对TCP、UDP和文件传输的支持
 - 使用更高效的socket底层，对epoll空轮询引起的cpu占用飙升在内部进行了处理，避免了直接使用NIO的陷阱，简化了NIO的处理方式。
@@ -2088,7 +2088,7 @@ Spring事务的本质其实就是数据库对事务的支持，没有数据库�
 - 使用单线程串行化的方式，高效的Reactor线程模型
 - 大量使用了volitale、使用了CAS和原子类、线程安全类的使用、读写锁的使用
 
-### Netty执行流程
+#### Netty执行流程
 
 - 当客户端网络I/O请求来了就需要为其通过**Bootstrap**创建一个**Channel**，**Channel**是一个Socket的抽象
 - 在创建过程中**Channel**会去**EventLoopGroup**中申请注册一个**EventLoop**，**Channel**和**EventLoopGroup**是多对一的关系，**EventLoop**对应一个Reactor线程模型
@@ -2097,27 +2097,11 @@ Spring事务的本质其实就是数据库对事务的支持，没有数据库�
 
 
 
-## Mybatis
+## 数据库
 
-### 执行流程
+### Mysql
 
-- 根据配置文件生成 SqlSessionFactory
-  - SqlSessionFactoryBuilder和配置文件是一对一的，只能解析一次
-  - 解析完成之后配置文件信息保存在了Configuration对象实例
-  - 将configuration交给DefaultSqlSessionFactory创建实例
--  SqlSessionFactory创建SqlSession
-- SqlSession执行操作包括事务
-- SqlSession关闭
-
-
-
-
-
-# 数据库
-
-## Mysql
-
-### 基本架构
+#### 基本架构
 
 MySQL 主要分为 Server 层和存储引擎层
 
@@ -2134,14 +2118,14 @@ MySQL 主要分为 Server 层和存储引擎层
 
 ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/mysql-fw.png)
 
-### SQL执行过程
+#### SQL执行过程
 
 - 查询等过程如下：
   - 权限校验---》查询缓存---》分析器---》优化器---》权限校验---》执行器---》引擎
 - 更新等语句执行流程如下
   - 分析器----》权限校验----》执行器---》引擎---redo log prepare---》binlog---》redo log commit
 
-### MyISAM和InnoDB区别
+#### MyISAM和InnoDB区别
 
 - **是否支持行级锁** : MyISAM 只有表级锁(table-level locking)，而InnoDB 支持行级锁(row-level locking)和表级锁,默认为行级锁。
 
@@ -2151,14 +2135,14 @@ MySQL 主要分为 Server 层和存储引擎层
 
 - **是否支持MVCC** ：仅 InnoDB 支持。应对高并发事务, MVCC比单纯的加锁更高效;MVCC只在 READ COMMITTED 和 REPEATABLE READ 两个隔离级别下工作;MVCC可以使用 乐观(optimistic)锁 和 悲观(pessimistic)锁来实现;各数据库中MVCC实现并不统一
 
-### 数据库事务四大特性
+#### 数据库事务四大特性
 
 - 原子性（Atomic）要么全做要么全不做
 - 一致性（Consistency）数据要保持完整性，从一个一致状态到另一个一致状态，执行事务前后，多个事务对同一个数据读取的结果是相同的
 - 隔离性（Isolation）一个事务的执行不影响其他事务
 - 持久性（Durability）事务一旦提交，变更应该永久的保存到数据库中
 
-### 事务隔离级别
+#### 事务隔离级别
 
 |隔离级别|脏读|不可重复读|幻读|
 |---|---|---|---|
@@ -2177,13 +2161,13 @@ MySQL 主要分为 Server 层和存储引擎层
     - 注：**和不可重复读类似，但虚读(幻读)会读到其他事务的插入的数据，导致前后读取不一致**
     - MySQL的Repeatable read隔离级别加上GAP间隙锁**已经大概率处理了幻读了**。
 
-### 常用存储引擎适用场景
+#### 常用存储引擎适用场景
 
 - MyISAM适用频繁执行全表count，查询频率高，增删改频率不高
 
 - InnoDB增删改查都频繁，对可靠性要求高，要求支持事务
 
-### 锁
+#### 锁
 
 - 粒度划分
   - **表锁**开销小，加锁快；不会出现死锁；锁定力度大，发生锁冲突概率高，并发度最低
@@ -2195,13 +2179,13 @@ MySQL 主要分为 Server 层和存储引擎层
 - 排他锁（X)：`SELECT * FROM table_name WHERE ... FOR UPDATE`
 - InnoDB支持事务，关闭事务自动提交方法 set autocommit = 0
 
-### InnoDB锁种类
+#### InnoDB锁种类
 
 - Record lock：单个行记录上的锁
 - Gap lock：间隙锁，锁定一个范围，不包括记录本身
 - Next-key lock：record+gap 锁定一个范围，包含记录本身
 
-### MVCC和事务的隔离级别
+#### MVCC和事务的隔离级别
 
 - 描述
   - 数据库事务有不同的隔离级别，不同的隔离级别对锁的使用是不同的，**锁的应用最终导致不同事务的隔离级别**
@@ -2217,12 +2201,12 @@ MySQL 主要分为 Server 层和存储引擎层
       - 事务级别 
         - 针对于Repeatable read隔离级别
 
-### InnoDB 可重复读（Repeatable read）级别为什么可以大概率避免幻读
+#### InnoDB 可重复读（Repeatable read）级别为什么可以大概率避免幻读
 
 - 表象：快照读（非阻塞读不加锁，对应加锁的叫当前读）伪MVCC
 - 内在：next-key锁（行锁 + gap锁）
 
-### Mysql事务日志
+#### Mysql事务日志
 
 - 描述
   - 使用事务日志，存储引擎在修改表的数据时只需要修改其内存拷贝，再把该修改行为记录到持久在硬盘上的事务日志中，而不用每次都将修改的数据本身持久到磁盘
@@ -2237,7 +2221,7 @@ MySQL 主要分为 Server 层和存储引擎层
     - 保证事务的**持久性**
     - 重做日志由两部分组成，一是 **内存** 中的重做日志缓冲区，因为重做日志缓冲区在内存中，所以它是易失的，另一个就是在 **磁盘** 上的重做日志文件，它是持久的
 
-### MySQL Server 日志
+#### MySQL Server 日志
 
 - **binlog**
   - 描述
@@ -2247,7 +2231,7 @@ MySQL 主要分为 Server 层和存储引擎层
     - 数据恢复：通过 mysqlbinlog 工具恢复数据
     - 增量备份
 
-### SQL语句执行得很慢的原因
+#### SQL语句执行得很慢的原因
 
 - 偶尔很慢
   - 数据库在刷新脏页
@@ -2261,7 +2245,7 @@ MySQL 主要分为 Server 层和存储引擎层
   - 没用到索引
   - 数据库选错了索引
 
-### SQL慢查询的优化
+#### SQL慢查询的优化
 
 - 分析过程
   - 开启慢日志，查看慢日志，找到查询比较慢的语句
@@ -2286,7 +2270,7 @@ MySQL 主要分为 Server 层和存储引擎层
     - **关延迟联**
     - 建立联合索引
 
-### 索引为什么能提高查询速度
+#### 索引为什么能提高查询速度
 
 - 不使用索引如和查询
 
@@ -2298,14 +2282,14 @@ MySQL 主要分为 Server 层和存储引擎层
 
   ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/mysql-index.jpg)
 
-### Hash索引的局限性
+#### Hash索引的局限性
 
 - 哈希索引也没办法利用索引完成**排序**
 - 不支持**最左匹配原则**
 - 在有大量重复键值情况下，哈希索引的效率也是极低的---->**哈希碰撞**问题。
 - **不支持范围查询**
 
-### 稀疏索引和聚集索引 
+#### 稀疏索引和聚集索引 
 
 - 聚集索引
   - 指索引项的排序方式和表中数据记录排序方式一致的索引
@@ -2316,13 +2300,13 @@ MySQL 主要分为 Server 层和存储引擎层
 - InnoDB 主键走聚集索引，其他走稀疏索引
 - MyISAM 全是走稀疏索引
 
-### 联合索引
+#### 联合索引
 
 - **最左匹配原则**
   - 索引只能用于查找key是否**存在（相等）**，遇到范围查询`(>、<、between、like`左匹配)等就**不能进一步匹配**了，后面的条件退化为线性查找
   - 例如创建 union index (a , b ,c)  查（a，b）走索引，查（a，c）走不了索引
 
-### 大表优化
+#### 大表优化
 
 - 查询限定数据范围
 
@@ -2354,11 +2338,11 @@ MySQL 主要分为 Server 层和存储引擎层
     - **客户端代理：** **分片逻辑在应用端，封装在jar包中，通过修改或者封装JDBC层来实现。** 当当网的 **Sharding-JDBC** 、阿里的TDDL是两种比较常用的实现
     - **中间件代理：** **在应用和数据中间加了一个代理层。分片逻辑统一维护在中间件服务中。** 我们现在谈的 **Mycat** 、360的Atlas、网易的DDB等等都是这种架构的实现
 
-### 高性能实践的一些规范
+#### 高性能实践的一些规范
 
 [参考](https://mp.weixin.qq.com/s?__biz=Mzg2OTA0Njk0OA==&mid=2247485117&idx=1&sn=92361755b7c3de488b415ec4c5f46d73&chksm=cea24976f9d5c060babe50c3747616cce63df5d50947903a262704988143c2eeb4069ae45420&token=79317275&lang=zh_CN#rd)
 
-- #### 命令规范
+- ##### 命令规范
 
   - 所有数据库对象名称必须使用小写字母并用下划线分割
   - 所有数据库对象名称禁止使用 MySQL 保留关键字（如果表名中包含关键字查询时，需要将其用单引号括起来）
@@ -2366,7 +2350,7 @@ MySQL 主要分为 Server 层和存储引擎层
   - 临时库表必须以 tmp_为前缀并以日期为后缀，备份表必须以 bak_为前缀并以日期 (时间戳) 为后缀
   - 所有存储相同数据的列名和列类型必须一致（一般作为关联列，如果查询时关联列类型不一致会自动进行数据类型隐式转换，会造成列上的索引失效，导致查询效率降低）
 
-- #### 设计规范
+- ##### 设计规范
 
   - 所有表必须使用 Innodb 存储引擎
   - 数据库和表的字符集统一使用 UTF8
@@ -2383,7 +2367,7 @@ MySQL 主要分为 Server 层和存储引擎层
   -  使用 TIMESTAMP(4 个字节) 或 DATETIME 类型 (8 个字节) 存储时间
   -  同财务相关的金额类数据必须使用 decimal 类型
   
-- #### 索引规范
+- ##### 索引规范
 
   -  限制每张表上的索引数量,建议单张表索引不超过 5 个
   -  禁止给表中的每一列都建立单独的索引
@@ -2400,7 +2384,7 @@ MySQL 主要分为 Server 层和存储引擎层
   -  避免建立冗余索引和重复索引
   -  尽量避免使用外键约束
 
-- #### SQL语句规范
+- ##### SQL语句规范
 
   - 禁止使用 SELECT * 必须使用 SELECT <字段列表> 查询
   -  禁止使用不含字段列表的 INSERT 语句
@@ -2414,7 +2398,7 @@ MySQL 主要分为 Server 层和存储引擎层
   -  对于连续数值，使用`BETWEEN`不用`IN`：`SELECT id FROM t WHERE num BETWEEN 1 AND 5`
   -  尽量避免在 WHERE 子句中使用!=或<>操作符，否则将引擎放弃使用索引而进行全表扫描
 
-### 常用命令
+#### 常用命令
 
 [一千行MySQL命令](https://snailclimb.gitee.io/javaguide/#/database/一千行MySQL命令)
 
@@ -2458,13 +2442,13 @@ show keys from table_name;
 
 
 
-# 架构设计
+## 架构设计
 
-## 设计模式
+### 设计模式
 
 [关于设计模式的一些简单案例](https://github.com/freshchen/fresh-design-pattern)
 
-### 概念简述
+#### 概念简述
 
 - **单一责任原则**
 
@@ -2584,7 +2568,7 @@ show keys from table_name;
 
   表示一个作用于某种对象结构中的各元素的操作。它使你可以在不改变各元素的类的前提下定义作用于这些元素的新操作。
 
-### Java中的观察者模式
+#### Java中的观察者模式
 
 - **Observable（观察者模式Subject）**
 
@@ -2594,7 +2578,7 @@ show keys from table_name;
 
 接口：定义了update(Observable o, Object arg)方法，当调用Observable的notifyObservers时，会触发update。观察者需要实现这个接口，重写update方法实现特定功能
 
-### Java中的单例模式
+#### Java中的单例模式
 
 - 普通的线程安全单例
 
@@ -2645,9 +2629,9 @@ show keys from table_name;
 
 
 
-## 分布式
+### 分布式
 
-### 一致性哈希算法
+#### 一致性哈希算法
 
 主要用于解决分布式系统中负载均衡的问题。
 
@@ -2661,9 +2645,9 @@ show keys from table_name;
 
 解决方案：可以增加虚拟节点，例如在主机ip后加编号取模映射到环的不同位置。然后数据遇到虚拟节点之后再映射回真实节点。
 
-## 缓存
+### 缓存
 
-### 引入缓存
+#### 引入缓存
 
 -  **场景**：例如我们系统面临大量的查询请求，我们的数据库后端面对如此频繁的IO可能出现性能问题，甚至直接崩溃。就好比CPU和内存之间的关系，CPU处理的太快了，内存速度跟不上，这时最先想到的解决方案就是引入缓存
 -  **目标**：
@@ -2671,7 +2655,7 @@ show keys from table_name;
    -  降低后端负载，减少潜在的风险，保证系统平稳
    -  保证数据“尽可能”及时更新
 
-### 如何保证缓存与数据库的双写一致性
+#### 如何保证缓存与数据库的双写一致性
 
 - 要求强一致性（实际很少）：
   - 方案：**读请求和写请求串行化**，串到一个**内存队列**里去
@@ -2692,7 +2676,7 @@ show keys from table_name;
   - 解决思路：
     - 再数据库更新操作还没成功之前，将读请求放入队列（JVM内部队列即可）中等待更新完成，如果请求在等待时间范围内，不断轮询发现可以取到值了，那么就直接返回；如果请求等待的时间超过一定时长，那么这一次直接从数据库中读取当前的旧值
 
-### 缓存可能引入的问题
+#### 缓存可能引入的问题
 
 - **缓存穿透**
   - 场景：大量查询一个数据库中没有的key，每次请求都走到了后端数据库，缓存没有起到作用
@@ -2713,7 +2697,7 @@ show keys from table_name;
       - set key value [ex seconds|px milliseconds] [nx|xx]   nx key不存在贼执行，xx key存在则执行 
     - 手动过期：缓存上从不设置过期时间，功能上将过期时间存在 KEY 对应的 VALUE 里，如果发现要过期，通过一个后台的异步线程进行缓存的构建，也就是“手动”过期。通过后台的异步线程，保证有且只有一个线程去查询 DB
 
-### Redis分布式锁
+#### Redis分布式锁
 
 - 单节点分布式锁
 
@@ -2751,7 +2735,7 @@ show keys from table_name;
 
       如果我们的节点没有持久化机制，client 从 5 个 master 中的 3 个处获得了锁，然后其中一个重启了，这是注意 **整个环境中又出现了 3 个 master 可供另一个 client 申请同一把锁！** 违反了互斥性。如果我们开启了 AOF 持久化那么情况会稍微好转一些，因为 Redis 的过期机制是语义层面实现的，所以在 server 挂了的时候时间依旧在流逝，重启之后锁状态不会受到污染。但是考虑断电之后呢，AOF部分命令没来得及刷回磁盘直接丢失了，除非我们配置刷回策略为 fsnyc = always，但这会损伤性能。解决这个问题的方法是，当一个节点重启之后，我们规定在 max TTL 期间它是不可用的，这样它就不会干扰原本已经申请到的锁，等到它 crash 前的那部分锁都过期了，环境不存在历史锁了，那么再把这个节点加进来正常工作。
 
-### Redis部署
+#### Redis部署
 
 - 主从模式：一般主服务器写，从读。主服务器挂掉系统就挂了
 - 哨兵sentinel模式：相对主从模式，多了监控主服务器，主挂掉能自动推举下一个主服务器，类似zookeeper，并且能发送故障通知。
@@ -2759,7 +2743,7 @@ show keys from table_name;
   - 去中心化，去中间件，集群中的每个节点都是平等的关系
   - Redis 集群没有并使用传统的一致性哈希来分配数据，而是采用另外一种叫做`哈希槽 (hash slot)`的方式来分配的。redis cluster 默认分配了 16384 个slot，当我们set一个key 时，会用`CRC16`算法来取模得到所属的`slot`，然后将这个key 分到哈希槽区间的节点上，具体算法就是：`CRC16(key) % 16384`
 
-### Redis持久化
+#### Redis持久化
 
 | 方案    | 描述                                                         | 优点                   | 缺点                                         |
 | ------- | ------------------------------------------------------------ | ---------------------- | -------------------------------------------- |
@@ -2788,7 +2772,7 @@ show keys from table_name;
 
 答: rdb快,因为其是数据的内存映射,直接载入到内存,而aof是命令,需要逐条执行
 
-### Redis常用数据类型
+#### Redis常用数据类型
 
 - String ：基本类型，二进制安全，可以存放图片序列化对象等
 - Hash：String元素组成的字典
@@ -2796,14 +2780,14 @@ show keys from table_name;
 - Set：无序不重复集合
 - Sorted Set：有序的Set
 
-### Redis为什么快
+#### Redis为什么快
 
 - 完全基于内存，C语言编写
 - 数据结构相对简单
 - 单进程单线程的处理请求，从而确保高并发线程安全，想多核都用上可以通过启动多个实例
 - 多路I/O复用，非阻塞
 
-### Redis和 Memcache区别
+#### Redis和 Memcache区别
 
 - Memcache支持简单的数据类型，不支持持久化存储，不支持主从，不支持分片
 - Redis数据类型丰富，支持持久化存储，支持主从，支持分片

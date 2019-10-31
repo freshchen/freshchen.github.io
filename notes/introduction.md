@@ -32,7 +32,7 @@
 
 # 技能清单
 
-**JavaSE：**集合，多线程，反射，网络编程，JVM，设计模式
+**JavaSE**：集合，多线程，反射，网络编程，JVM，设计模式
 
 **JavaEE**：Tomcat，Netty，Spring，Spring MVC，Mybatis，Spring Boot ，Spring Cloud
 
