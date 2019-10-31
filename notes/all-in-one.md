@@ -2097,6 +2097,22 @@ Spring事务的本质其实就是数据库对事务的支持，没有数据库�
 
 
 
+## Mybatis
+
+### 执行流程
+
+- 根据配置文件生成 SqlSessionFactory
+  - SqlSessionFactoryBuilder和配置文件是一对一的，只能解析一次
+  - 解析完成之后配置文件信息保存在了Configuration对象实例
+  - 将configuration交给DefaultSqlSessionFactory创建实例
+-  SqlSessionFactory创建SqlSession
+- SqlSession执行操作包括事务
+- SqlSession关闭
+
+
+
+
+
 # 数据库
 
 ## Mysql
