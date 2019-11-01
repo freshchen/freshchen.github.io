@@ -5,6 +5,67 @@
 
 
 
+
+### k8s如何支持多网络
+
+[multus-cni ]( https://github.com/intel/multus-cni )
+
+### Docker启动Zabbix
+
+- 1 先安装数据库mysql
+
+```cpp
+docker run --name zabbix-mysql-server --hostname zabbix-mysql-server \
+-e MYSQL_ROOT_PASSWORD="123456" \
+-e MYSQL_USER="zabbix" \
+-e MYSQL_PASSWORD="123456" \
+-e MYSQL_DATABASE="zabbix" \
+-p 3306:3306  \
+-d mysql:5.7 \
+--character-set-server=utf8 --collation-server=utf8_bin
+```
+
+- 2 创建zabbix-server
+
+```jsx
+docker run  --name zabbix-server-mysql --hostname zabbix-server-mysql \
+--link zabbix-mysql-server:mysql \
+-e DB_SERVER_HOST="mysql" \
+-e MYSQL_USER="zabbix" \
+-e MYSQL_DATABASE="zabbix" \
+-e MYSQL_PASSWORD="123456" \
+-v /etc/localtime:/etc/localtime:ro \
+-v /data/docker/zabbix/alertscripts:/usr/lib/zabbix/alertscripts \
+-v /data/docker/zabbix/externalscripts:/usr/lib/zabbix/externalscripts \
+-p 10051:10051 \
+-d \
+zabbix/zabbix-server-mysql
+```
+
+- 3 安装web-nginx
+
+```bash
+docker run --name zabbix-web-nginx-mysql --hostname zabbix-web-nginx-mysql \
+--link zabbix-mysql-server:mysql \
+--link zabbix-server-mysql:zabbix-server \
+-e DB_SERVER_HOST="mysql" \
+-e MYSQL_USER="zabbix" \
+-e MYSQL_PASSWORD="123456" \
+-e MYSQL_DATABASE="zabbix" \
+-e ZBX_SERVER_HOST="zabbix-server" \
+-e PHP_TZ="Asia/Shanghai" \
+-p 8000:80 \
+-p 8443:443 \
+-d \
+zabbix/zabbix-web-nginx-mysql
+```
+
+浏览器访问ip:8000查看
+ 默认登录
+ username:Admin
+ password:zabbix
+
+
 ### 复制代码到IDEA有行号
 
 CTRL+R  ^[ 0-9] relace all狂点直到没有红
@@ -33,13 +94,15 @@ hw:cpu_threads_policy	isolate
 https://docs.openstack.org/nova/pike/admin/configuration/schedulers.html
 
 
-
-
 ### WSL安装配置docker和k8s
 
 [Running Kubernetes CLI on Windows Subsystem for Linux (WSL)]( https://devkimchi.com/2018/06/05/running-kubernetes-on-wsl/)
 
 [Installing the Docker client on Windows Subsystem for Linux (Ubuntu)](https://medium.com/@sebagomez/installing-the-docker-client-on-ubuntus-windows-subsystem-for-linux-612b392a44c4)
+
+```bash
+echo "export DOCKER_HOST=localhost:2375" >> ~/.bash_profile
+```
 
 [Running Kubernetes Minikube on Windows 10 with WSL](https://www.jamessturtevant.com/posts/Running-Kubernetes-Minikube-on-Windows-10-with-WSL/)
 
