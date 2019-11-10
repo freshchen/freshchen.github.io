@@ -2094,15 +2094,30 @@ Spring事务的本质其实就是数据库对事务的支持，没有数据库�
             - 用上面创建的事务，以及传入的执行器类型创建执行器executor
             - 最后根据executor，configuration，是否自动提交创建DefaultSqlSession
     - 有了SqlSession就可以向数据库发送请求了
-        - 根据传入的ID到mapping配置文件中找到要执行的sql语句
+        - 根据传入的ID到mapping配置文件中找到要执行的sql语句模板
+        - executor依靠MapperStatement对象将复制内容与sql动态占位符绑定，创建出Statement
+    - SqlSession提交事务
+        - 根据dirty属性决定提交还是回滚
+    - 关闭SqlSession
 
+#### 匹配符$和#的区别
 
+- # 
+  - 可以防止sql注入，值不是直接放在语句中而是用占位符?
+  - 只在条件例如where语句中起作用
+- $
+  - 可以用于动态sql，值是直接嵌入到sql中的
+  - 不能防止sql注入
 
+#### ResultType和ResultMap
 
+都是用于映射sql返回结果，数据库表中字段与Entity字段的映射
 
-
-
-
+- ResultType
+  - 两边字段名一致
+- ResultMap
+  - 两变字段名可以不一致，显示指定对应关系
+  - 还可以添加构造，生成数据库中没有的字段的数据
 
 ### Netty
 
