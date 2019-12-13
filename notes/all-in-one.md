@@ -1369,6 +1369,24 @@ docker rmi --force $(docker images -q)
   - 基于事件和回调机制
   - 请求立即返回，连接和线程无对应关系
 
+#### BIO组件
+
+|                  | Byte Based                                                   | Character Based                                              |                                                              |                                                              |
+| ---------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+|                  | Input                                                        | Output                                                       | Input                                                        | Output                                                       |
+| Basic            | [InputStream](http://tutorials.jenkov.com/java-io/inputstream.html) | [OutputStream](http://tutorials.jenkov.com/java-io/outputstream.html) | [Reader](http://tutorials.jenkov.com/java-io/reader.html) [InputStreamReader](http://tutorials.jenkov.com/java-io/inputstreamreader.html) | [Writer](http://tutorials.jenkov.com/java-io/writer.hml) [OutputStreamWriter](http://tutorials.jenkov.com/java-io/outputstreamwriter.html) |
+| Arrays           | [ByteArrayInputStream](http://tutorials.jenkov.com/java-io/bytearrayinputstream.html) | [ByteArrayOutputStream](http://tutorials.jenkov.com/java-io/bytearrayoutputstream.html) | [CharArrayReader](http://tutorials.jenkov.com/java-io/chararrayreader.html) | [CharArrayWriter](http://tutorials.jenkov.com/java-io/chararraywriter.html) |
+| Files            | [FileInputStream](http://tutorials.jenkov.com/java-io/fileinputstream.html) [RandomAccessFile](http://tutorials.jenkov.com/java-io/randomaccessfile.html) | [FileOutputStream](http://tutorials.jenkov.com/java-io/fileoutputstream.html) [RandomAccessFile](http://tutorials.jenkov.com/java-io/randomaccessfile.html) | [FileReader](http://tutorials.jenkov.com/java-io/filereader.html) | [FileWriter](http://tutorials.jenkov.com/java-io/filewriter.html) |
+| Pipes            | [PipedInputStream](http://tutorials.jenkov.com/java-io/pipedinputstream.html) | [PipedOutputStream](http://tutorials.jenkov.com/java-io/pipedoutputstream.html) | [PipedReader](http://tutorials.jenkov.com/java-io/pipedreader.html) | [PipedWriter](http://tutorials.jenkov.com/java-io/pipedwriter.html) |
+| Buffering        | [BufferedInputStream](http://tutorials.jenkov.com/java-io/bufferedinputstream.html) | [BufferedOutputStream](http://tutorials.jenkov.com/java-io/bufferedoutputstream.html) | [BufferedReader](http://tutorials.jenkov.com/java-io/bufferedreader.html) | [BufferedWriter](http://tutorials.jenkov.com/java-io/bufferedwriter.html) |
+| Filtering        | [FilterInputStream](http://tutorials.jenkov.com/java-io/filterinputstream.html) | [FilterOutputStream](http://tutorials.jenkov.com/java-io/filteroutputstream.html) | [FilterReader](http://tutorials.jenkov.com/java-io/filterreader.html) | [FilterWriter](http://tutorials.jenkov.com/java-io/filterwriter.html) |
+| Parsing          | [PushbackInputStream](http://tutorials.jenkov.com/java-io/pushbackinputstream.html) [StreamTokenizer](http://tutorials.jenkov.com/java-io/streamtokenizer.html) |                                                              | [PushbackReader](http://tutorials.jenkov.com/java-io/pushbackreader.html) [LineNumberReader](http://tutorials.jenkov.com/java-io/linenumberreader.html) |                                                              |
+| Strings          |                                                              |                                                              | [StringReader](http://tutorials.jenkov.com/java-io/stringreader.html) | [StringWriter](http://tutorials.jenkov.com/java-io/stringwriter.html) |
+| Data             | [DataInputStream](http://tutorials.jenkov.com/java-io/datainputstream.html) | [DataOutputStream](http://tutorials.jenkov.com/java-io/dataoutputstream.html) |                                                              |                                                              |
+| Data - Formatted |                                                              | [PrintStream](http://tutorials.jenkov.com/java-io/printstream.html) |                                                              | [PrintWriter](http://tutorials.jenkov.com/java-io/printwriter.html) |
+| Objects          | [ObjectInputStream](http://tutorials.jenkov.com/java-io/objectinputstream.html) | [ObjectOutputStream](http://tutorials.jenkov.com/java-io/objectoutputstream.html) |                                                              |                                                              |
+| Utilities        | [SequenceInputStream](http://tutorials.jenkov.com/java-io/sequenceinputstream.html) |                                                              |                                                              |                                                              |
+
 #### Java泛型参数
 
 生产者用extends，消费者用super
@@ -1685,6 +1703,68 @@ public class NewStack<T>{
 - 如果一个对象**完全初始化**以后，一个线程持有该对象的引用，那么这个线程一定可以看到正确初始化的 final 属性的值（也就是不加final可能看到的是默认的0值）
 - final 属性的 freeze 操作发生于被调用的构造方法结束的时候
 - final 属性可以通过反射和其他方法来改变
+
+#### JDBC连接数据库步骤
+
+- 加载JDBC驱动程序
+
+- ###### 拼接JDBC需要连接的URL
+
+- ###### 创建数据库的连接
+
+- ###### 创建一个Statement
+
+- ###### 执行SQL语句
+
+- ###### 处理执行完SQL之后的结果
+
+- ###### 关闭使用的JDBC对象
+
+![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/jdbc.png)
+
+#### 数据库连接池
+
+- 功能
+  - 连接池的建立
+    - 在系统初始化时，依照系统配置来创建连接池，并在池中建立几个连接对象，以便使用时获取。连接池中的连接不允许随意建立和关闭，避免系统开销。
+  - 连接的使用和管理
+    - 当客户请求数据库连接时，首先查看连接池中是否有空闲连接，如果存在空闲连接，则将连接分配给客户使用；如果没有空闲连接，则查看当前所开的连接数是否已经达到最大连接数，如果没达到就重新创建一个连接给请求的客户；如果达到就按设定的最大等待时间进行等待，如果超出最大等待时间，则抛出异常给客户
+    - 当客户释放数据库连接时，先判断该连接的引用次数是否超过了规定值，如果超过就从连接池中删除该连接，否则保留为其他客户服务。
+  - 连接池的关闭
+    - 当系统或者应用关闭时，关闭连接池，释放所有连接。 
+
+- 优势
+  -  资源复用 
+    -  由于数据库连接得到重用，避免了频繁创建、释放连接引起的大量性能开销。在减少系统消耗的基础上，另一方面也增进了系统运行环境的平稳性（减少内存碎片以及数据库临时进程/线程的数量） 
+  -  更快的系统响应速度 
+    -  数据库连接池在初始化过程中，往往已经创建了若干数据库连接至于池中备用。此时连接的初始化工作均已完成。对于业务请求处理而言，直接利用现有可用连接，避免了数据库连接初始化和释放过程的时间，从而缩减了系统整体响应时间 
+  -  统一的连接管理，避免数据库连接泄漏 
+    -  在较为完备的数据库连接池实现中，可根据预先的连接占用超时设定，强制收回被占用连接。从而避免了常规数据库连接操作中可能出现的资源泄漏 
+- 常用实现
+  - dhcp
+  - c3p0
+  - druid
+
+#### 注解
+
+- 作用
+  - 再编译，构建或者运行阶段提供一些元数据，不影响正常运行逻辑
+- 自定义注解
+  - @Retention	指定生命周期
+    - RetentionPolicy.RUNTIME：运行时可以被反射捕获到
+    -  RetentionPolicy.CLASS：注解会保留在.class字节码文件中，这是注解的默认选项，运行中获取不到
+    -  RetentionPolicy.SOURCE：只在编译阶段有用，不被保存到class文件中
+  - @Target     指定注解可以加在哪里
+    - ElementType.ANNOTATION_TYPE：只能用于定义其他注解
+    - ElementType.CONSTRUCTOR
+    - ElementType.FIELD
+    - ElementType.LOCAL_VARIABLE
+    - ElementType.METHOD
+    - ElementType.PACKAGE
+    - ElementType.PARAMETER
+    - ElementType.TYPE： 可以是类、接口、枚举或注释 
+  - @Inherited    使用了注解的类的子类会继承这个注解
+  - @Documented     用于在JavaDoc中生成
 
 ### JVM
 
