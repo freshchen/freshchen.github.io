@@ -1353,6 +1353,7 @@ docker rmi --force $(docker images -q)
 - 别忽略异常
 - 不要打印异常日志的同时将其抛出
 - 自定义异常包裹某个异常的同时不要丢弃它原本的信息
+- 如果catch住之后throw一个新异常，方法下面的内容都不会执行
 
 #### BIO,NIO,AIO的区别
 
@@ -2060,8 +2061,8 @@ BeanFactory和ApplicationContext是Spring的两大核心接口，都可以当做
 
 #### Bean的五种作用域
 
-- singleton：单例模式，在整个Spring IoC容器中，使用singleton定义的Bean将只有一个实例
-- prototype：原型模式，每次通过容器的getBean方法获取prototype定义的Bean时，都将产生一个新的Bean实例
+- singleton：单例模式，在整个Spring IoC容器中，使用singleton定义的Bean将只有一个实例，Spring容器启动时就生成了
+- prototype：原型模式，每次通过容器的getBean方法获取prototype定义的Bean时，都将产生一个新的Bean实例，Spring容易启动时没用生成
 - request：对于每次HTTP请求，使用request定义的Bean都将产生一个新实例，即每次HTTP请求将会产生不同的Bean实例。只有在Web应用中使用Spring时，该作用域才有效
 - session：对于每次HTTP Session，使用session定义的Bean豆浆产生一个新实例。同样只有在Web应用中使用Spring时，该作用域才有效
 - globalsession：每个全局的HTTP Session，使用session定义的Bean都将产生一个新实例。典型情况下，仅在使用portlet context的时候有效。同样只有在Web应用中使用Spring时，该作用域才有效
@@ -2069,6 +2070,11 @@ BeanFactory和ApplicationContext是Spring的两大核心接口，都可以当做
 #### Bean的生命周期
 
 ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/spring-bean-lifecycle.png)
+
+- 读取XML或者注解，注册到Spring容器中，然后通过工厂或者自定义动态工厂去创建Bean
+- BeanPostProcessor 加入一些增强功能，相当于动态代理
+
+
 
 #### AOP（面向切面编程）基础
 
@@ -2147,13 +2153,28 @@ Spring事务的本质其实就是数据库对事务的支持，没有数据库�
 
 ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/springmvc.png)
 
+-  用户发送请求至前端控制器DispatcherServlet
+- DispatcherServlet收到请求调用HandlerMapping处理器映射器。
+- 处理器映射器根据请求url找到具体的处理器，生成处理器对象及处理器拦截器(如果有则生成)一并返回给DispatcherServlet。
+- DispatcherServlet通过HandlerAdapter处理器适配器调用处理器
+- HandlerAdapter执行处理器(handler，也叫后端控制器)。
+- Controller执行完成返回ModelAndView
+- HandlerAdapter将handler执行结果ModelAndView返回给DispatcherServlet
+- DispatcherServlet将ModelAndView传给ViewReslover视图解析器
+- ViewReslover解析后返回具体View对象
+- DispatcherServlet对View进行渲染视图（即将模型数据填充至视图中）。
+- DispatcherServlet响应用户
+
 #### SpringMvc的控制器是不是单例模式是不是线程安全
 
 - 是单例模式,所以在多线程访问的时候有线程安全问题
 - 不要用同步,会影响性能,解决方案把控制器变为无状态对象
 - 如果一定有成员变量，可以增加注解@Scope(value = "prototype")改为原型模式
 
+#### 如何解决跨域
 
+- CORS
+  - 通过实现Spring MVC中的拦截器HandlerInterceptor 加上跨域需要的请求头
 
 ### MyBatis
 
