@@ -3039,7 +3039,105 @@ ACID 在英文中的意思是“酸”， BASE 的意思是“碱”
   - 异步调用内部超时
   - 异步调用固调超时
 
+#### 压测工具
 
+- ab
+  - ab 是一款针对HTTP 实现的服务进行性能压测的工具
+  - ab -c 10 -n 100 000 http://localhost : 8080/genid
+  - ab 只能测试简单的RESTful 风格的接口，无法进行多个业务逻辑的串联测试
+- jmeter
+  - 它可以用于测试静态和动态资源，例如静态文件、Java Applet、CGI 脚本、Java 类库、数据库、FTP 服务器， HTTP服务器等。
+- mysqlslap
+  - mysqlslap 是MySQL 自带的一款性能压测工具，通过模拟多个并发客户端访问MySQL 来
+    执行压力测试，同时提供了详细的数据性能报告。
+  - 命令
+    - mysqlslap -a -uroot -pyouarebest
+    - mysqlslap -a - c 100 -uroot - pyouarebest
+    - mysqlslap -a -i 10 -uroot - pyouarebest
+    - rnysqlslap - a -clO --nurnber-of-quer 工es=lOOO --auto-generate-sql-load- type=read
+      -uroot -pyouarebest
+    - mysqlslap -a -cl0 --number-of-queries=l 000 - -auto-genera te - sql-load- type=wri te
+      -uroot -pyouarebest
+    - mysqlslap -a -clO --number-of-queries=lOOO -- auto-generate-sql-load-type =mixed -uroot -pyouarebest
+    - mysqlslap -a --concurrency=S0 , 100 --number-of-queries 1000 一－ debug-info
+      --engine=myisam, innodb --iterations=S -uroot -pyouarebest
+- sysbench
+  - CPU 性能测试
+    - sysbench --test=cpu --cpu-max-prime=20000 run
+  - 线程锁性能测试
+    - sysbench --test=threads --num- threads=64 --thread-yields=lOO --thread-locks=2 run
+  - 磁盘随机1/0 性能测试
+    - sysbench --test=fileio -- file - num=l6 --file-total-size=lOOM prepare
+  - 内存性能测试
+    - sysbench --test=memory --num-threads=512 --memory-block-size=256M --memory total-size=32G run
+  - M ySQL 事务性操作测试
+    - sysbench --test=oltp --mysql-table-engi 口e=myisam oltp-table- size=lOOO --mysql-user=root --mysql-host=localhost - - mysql-password=youarebest --mysql-db=test run
+- dd
+  - dd 可以用于测试磁盘顺序110 的存取速度。
+- LoadRunner
+  - LoadRunner 是惠普的一款商业化性能测试工具
+- hprof
+  - hprof 是JDK 自带的分析内存堆和CPU 使用情况的命令行工具。实际上， hprof 并不是一
+    个可执行的命令，而是一个JVM 执行时动态加载的本地代理库，力日载后运行在只币f 进程中。
+    通过在NM 启动时配置不同的选项，可以让hprof 监控不同的性能指标，包括堆、CPU 使用情
+    况、械和线程等。hprof 会生成二进制或者文本格式的输出文件，对二进制格式的输出可以借助
+    命令行工具HAT 进行分析，开发者可以通过分析输出文件来找到性能瓶颈。
+  - java agentlib : hprof=cpu=times,interval=20,depth=3 类路径
+  - java -agentlib : hprof=heap=sites 类路径
+
+#### 大数据日志系统
+
+日志框架主流slf4j+logback或slf4j+log4j2
+
+- 日志收集器
+  - Logstash
+  - Fluentd
+  - Flume
+  - Scribe
+  - Rsyslog
+- 日志缓冲队列
+  - Kafka
+  - Redis
+  - RabbitMQ
+- 日志解析器
+  - Logstash
+  - Fluentd
+- 日志存储和搜索
+  - Elasticsearch
+  - Solr
+- 日志展示系统
+  - Kibana
+
+#### APM （应用性能管理，调用链管理）系统
+
+TraceID 和SpanID跟踪请求，谷歌的Dapper 论文提到的调用链跟踪原理
+
+- Pinpoint
+- Zipkin
+- CAT
+
+#### 故障排除小工具
+
+- jvm命令行
+  - jad or jd-gui：反编译
+  - btrace：线上debug，增加日志，切面功能
+  - jmap：查看内存使用
+  - jstat：jstat 利用了口叫内建的指令对Java 应用程序的资源和性能进行实时的命令行监控，包括对堆大小和垃圾回收状况的监控等。与jmap 对比， jstat 更倾向于输出累积的信息与打印GC 等的统计信息等。
+  - jinfo：可以输出井修改运行时的Java 进程的环境变量和虚拟机参数。
+  - javah ：生成Java 类中本地方法的C 头文件，一般用于开发JNI 库。
+  - jps ：用于查找Java 进程，通常使用ps 命令代替。
+  - jhat：用于分析内存堆的快照文件。
+  - jdb ：远程调试，用于线上定位问题。
+  - jstatd: jstat 的服务器版本。
+- GUI
+  - JCorisole: JDK 自带的可以查看Java 内存和线程堆拢的工具，己经过时。
+  - JVisualVM: JDK 自带的可以查看Java 内存和线程堆拢的工具，功能丰富、完善，是JConsole 的替代版本。
+  - JMAT: Eclipse 组织开发的全功能的开源Java 性能跟踪、分析和定位工具。
+  - JProfiler ： 全功能的商业化Java 性能跟踪、分析和定位工具。
+- Linux
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/linux-cmd-1.PNG)
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/linux-cmd-2.PNG)
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/linux-cmd-3.PNG)
 
 ### 缓存
 
