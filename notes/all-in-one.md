@@ -3139,6 +3139,13 @@ TraceID 和SpanID跟踪请求，谷歌的Dapper 论文提到的调用链跟踪�
   - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/linux-cmd-2.PNG)
   - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/linux-cmd-3.PNG)
 
+#### 常用的4 种开发模式
+
+- 瀑布式开发
+- 迭代式开发
+- 螺旋式开发
+- 敏捷软件开发
+
 ### 缓存
 
 #### 引入缓存
