@@ -2240,7 +2240,34 @@ Spring事务的本质其实就是数据库对事务的支持，没有数据库�
 - 注册完成后**Channel**就可以执行**ChannelpipeLine**中的任务了
 - **ChannelpipeLine**由各种Handler组成，主要有**ChannelInboundHandler**（读）和**ChannelOutboundHandler**（写），通过**HandlerContext**管理，各大Handler可以通过**ByteBuf**操作数据
 
+### Vert.x
 
+#### 官网笔记
+
+- 流式API
+- 事件驱动
+- Reactor模型，不同于node.js，可以支持多Reactor，充分利用CPU
+- EventLoop中不要使用阻塞方法，有专门的方式兼容运行阻塞代码
+- 异步结果可以组合，或者构成链式结构
+- Verticle
+  - 推荐的开发方式，便于并发，部署，扩展
+  - 一个Vert.x实例默认维护N个event loop threads (where N by default is core*2) 
+  - 支持多语言
+  - 同一个Vert.x实例上运行多个Verticle构成一个应用，Verticle之间通过event bus联系
+  - 三种类型
+    - Standard Verticles：常用，通过event loop thread执行
+    - Worker Verticles：通过worker pool执行，单线程
+    - Multi-threaded worker verticles：通过worker pool执行，多线程
+  - 可以设置不同的上下文context 
+  - 支持定时器
+- Event Bus事件总线
+  - 很简单的绑定消息传递的地址
+  - Handlers和Adress可以是一对一，一对多或者多对多的
+  - 支持消息订阅模式
+  - 支持点对点，以及传统的请求响应模式
+  - 消息有可能丢失，需要自己实现幂等，通过重试等方式
+  - 支持String，buffer，json消息格式，当然也可以自己定义格式通过codec
+  - 不止可以单点，也可以作为集群总线
 
 ## 数据库
 
