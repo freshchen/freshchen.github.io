@@ -26,16 +26,31 @@
 
 
 
+## 软件
 
-
-
-
-
-
-
-
-
-
+- 浏览器
+  - chrome
+    - Octotree
+    - 谷歌翻译
+    - One Tab
+    - Infinity
+  - firefox
+- IDE
+  - IDEA
+    - Lombok
+  - PyCharm
+  - VS Code
+- 工具
+  - Xshell
+  - Typora
+  - Mysql Workbench
+  - Fork
+  - Wireshark
+  - Docker desktop
+  - Another redis desktop manager
+  - Gilffy Diagrams
+  - Logi Optional
+  - 滴答清单
 
 
 
@@ -2219,6 +2234,24 @@ Spring事务的本质其实就是数据库对事务的支持，没有数据库�
 - ResultMap
   - 两变字段名可以不一致，显示指定对应关系
   - 还可以添加构造，生成数据库中没有的字段的数据
+
+### SpringBoot
+
+[纯洁的微笑](http://www.ityouknow.com/spring-boot.html)
+
+#### 启动流程
+
+[link](https://www.cnblogs.com/shamo89/p/8184960.html)
+
+![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/springboot-start.png)
+
+- 注解
+
+  ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/springboot-start-1.png)
+
+- SpringApplication.run()
+
+  ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/springboot-start-2.png)
 
 ### Netty
 
