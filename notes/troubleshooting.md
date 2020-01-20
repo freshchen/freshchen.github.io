@@ -4,7 +4,9 @@
 
 
 
+### IDEA右侧Maven标签栏的Dependences报红
 
+检查没有冲突，并且包导入成功，把pom中的对应的报红依赖注释，import一遍，然后放开再import一遍
 
 ### k8s如何支持多网络
 

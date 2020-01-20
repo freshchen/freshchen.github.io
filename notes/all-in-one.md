@@ -34,12 +34,14 @@
     - 谷歌翻译
     - One Tab
     - Infinity
+    - draw.ioDesktop.Me
   - firefox
 - IDE
   - IDEA
     - Lombok
   - PyCharm
   - VS Code
+  - GsonFormat
 - 工具
   - Xshell
   - Typora
@@ -49,7 +51,7 @@
   - Docker desktop
   - Another redis desktop manager
   - Gilffy Diagrams
-  - Logi Optional
+  - Logitech Optional
   - 滴答清单
 
 
@@ -2234,6 +2236,13 @@ Spring事务的本质其实就是数据库对事务的支持，没有数据库�
 - ResultMap
   - 两变字段名可以不一致，显示指定对应关系
   - 还可以添加构造，生成数据库中没有的字段的数据
+
+### JOOQ
+
+是一款ORM框架
+
+- 作用
+  - 基于流式的api操作数据库，提供自动生成表结构功能，支持生成sql，执行sql，解析sql执行结果
 
 ### SpringBoot
 
