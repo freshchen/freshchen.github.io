@@ -2456,6 +2456,7 @@ MySQL 主要分为 Server 层和存储引擎层
   - 使用explain分析sql
   - 分析结果中type字段，从好到坏是const、eq_reg、ref、range、index和all，是index和all就有问题需要优化
   - extra字段是Using filesort指用的外部索引例如文件系统索引等，Using temporary指用的临时表，这两种情况也需要优化
+  - 使用show profile查看SQL执行时的底层 性能问题
 - 解决
   - 没有索引可以试图建立索引，反复测试
     - 加索引 alter table <table-name> add index index_name(<column-name>)
@@ -2463,7 +2464,7 @@ MySQL 主要分为 Server 层和存储引擎层
     - 最后稳定之后再把不必要的索引删除 
   - 增加查询筛选的限制条件
   - 改写一些导致索引失效的SQL语句
-  - 优化数据库结构
+  - 优化数据库结构 
     - 将字段很多的表分解成多个表 
     - 对于需要经常联合查询的表，可以建立中间表以提高查询效率
   - 分解关联查询
@@ -2504,11 +2505,50 @@ MySQL 主要分为 Server 层和存储引擎层
 - InnoDB 主键走聚集索引，其他走稀疏索引
 - MyISAM 全是走稀疏索引
 
+#### InnoDB聚集索引和普通索引有什么差异？ 
+
+[好文](https://www.cnblogs.com/AbnerLc/p/11923242.html)
+
+- InnoDB **聚集索引** 的叶子节点存储行记录，因此， InnoDB必须要有，且只有一个聚集索引：
+
+　　　　（1）如果表定义了PK，则PK就是聚集索引；
+
+　　　　（2）如果表没有定义PK，则第一个not NULL unique列是聚集索引；
+
+　　　　（3）否则，InnoDB会创建一个隐藏的row-id作为聚集索引；
+
+- InnoDB **普通索引** 的叶子节点存储主键值。
+
+　　　　画外音：注意，不是存储行记录头指针，MyISAM的索引叶子节点存储记录指针。
+
+#### 覆盖索引
+
+- 回表
+  - 当我们查询普通索引时，结果是主键的值，这时候就需要用主键值去查主键的索引树，这就是回表
+- 当我们需要查询的列上都有索引时，我们需要查询的数据就已经全部拿到了，就不需要回表，大大提高了效率
+- 如何实现覆盖索引
+  - 可以通过把需要查的列建立联合索引
+- 特征
+  - explain的输出结果Extra字段为Using index时证明查询走了覆盖索引
+  - explain的输出结果Extra字段为Using index condition时就没有用到覆盖索引，存在回表
+- 使用场景
+  - **全表count查询优化**
+  - **列查询回表优化**
+  - **分页查询**
+
 #### 联合索引
 
 - **最左匹配原则**
   - 索引只能用于查找key是否**存在（相等）**，遇到范围查询`(>、<、between、like`左匹配)等就**不能进一步匹配**了，后面的条件退化为线性查找
   - 例如创建 union index (a , b ,c)  查（a，b）走索引，查（a，c）走不了索引
+
+#### 性能优化show profile
+
+- select @@profiling     查看是否开启性能分析
+
+- set profiling=1; 		开启
+- show profiles;          看最近的执行大体情况
+- show profile all for query <query_id>;              找到有问题的命令，然后用id查看详细信息
 
 #### 大表优化
 
