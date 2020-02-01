@@ -2385,9 +2385,13 @@ MySQL 主要分为 Server 层和存储引擎层
 
 #### InnoDB锁种类
 
-- Record lock：单个行记录上的锁
-- Gap lock：间隙锁，锁定一个范围，不包括记录本身
-- Next-key lock：record+gap 锁定一个范围，包含记录本身
+- 支持行锁表锁
+- 行锁有三种实现
+  - Record Lock：单个行记录上的锁。
+  - Gap Lock：间隙锁，锁定一个范围，但不包括记录本身。GAP锁的目的，是为了防止同一事务的两次当前读，可能出现幻读的情况。因为索引结构是b+树所以最后叶子节点一层有序
+  - Next-Key Lock：Record 和 Gap锁的合体，锁定一个范围，并且锁定记录本身。对于行的查询，都是采用该方法，主要目的是解决幻读的问题。
+
+- 如果没有索引就直接上表锁
 
 #### MVCC和事务的隔离级别
 
@@ -2542,9 +2546,9 @@ MySQL 主要分为 Server 层和存储引擎层
   - 索引只能用于查找key是否**存在（相等）**，遇到范围查询`(>、<、between、like`左匹配)等就**不能进一步匹配**了，后面的条件退化为线性查找
   - 例如创建 union index (a , b ,c)  查（a，b）走索引，查（a，c）走不了索引
 
-#### 性能优化show profile
+#### 性能优化show profile 
 
-- select @@profiling     查看是否开启性能分析
+- select @@profiling     查看是否开启性能分析 
 
 - set profiling=1; 		开启
 - show profiles;          看最近的执行大体情况
@@ -2580,11 +2584,39 @@ MySQL 主要分为 Server 层和存储引擎层
 
   - 实际中使用的方案
     - **客户端代理：** **分片逻辑在应用端，封装在jar包中，通过修改或者封装JDBC层来实现。** 当当网的 **Sharding-JDBC** 、阿里的TDDL是两种比较常用的实现
-    - **中间件代理：** **在应用和数据中间加了一个代理层。分片逻辑统一维护在中间件服务中。** 我们现在谈的 **Mycat** 、360的Atlas、网易的DDB等等都是这种架构的实现
+    - **中间件代理：** **在应用和数据中间加了一个代理层。分片逻辑统一维护在中间件服务中。** 我们现在谈的 **Mycat** 、360的Atlas、 网易的DDB等等都是这种架构的实现
+
+#### 集群
+
+- 主从复制
+  - 只保证HA，主服务器对外服务，从机只做备份，有点浪费
+- mysql proxy读写分离
+  - 可以让写操作去主服务器，从服务器只负责读，充分利用
+- MyCat分库分表
+  - 如何切分
+    - id hash
+    - 日期
+    - id范围等等
+  - 问题
+    - 跨库join
+      - 将不同库的join拆分成多个select
+      - 建立全局表，每个库都有张相同的表
+      - 冗余字段，不遵守三范式
+      - E-R分片，将有关系的记录存储到一个库中 
+    - 分布式事务，mycat支持的都不好
+      - 强一致性，一般不用
+      - 最终一致性
+    - 分布式主键
+      - redis incr 命令
+      - 数据库生成
+      - UUID
+      - snowflake算法
+
+
 
 #### 高性能实践的一些规范
 
-[参考](https://mp.weixin.qq.com/s?__biz=Mzg2OTA0Njk0OA==&mid=2247485117&idx=1&sn=92361755b7c3de488b415ec4c5f46d73&chksm=cea24976f9d5c060babe50c3747616cce63df5d50947903a262704988143c2eeb4069ae45420&token=79317275&lang=zh_CN#rd)
+[参考](https://mp.weixin.qq.com/s?__biz=Mzg2OTA0Njk0OA==&mid=2247485117&idx=1&sn=92361755b7c3de488b415ec4c5f46d73&chksm=cea24976f9d5c060babe50c3747616cce63df5d50947903a262704988143c2eeb4069ae45420&token=79317275&lang=zh_CN#rd) 
 
 - ##### 命令规范
 
@@ -2642,6 +2674,10 @@ MySQL 主要分为 Server 层和存储引擎层
   -  对于连续数值，使用`BETWEEN`不用`IN`：`SELECT id FROM t WHERE num BETWEEN 1 AND 5`
   -  尽量避免在 WHERE 子句中使用!=或<>操作符，否则将引擎放弃使用索引而进行全表扫描
 
+
+
+
+
 #### 常用命令
 
 [一千行MySQL命令](https://snailclimb.gitee.io/javaguide/#/database/一千行MySQL命令)
@@ -2669,6 +2705,8 @@ commit;
 set autocommit = 0
 # 加共享锁
 <command> lock in share mode
+# 加排他锁
+<command> for update
 # 索引创建
 ALTER TABLE table_name ADD INDEX index_name (column_list)
 ALTER TABLE table_name ADD UNIQUE (column_list)
