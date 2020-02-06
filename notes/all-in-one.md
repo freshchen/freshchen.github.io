@@ -26,16 +26,33 @@
 
 
 
+## 软件
 
-
-
-
-
-
-
-
-
-
+- 浏览器
+  - chrome
+    - Octotree
+    - 谷歌翻译
+    - One Tab
+    - Infinity
+    - draw.ioDesktop.Me
+  - firefox
+- IDE
+  - IDEA
+    - Lombok
+  - PyCharm
+  - VS Code
+  - GsonFormat
+- 工具
+  - Xshell
+  - Typora
+  - Mysql Workbench
+  - Fork
+  - Wireshark
+  - Docker desktop
+  - Another redis desktop manager
+  - Gilffy Diagrams
+  - Logitech Optional
+  - 滴答清单
 
 
 
@@ -2220,6 +2237,31 @@ Spring事务的本质其实就是数据库对事务的支持，没有数据库�
   - 两变字段名可以不一致，显示指定对应关系
   - 还可以添加构造，生成数据库中没有的字段的数据
 
+### JOOQ
+
+是一款ORM框架
+
+- 作用
+  - 基于流式的api操作数据库，提供自动生成表结构功能，支持生成sql，执行sql，解析sql执行结果
+
+### SpringBoot
+
+[纯洁的微笑](http://www.ityouknow.com/spring-boot.html)
+
+#### 启动流程
+
+[link](https://www.cnblogs.com/shamo89/p/8184960.html)
+
+![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/springboot-start.png)
+
+- 注解
+
+  ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/springboot-start-1.png)
+
+- SpringApplication.run()
+
+  ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/springboot-start-2.png)
+
 ### Netty
 
 #### Netty的特点
@@ -2353,9 +2395,13 @@ MySQL 主要分为 Server 层和存储引擎层
 
 #### InnoDB锁种类
 
-- Record lock：单个行记录上的锁
-- Gap lock：间隙锁，锁定一个范围，不包括记录本身
-- Next-key lock：record+gap 锁定一个范围，包含记录本身
+- 支持行锁表锁
+- 行锁有三种实现
+  - Record Lock：单个行记录上的锁。
+  - Gap Lock：间隙锁，锁定一个范围，但不包括记录本身。GAP锁的目的，是为了防止同一事务的两次当前读，可能出现幻读的情况。因为索引结构是b+树所以最后叶子节点一层有序
+  - Next-Key Lock：Record 和 Gap锁的合体，锁定一个范围，并且锁定记录本身。对于行的查询，都是采用该方法，主要目的是解决幻读的问题。
+
+- 如果没有索引就直接上表锁
 
 #### MVCC和事务的隔离级别
 
@@ -2424,6 +2470,7 @@ MySQL 主要分为 Server 层和存储引擎层
   - 使用explain分析sql
   - 分析结果中type字段，从好到坏是const、eq_reg、ref、range、index和all，是index和all就有问题需要优化
   - extra字段是Using filesort指用的外部索引例如文件系统索引等，Using temporary指用的临时表，这两种情况也需要优化
+  - 使用show profile查看SQL执行时的底层 性能问题
 - 解决
   - 没有索引可以试图建立索引，反复测试
     - 加索引 alter table <table-name> add index index_name(<column-name>)
@@ -2431,7 +2478,7 @@ MySQL 主要分为 Server 层和存储引擎层
     - 最后稳定之后再把不必要的索引删除 
   - 增加查询筛选的限制条件
   - 改写一些导致索引失效的SQL语句
-  - 优化数据库结构
+  - 优化数据库结构 
     - 将字段很多的表分解成多个表 
     - 对于需要经常联合查询的表，可以建立中间表以提高查询效率
   - 分解关联查询
@@ -2472,11 +2519,50 @@ MySQL 主要分为 Server 层和存储引擎层
 - InnoDB 主键走聚集索引，其他走稀疏索引
 - MyISAM 全是走稀疏索引
 
+#### InnoDB聚集索引和普通索引有什么差异？ 
+
+[好文](https://www.cnblogs.com/AbnerLc/p/11923242.html)
+
+- InnoDB **聚集索引** 的叶子节点存储行记录，因此， InnoDB必须要有，且只有一个聚集索引：
+
+　　　　（1）如果表定义了PK，则PK就是聚集索引；
+
+　　　　（2）如果表没有定义PK，则第一个not NULL unique列是聚集索引；
+
+　　　　（3）否则，InnoDB会创建一个隐藏的row-id作为聚集索引；
+
+- InnoDB **普通索引** 的叶子节点存储主键值。
+
+　　　　画外音：注意，不是存储行记录头指针，MyISAM的索引叶子节点存储记录指针。
+
+#### 覆盖索引
+
+- 回表
+  - 当我们查询普通索引时，结果是主键的值，这时候就需要用主键值去查主键的索引树，这就是回表
+- 当我们需要查询的列上都有索引时，我们需要查询的数据就已经全部拿到了，就不需要回表，大大提高了效率
+- 如何实现覆盖索引
+  - 可以通过把需要查的列建立联合索引
+- 特征
+  - explain的输出结果Extra字段为Using index时证明查询走了覆盖索引
+  - explain的输出结果Extra字段为Using index condition时就没有用到覆盖索引，存在回表
+- 使用场景
+  - **全表count查询优化**
+  - **列查询回表优化**
+  - **分页查询**
+
 #### 联合索引
 
 - **最左匹配原则**
   - 索引只能用于查找key是否**存在（相等）**，遇到范围查询`(>、<、between、like`左匹配)等就**不能进一步匹配**了，后面的条件退化为线性查找
   - 例如创建 union index (a , b ,c)  查（a，b）走索引，查（a，c）走不了索引
+
+#### 性能优化show profile 
+
+- select @@profiling     查看是否开启性能分析 
+
+- set profiling=1; 		开启
+- show profiles;          看最近的执行大体情况
+- show profile all for query <query_id>;              找到有问题的命令，然后用id查看详细信息
 
 #### 大表优化
 
@@ -2508,11 +2594,39 @@ MySQL 主要分为 Server 层和存储引擎层
 
   - 实际中使用的方案
     - **客户端代理：** **分片逻辑在应用端，封装在jar包中，通过修改或者封装JDBC层来实现。** 当当网的 **Sharding-JDBC** 、阿里的TDDL是两种比较常用的实现
-    - **中间件代理：** **在应用和数据中间加了一个代理层。分片逻辑统一维护在中间件服务中。** 我们现在谈的 **Mycat** 、360的Atlas、网易的DDB等等都是这种架构的实现
+    - **中间件代理：** **在应用和数据中间加了一个代理层。分片逻辑统一维护在中间件服务中。** 我们现在谈的 **Mycat** 、360的Atlas、 网易的DDB等等都是这种架构的实现
+
+#### 集群
+
+- 主从复制
+  - 只保证HA，主服务器对外服务，从机只做备份，有点浪费
+- mysql proxy读写分离
+  - 可以让写操作去主服务器，从服务器只负责读，充分利用
+- MyCat分库分表
+  - 如何切分
+    - id hash
+    - 日期
+    - id范围等等
+  - 问题
+    - 跨库join
+      - 将不同库的join拆分成多个select
+      - 建立全局表，每个库都有张相同的表
+      - 冗余字段，不遵守三范式
+      - E-R分片，将有关系的记录存储到一个库中 
+    - 分布式事务，mycat支持的都不好
+      - 强一致性，一般不用
+      - 最终一致性
+    - 分布式主键
+      - redis incr 命令
+      - 数据库生成
+      - UUID
+      - snowflake算法
+
+
 
 #### 高性能实践的一些规范
 
-[参考](https://mp.weixin.qq.com/s?__biz=Mzg2OTA0Njk0OA==&mid=2247485117&idx=1&sn=92361755b7c3de488b415ec4c5f46d73&chksm=cea24976f9d5c060babe50c3747616cce63df5d50947903a262704988143c2eeb4069ae45420&token=79317275&lang=zh_CN#rd)
+[参考](https://mp.weixin.qq.com/s?__biz=Mzg2OTA0Njk0OA==&mid=2247485117&idx=1&sn=92361755b7c3de488b415ec4c5f46d73&chksm=cea24976f9d5c060babe50c3747616cce63df5d50947903a262704988143c2eeb4069ae45420&token=79317275&lang=zh_CN#rd) 
 
 - ##### 命令规范
 
@@ -2570,6 +2684,10 @@ MySQL 主要分为 Server 层和存储引擎层
   -  对于连续数值，使用`BETWEEN`不用`IN`：`SELECT id FROM t WHERE num BETWEEN 1 AND 5`
   -  尽量避免在 WHERE 子句中使用!=或<>操作符，否则将引擎放弃使用索引而进行全表扫描
 
+
+
+
+
 #### 常用命令
 
 [一千行MySQL命令](https://snailclimb.gitee.io/javaguide/#/database/一千行MySQL命令)
@@ -2597,6 +2715,8 @@ commit;
 set autocommit = 0
 # 加共享锁
 <command> lock in share mode
+# 加排他锁
+<command> for update
 # 索引创建
 ALTER TABLE table_name ADD INDEX index_name (column_list)
 ALTER TABLE table_name ADD UNIQUE (column_list)
