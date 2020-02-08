@@ -3004,6 +3004,10 @@ show keys from table_name;
 - Hessian 及Burlap
 - Spring HTIP Invoke
 
+![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/rpc-1.png)
+
+![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/rpc-2.png)
+
 #### SOA框架
 
 - Dubbo
