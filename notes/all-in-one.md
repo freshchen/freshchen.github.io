@@ -992,6 +992,12 @@ docker rmi --force $(docker images -q)
 
 ## Java
 
+### 代码习惯
+
+- 入参尽量用Collection，更灵活
+- 枚举天然单例，直接比较内存地址
+- 方法内使用基本数据类型；   入参，模型l中使用包装类
+
 ### 核心
 
 #### HashMap
