@@ -1,290 +1,508 @@
 # Java8新特性之Stream
 
+## 前言
 
+在想很好了解 Stream 之前，很有必要简单的了解下函数式变成以及Lambda的概念，可以阅读另外一篇
 
-集合是Java中使用最多的API,。比如，以下SQL查询语句就可以选出热量较低的菜肴名
-称：SELECT name FROM dishes WHERE calorie < 400。你看，你不需要实现如何
-根据菜肴的属性进行筛选（比如利用迭代器和累加器），你只需要表达你想要什么,要是要处理大量元素又该怎么办呢？为了提高性能，你需要并行处理，并利用多核架构。
-但写并行代码比用迭代器还要复杂，而且调试起来也够受的！
+[**Java8新特性之Lambda**](https://www.cnblogs.com/freshchen/p/11721202.html)
 
+大家回忆下日常学习工作中使用的最多的 Java API 是是什么？相信很多人的答案和我一样都是集合。我们选择适合的集合数据结构存储数据，而我们之于集合最多的操作就是遍历，实现查询，统计，过滤，合并等业务。
 
+## 哪里用Stream
 
-流是Java API的新成员，它允许你以声明性方式处理数据集合（通过查询语句来表达，而不
-是临时编写一个实现）。就现在来说，你可以把它们看成遍历数据集的高级迭代器。此外，流还可以透明地并行处理，你无需写任何多线程代码了
+### 集合遍历
 
+> 外部迭代：通过 for循环，Iterator迭代器遍历集合，手动的拿到集合中每个元素进行相应处理
 
+- 优点
+  - 对于程序的掌控更高
+  - 性能强（如果算法功力深厚）
+- 缺点
+  - 很多重复的模板代码
+  - 需要很多中间临时变量来减少遍历次数
+  - 性能完全取决于程序员水平，烧脑
+  - 代码不易读
+  - 容易出错：例如for循环遍历LinkedList会出错
 
-69页例子
+> 内部迭代：只提供对集合中元素的处理逻辑，遍历过程交给库类，Java5提供了foreach，Java8提供了Stream
 
+- 优点
+  - 代码好读
+  - 简单，只需要提供处理逻辑
+- 缺点
+  - 有些情况性能比外部迭代差一点点
+  - 在使用foreach时不能对元素进行赋值操作
 
+## 为什么要Stream
 
-因为filter、sorted、map和collect等操作是与具体线程模型无关的高层次构件，所以
-它们的内部实现可以是单线程的，也可能透明地充分利用你的多核架构！在实践中，这意味着你
-用不着为了让某些数据处理任务并行而去操心线程和锁了，Stream API都替你做好了！
-图4-
+本文要介绍的Stream属于内部迭代，之前我们已经有了foreach减少了我们的代码量，为什么我们还需要Stream呢？
 
+- 流水线的方式处理集合，结合Lambda爽歪歪
+- 代码超短超好读
+- Stream的开始到结束就相当于一次遍历，允许我们在遍历中拼接多个操作
+- 强调的是对集合的计算逻辑，逻辑可以多次复用
+- 特别繁重的任务可以很轻松的转为并行流，适合类似于大数据处理等业务
+- 成本非常小的实现并行执行效果
 
+## 怎么用Stream
 
-Java 8中的Stream API可以让你写出这样的代码：
+上文我们大概知道了Stream主要服务与集合，流的过程可以总结为三步：
 
-声明性——更简洁，更易读
+- 开始操作：读取数据源（如集合）
+- 中间操作：组装中间操作链，形成一条流的流水线
+- 终端操作：一次迭代执行流水线，结束流，并生成结果
 
-可复合——更灵活
+### 中间操作和终端操作
 
-可并行——性能更好
+第一步流加载集合数据，库类完成我们不需要关心，要想使用好Stream有必要从不同维度了解主要的操作
 
+- **中间操作**：流水线的部件，返回的是this，也就是Stream，此时迭代并没有执行
+- **终端操作**：流水线真正开始执行，返回的是处理结果，终端操作过后流关闭
+- **无状态操作**：例如对集合中所有元素做转换，或者过滤，不用保存别的元素的处理结果
+- **有状态操作**：例如排序，去重操作，需要保存之前集合中元素的状态
+- **非短路操作**：按部就班完成迭代，返回处理结果
+- **短路操作**：只有一达到预设的条件，立刻停止并返回
 
+下图给出了Stream给出的一些常用api的基本信息
 
+![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/stream-1.png)
 
+### 基本数据类型流
 
-。集合讲的是数据，流讲的是计算
+为了避免自动装箱拆箱消耗性能，Stream为我们提供了IntStream、DoubleStream和LongStream，分别将流中的元素特化为int、long和double，这些特殊的流中提供了range，sum，max等数字类型常用的api
 
-流会使用一个提供数据的源，如集合、数组或输入/输出资源。 请注意，从有序集
-合生成流时会保留原有的顺序。由列表生成的流，其元素顺序与列表一致。
+### 并行流
 
+当我们面对计算是否密集的应用开发时，为了充分利用硬件资源，可以简单的通过改变parallel方法将流变成并行执行，但是在使用时有如下注意事项。
 
+- 并行流是通过 fork/join 线程池来实现的，该池是所有并行流共享的。默认情况，fork/join 池会为每个处理器分配一个线程。假设你有一台16核的机器，这样你就只能创建16个线程。而与此同时其他任务将无法获得线程被阻塞住，所以使用并行流要结合机器和业务场景。
+- 避免在并行流中改变共享状态，小心使用有状态的操作
+- 并行流并不一定就快，要将多个线程的执行结果汇总
 
-粗略地说，集合与流之间的差异就在于什么时候进行计算，粗略地说，集合与流之间的差异就在于什么时候进行计算。集合是一个内存中的数据结构，
-它包含数据结构中目前所有的值
+## 实战
 
+相信大家最关心的还是实际开发中能帮助我们解决哪些问题，通过一些简单案例熟悉各种操作的用法
 
+### 开始操作
 
-请注意，和迭代器类似，流只能遍历一次
+#### 值生成流
 
+```java
+// 生成空流
+Stream<Object> empty = Stream.empty();
+// 值生成流
+Stream<String> stringStream = Stream.of("1", "2", "3");
+```
 
+#### 数组生成流
 
+```java
+String[] strings = { "1", "2", "3"};
+Stream<String> stream = Arrays.stream(strings);
+```
 
+#### 集合生成流
 
-集合和流的另一个关键区别在于它们遍历数据的方式。使用Collection接口需要用户去做迭代（比如用for-each），这称为外部迭代。 相反，
-Streams库使用内部迭代——它帮你把迭代做了，还把得到的流值存在了某个地方，你只要给出
-一个函数说要干什么就可以了
+```java
+List<String> strings1 = Arrays.asList("1", "2", "3");
+Stream<String> stream1 = strings1.stream();
+```
+
+#### 文件生成流
+
+```java
+Stream<String> lines = Files.lines(Paths.get("/c/mnt/"));
+```
 
+#### 函数生成流（无限流）
 
+```java
+// 无限流，流从0开始，下面的每个元素依次加2
+Stream<Integer> iterate = Stream.iterate(0, num -> num + 2);
+// 无限流，流中每个元素都是 0~1 随机数
+Stream<Double> generate = Stream.generate(Math::random);
+```
 
-可以连接起来的流操作称为中间操作，关闭流的操作称为终端操作
+#### 数值范围生成流
 
+```java
+// 生成0到10的int流
+IntStream intStream = IntStream.rangeClosed(0, 10);
+// 生成0到9的int流
+IntStream intStream1 = IntStream.range(0, 10);
+```
 
+#### 手动生成流
 
-以下是你应从本章中学到的一些关键概念。
- 流是“从支持数据处理操作的源生成的一系列元素”。
- 流利用内部迭代：迭代通过filter、map、sorted等操作被抽象掉了。
- 流操作有两类：中间操作和终端操作。
- filter和map等中间操作会返回一个流，并可以链接在一起。可以用它们来设置一条流
-水线，但并不会生成任何结果。
- forEach和count等终端操作会返回一个非流的值，并处理流水线以返回结果。
- 流中的元素是按需计算的。
+```java
+// 生成有字符串a和数字1的异构的流
+Stream.builder().add("a").add(1).build().forEach(System.out::print);
+```
+
+#### 合并两个流
 
+```java
+Stream.concat(
+    Stream.of("1", 22, "333"),
+    Stream.of("1", 22, 333)
+).forEach(System.out::print);
+```
+
+### 中间操作
+
+在介绍中间操作时，为了方便学习演示使用到了终端操作中的foreach方法，作用就和我们写的foreach循环类似，遍历执行，不返回值。
 
+#### 过滤filter
+
+```java
+// 过滤所有空字符串，注意是返回 true的留下
+Stream.of("1", null, "2", "", "3")
+    .filter(StringUtils::isNotEmpty)
+    .forEach(System.out::print);
+```
 
+#### 去重distinct
 
+```java
+// 去掉重复的2
+Stream.of("1", "2", "2", "2", "3")
+    .distinct()
+    .forEach(System.out::print);
+```
 
-筛选和切片
-在本节中，我们来看看如何选择流中的元素：用谓词筛选，筛选出各不相同的元素，忽略流
-中的头几个元素，或将流截短至指定长度。
+#### 跳过skip
 
+```java
+// 跳过前两个元素
+Stream.of("1", "2", "3", "4", "5")
+    .skip(2)
+    .forEach(System.out::print);
+```
 
+#### 截短limit
 
-用谓词筛选
+```java
+// 与skip相反，只留下前2个
+Stream.of("1", "2", "3", "4", "5")
+    .limit(2)
+    .forEach(System.out::print);
+```
 
-Streams接口支持filter方法（你现在应该很熟悉了）。该操作会接受一个谓词（一个返回
-boolean的函数）作为参数，并返回一个包括所有符合谓词的元素的流
+#### 映射map
+
+```java
+@Data
+@AllArgsConstructor
+public class Person {
+    private String name;
+}
 
+// 将流中每个字符串转为Person实例
+Stream.of("1", "2", "3")
+    .map(Person::new)
+    .forEach(System.out::print);
+
+// 将流每个字符串变成其长度，为了避免自动拆箱，使用mapToInt转为IntStream
+Stream.of("1", "2", "3")
+    .mapToInt(String::length)
+    .forEach(System.out::print);
+```
 
+#### 扁平映射flatMap
 
-流还支持一个叫作distinct的方法，去重，它会返回一个元素各异（根据流所生成元素的
-hashCode和equals方法实现）的流
+用法和map类似，当我们需要把流中的每个元素全映射另外一个流，也就是数据在流中流里面，这时候操作就不方便，借助flatMap，我们可以把所有第二层流中的元素合并到最外层流
 
+```java
+// 每个字符串按照逗号分隔合并成一个流
+Stream.of("1,2,3", "4,5,6", "7,8,9")
+    .flatMap(a -> Stream.of(a.split(",")))
+    .forEach(System.out::print);
+```
 
+#### 排序sorted
 
-流支持limit(n)方法，该方法会返回一个不超过给定长度的流。所需的长度作为参数传递
-给limit。如果流是有序的，则最多会返回前n个元素
+```java
+Stream.of("4", "3", "5")
+    .sorted()
+    .forEach(System.out::print);
 
+Stream.of("4", "3", "5")
+    .sorted(Comparator.naturalOrder())
+    .forEach(System.out::print);
+```
 
+#### 并行流相关parallel，sequential，unordered
 
-流还支持skip(n)方法，返回一个扔掉了前n个元素的流。如果流中元素不足n个，则返回一
-个空流。请注意，limit(n)和skip(n)是互补的！例如，下面的代码将跳过超过300卡路里的头
-两道菜，并返回剩下的。
+```java
+// 串行流转并行流
+Stream.of("1", "2", "3").parallel();
+// 并行流转串行流
+Arrays.asList("1", "2", "3").parallelStream().sequential();
 
+// 在并行流中加上unordered，使得流变成无序，提供并行效率，此时limit相当于随机取2个元素
+Arrays.asList("1", "2", "3", "4", "5")
+    .parallelStream()
+    .unordered()
+    .limit(2).forEach(System.out::print);
+```
 
+#### 调试peek
 
-一个非常常见的数据处理套路就是从某些对象中选择信息。比如在SQL里，你可以从表中选
-择一列。Stream API也通过map和flatMap方法提供了类似的工具
+用于debug调试代码，在每次执行操作前，看一眼元素
 
-使用映射一词，是因为它和转换类似，但其中的细微差别在于它是“创建一
-个新版本”而不是去“修改”）
+```java
+// 每个元素会打印两遍
+Stream.of("1", "2", "3").peek(System.out::print).forEach(System.out::print);
+```
 
+### 终端操作
 
+#### 遍历foreach
 
-使用flatMap方法的效果是，各个数组并不是分别映射成一个流，而是映射成流的内容。所
-有使用map(Arrays::stream)时生成的单个流都被合并起来，即扁平化为一个流
+```java
+Stream.of("1", "2", "3").forEach(System.out::print);
 
+// 并行流中使用用于保持有序
+Arrays.asList("1", "2", "3").parallelStream().forEachOrdered(System.out::print);
+```
 
+#### 通用统计count，max，min
 
-另一个常见的数据处理套路是看看数据集中的某些元素是否匹配一个给定的属性。Stream
-API通过allMatch、anyMatch、noneMatch、findFirst和findAny方法提供了这样的工具
+```java
+// 总个数，返回true|false
+Stream.of("1", "2", "3").count();
+// 最大元素，返回Optional
+Stream.of("1", "2", "3").max(Comparator.naturalOrder());
+// 最小元素，返回Optional
+Stream.of("1", "2", "3").min(Comparator.naturalOrder());
+```
 
+#### 数值流特有统计sum，average，summaryStatistics
 
+以 IntStream 举例
 
-这样的查询可以被归类为归约操作
-（将流归约成一个值）。用函数式编程语言的术语来说，这称为折叠（fold），因为你可以将这个操
-作看成把一张长长的纸（你的流）反复折叠成一个小方块，而这就是折叠操作的结果。
+```java
+// 累加求和
+Stream.of("1", "2", "3").mapToInt(Integer::valueOf).sum();
+// 求平均数
+Stream.of("1", "2", "3").mapToInt(Integer::valueOf).average();
+// 总和，最大值，最小值，平均数，总个数，应有尽有
+Stream.of("1", "2", "3").mapToInt(Integer::valueOf).summaryStatistics();
+```
 
+#### 匹配match
 
+返回true|false
 
-reduce接受两个参数：
- 一个初始值，这里是0；
- 一个BinaryOperator<T>来将两个元素结合起来产生一个新值，这里我们用的是
-lambda (a, b) -> a + b。
+```java
+// 是否有长度大于 2 的字符串
+Stream.of("1", "22", "333").anyMatch(s -> s.length() > 2);
+// 是否一个长度大于 2 的字符串也没有
+Stream.of("1", "22", "333").noneMatch(s -> s.length() > 2);
+// 是否字符串长度全大于 2
+Stream.of("1", "22", "333").allMatch(s -> s.length() > 2);
+```
 
+#### 查找find
 
+由于是短路操作，所以只有在串行流中findAny和findFirst才区别明显
 
+```java
+// 找到流中任意一个元素，普通流一般也返回第一个元素，并行流中返回任意元素
+Stream.of("1", "22", "333").findAny();
+// 找到流中第一个元素，普通流和并行流都一样
+Stream.of("1", "22", "333").findFirst();
+```
 
+#### 汇总collect
 
-诸如map或filter等操作会从输入流中获取每一个元素，并在输出流中得到0或1个结果。
-这些操作一般都是无状态的：它们没有内部状态
+把所有处理结果汇总，Collectors收集器里提供了很多常用的汇总操作
 
-相反，诸如sort或distinct等操作一开始都和filter和map差不多——都是接受一个
-流，再生成一个流（中间操作），但有一个关键的区别。从流中排序和删除重复项时都需要知
-道先前的历史。例如，排序要求所有元素都放入缓冲区后才能给输出流加入一个项目，这一操
-作的存储要求是无界的。要是流比较大或是无限的，就可能会有问题（把质数流倒序会做什么
-呢？它应当返回最大的质数，但数学告诉我们它不存在）。我们把这些操作叫作有状态操作
+```java
+// 将结果汇总成一个list
+Stream.of("1", "22", "333").collect(Collectors.toList());
+```
 
+#### 归约reduce
 
+谷歌著名的map-reduce理想，用于最后汇总结果
 
-但不要担心，Stream API还提供了原始类
-型流特化，专门支持处理数值流的方法。Java 8引入了三个原始类型特化流接口来解决这个问题：IntStream、DoubleStream和
-LongStream，分别将流中的元素特化为int、long和double，从而避免了暗含的装箱成本。
+```java
+// 0作为起始的pre，流的结果等于pre乘以自身再加一，直到curr到达最后一个元素
+// (1) pre = 0 curr = 1 计算 pre = 0 * 1 + 1 = 1 
+// (2) pre = 1 curr = 2 计算 pre = 1 * 2 + 1 = 3
+// (3) pre = 3 curr = 3 计算 pre = 3 * 3 + 1 = 10
+// (4) pre = 10 curr = null 返回结果 10
+IntStream.of(1, 2, 3).reduce(0, (pre, curr) -> pre * curr + 1);
 
+// 当然如果不设置初始值，流中第一个元素就是pre
+IntStream.of(1, 2, 3).reduce((pre, curr) -> pre * curr + 1);
+```
 
+#### 转数组toArray
 
-要把原始流转换成一般流（每个int都会装箱成一个
-Integer），可以使用boxed方法
+```java
+Stream.of("1", "22", "333").toArray();
+```
 
+#### 获得迭代器iterator
 
+```java
+Stream.of("1", "2", "3").iterator();
+```
 
+####  获得并行可分迭代器spliterator
 
+```java
+Stream.of("1", "2", "3").spliterator();
+```
 
-你可以使用静态方法Stream.of，通过显式值创建一个流。它可以接受任意数量的参数。例
-如，以下代码直接使用Stream.of创建了一个字符串流。然后，你可以将字符串转换为大写，再
-一个个打印出来：
-Stream<String> stream = Stream.of("Java 8 ", "Lambdas ", "In ", "Action");
-stream.map(String::toUpperCase).forEach(System.out::println);
+#### 流类型判断isParallel
 
+```java
+Stream.of("1", "2", "3").isParallel();
+```
 
+### 收集器进阶
 
+在介绍 collect 操作中，我们用了 Collectors 中提供的 toList 方法将结果汇总成List，collect 是很常用的操作Collectors中有很多有用的方法值得熟悉一下，其实很多终端方法都是 collect 的快捷写法，如果都不能满足需求我们还可以自己实现一个
 
+#### 转常用集合
 
+```java
+// 转list
+List<String> collect = Stream.of("1", "2", "3").collect(Collectors.toList());
 
+// 转set
+Set<String> collect = Stream.of("1", "2", "3").collect(Collectors.toSet());
 
-总而言之，流的使用一般包括三件事：
- 一个数据源（如集合）来执行一个查询；
- 一个中间操作链，形成一条流的流水线；
- 一个终端操作，执行流水线，并能生成结果。
+// 转map，key为字符串长度，value为字符串本身
+Map<Integer, String> collect = Stream.of("1", "2", "3")
+    .collect(Collectors.toMap(String::length, Function.identity()));
 
+// 转并发版map，key为字符串长度，value为字符串本身
+Map<Integer, String> collect = Stream.of("1", "2", "3")
+    .collect(Collectors.toConcurrentMap(String::length, Function.identity()));
 
+// 转指定类型集合
+ArrayList<String> collect = Stream.of("1", "2", "3")
+    .collect(Collectors.toCollection(ArrayList::new));
+```
 
-流支持map方法，它会接受一个函数作为参数。这个函数会被应用到每个元素上，并将其映
-射成一个新的元素（使用映射一词，是因为它和转换类似，但其中的细微差别在于它是“创建一
-个新版本”而不是去“修改”）
+#### 拼接字符串
 
+```java
+// 拼接成一个字符串
+String collect = Stream.of("1", "2", "3").collect(Collectors.joining());
 
+// 拼接成一个字符串，逗号分隔
+String collect = Stream.of("1", "2", "3").collect(Collectors.joining(","));
+```
 
+#### 统计
 
+都有对应简化版，一些更加灵活多变的操作可以用Collectors
 
-，flatmap方法让你把一个流中的每个值都换成另一个流，然后把所有的流连接
-起来成为一个流。
+```java
+// 和终端操作中的 max 等价
+Stream.of("1", "2", "3").collect(Collectors.maxBy(Comparator.naturalOrder()));
 
+// 和终端操作中的 min 等价
+Stream.of("1", "2", "3").collect(Collectors.minBy(Comparator.naturalOrder()));
 
+// 和终端操作中的 sum 等价
+Stream.of("1", "2", "3").collect(Collectors.counting(Integer::valueOf));
 
-anyMatch、allMatch和noneMatch这三个操作都用到了我们所谓的短路，这就是大家熟悉
-的Java中&&和||运算符短路在流中的版本。
+// 和数值流终端操作中的 sum 等价
+Stream.of("1", "2", "3").collect(Collectors.summingInt(Integer::valueOf));
 
+// 和数值流终端操作中的 average 等价
+Stream.of("1", "2", "3").collect(Collectors.averagingInt(Integer::valueOf));
 
+// 和数值流终端操作中的 summaryStatistics 等价
+Stream.of("1", "2", "3").collect(Collectors.summarizingInt(Integer::valueOf));
+```
 
-表5-1 中间操作和终端操作
-操 作 类 型 返回类型 使用的类型/函数式接口 函数描述符
-filter 中间 Stream<T> Predicate<T> T -> boolean
-distinct 中间
-(有状态无界)
-Stream<T>
-skip 中间
-(有状态有界)
-Stream<T> long
-limit 中间
-(有状态有界)
-Stream<T> long
-map 中间 Stream<R> Function<T, R> T -> R
-flatMap 中间 Stream<R> Function<T, Stream<R>> T -> Stream<R>
-sorted 中间
-(有状态无界)
-Stream<T> Comparator<T> (T, T) -> int
-anyMatch 终端 boolean Predicate<T> T -> boolean
-noneMatch 终端 boolean Predicate<T> T -> boolean
-allMatch 终端 boolean Predicate<T> T -> boolean
-findAny 终端 Optional<T>
-findFirst 终端 Optional<T>
-forEach 终端 void Consumer<T> T -> void
-collect 终端 R Collector<T, A, R>
-reduce 终端
-(有状态有界)
-Optional<T> BinaryOperator<T> (T, T) -> T
-count 终端 long
+#### 分组
 
+可以和其他收集器方法任意组合
 
+```java
+// 以字符串长度分成3组，map的key为长度，value为对应长度字符串list
+Map<Integer, List<String>> collect = Stream.of("1", "22", "33", "4", "555")
+    .collect(Collectors.groupingBy(String::length));
 
+// 以字符串长度分成3组，map的key为长度，value为对应的元素个数
+Map<Integer, Long> collect = Stream.of("1", "22", "33", "4", "555")
+    .collect(Collectors.groupingBy(String::length, Collectors.counting()));
 
+// 这个例子没有实际意义，展示我们可以进行二级分组，长度分组完毕，再组内以hash值分组
+Map<Integer, Map<Integer, List<String>>> collect = Stream.of("1", "22", "33", "4", "555")
+    .collect(Collectors.groupingBy(
+        String::length,
+        Collectors.groupingBy(String::hashCode)
+    ));
+```
 
-Java 8引入了三个原始类型特化流接口来解决这个问题：IntStream、DoubleStream和
-LongStream，分别将流中的元素特化为int、long和double，从而避免了暗含的装箱成本。
+#### 分区
 
-将流转换为特化版本的常用方法是mapToInt、mapToDouble和mapToLong。这些方法和前
-面说的map方法的工作方式一样，只是它们返回的是一个特化流，而不是Stream<T>。
+分区时特殊的分组，使用方法类似，特殊是通过谓词表达式只能分成两组，true是一组，false是一组
 
-要把原始流转换成一般流（每个int都会装箱成一个
-Integer），可以使用boxed方法，
+```java
+// 以长度大于2为标准分区
+Map<Boolean, List<String>> collect = Stream.of("1", "22", "33", "4", "555")
+    .collect(Collectors.partitioningBy(s -> s.length() > 2));
+```
 
-求和的那个例子很容易，因为它有一个默认值：0。但是，如果你要计算IntStream中的最
-大元素，就得换个法子了，因为0是错误的结果。如何区分没有元素的流和最大值真的是0的流呢？
-前面我们介绍了Optional类，这是一个可以表示值存在或不存在的容器。Optional可以用
-Integer、String等参考类型来参数化。对于三种原始流特化，也分别有一个Optional原始类
-型特化版本：OptionalInt、OptionalDouble和OptionalLong
+#### 归约
 
+```java
+// 和终端操作 reduce 等价
+Stream.of("1", "22", "33", "4", "555")
+    .collect(Collectors.reducing(0, Integer::valueOf, Integer::sum))
+```
 
+#### 多操作连接
 
+```java
+// 把流汇总成list，然后再求出其容量
+Integer collect = Stream.of("1", "22", "33", "4", "555")
+    .collect(Collectors.collectingAndThen(Collectors.toList(), List::size));
+```
 
+#### 自定义
 
-。Java 8引入了两个可以用于IntStream和LongStream的静态方法，帮助生成这种范围：
-range和rangeClosed
+有些时候默认的实现有缺陷，或者追求更高的性能我们需要自己实现收集器。只要实现 Collector<T, A , R>接口 中的方法我们就可以获得自己的收集器，其中 T 是元素泛型，A是累加器结果，R是最终返回结果，所有首先我们来看下要实现哪些方法
 
+- supplier：提供一个容器 A 装结果
+- accumulator：累加器，将元素累加进刚才创建的容器
+- combiner：合并容器的结果
+- finisher：完成操作，将 A 转为 R 返回
+- characteristics：是个定义标识的方法
+  - UNORDERED：结果不受流中项目的遍历和累积顺序的影响
+  - CONCURRENT：accumulator函数可以从多个线程同时调用
+  - IDENTITY_FINISH：表示 finisher 没做任何事情，直接返回了累加的结果，也就是A和R相同
 
+```java
+public static final Collector<String, List<String>, List<String>> myToList = Collector.of(
+    // supplier： 创建 A（ArrayList）
+    ArrayList::new,
+    // accumulator：把每个元素放入 A 中
+    (list, el) -> list.add(el),
+    // combiner：如果并行拆分成多个流，直接 addAll 合并
+    // 如果不想支持并行可以写个空，或抛UnsupportedOperationException异常
+    (listA, listB) -> {
+        listA.addAll(listB);
+        return listA;
+    },
+    // finisher：不做任何事情，直接返回 A
+    Function.identity(),
+    // characteristics...：表名 A R 类型相同， 且支持并行流
+    Collector.Characteristics.IDENTITY_FINISH,
+    Collector.Characteristics.CONCURRENT
+);
 
-你可以使用静态方法Stream.of，通过显式值创建一个流
+// 自定义收集器转成list
+List<String> collect = Stream.of("1", "22", "33", "4", "555").collect(myToList);
+```
 
-你可以使用静态方法Arrays.stream从数组创建一个流
-
-你可以使用Files.lines得到一个流，其中的每个元素都是给定文件中的一行
-
-
-
-Stream API提供了两个静态方法来从函数生成流：Stream.iterate和Stream.generate。
-这两个操作可以创建所谓的无限流：
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-**在 JVM 的后台，使用通用的 fork/join 池来完成上述功能，该池是所有并行流共享的。默认情况，fork/join 池会为每个处理器分配一个线程。假设你有一台16核的机器，这样你就只能创建16个线程。对 CPU 密集型的任务来说，这样是有意义的，因为你的机器确实只能执行16个线程。但是真实情况下，不是所有的任务都是 CPU 密集型的，这就会导致线程因IO等待浪费CPU资源，降低系统处理性能。 这就解释了上面128个业务线程中只有2个线程处于RUNNABLE状态，而其他126个业务线程都在等待的原因。->因为业务线程内部使用了parallelStream处理业务数据，所以所有业务线程内部都需要使用jvm for/join线程进行业务处理，因为只有jvm fork/join线程，所以同时只能处理两个业务线程的执行逻辑**
