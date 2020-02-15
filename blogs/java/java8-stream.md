@@ -6,7 +6,7 @@
 
 [**Java8新特性之Lambda**](https://www.cnblogs.com/freshchen/p/11721202.html)
 
-大家回忆下日常学习工作中使用的最多的 Java API 是是什么？相信很多人的答案和我一样都是集合。我们选择适合的集合数据结构存储数据，而我们之于集合最多的操作就是遍历，实现查询，统计，过滤，合并等业务。
+大家回忆下日常学习工作中使用的最多的 Java API 是什么？相信很多人的答案和我一样都是集合。我们选择适合的集合数据结构存储数据，而我们之于集合最多的操作就是遍历，实现查询，统计，过滤，合并等业务。
 
 ## 哪里用Stream
 
@@ -85,12 +85,15 @@
 
 ### 开始操作
 
+#### 生成空流
+
+```java
+Stream<Object> empty = Stream.empty();
+```
+
 #### 值生成流
 
 ```java
-// 生成空流
-Stream<Object> empty = Stream.empty();
-// 值生成流
 Stream<String> stringStream = Stream.of("1", "2", "3");
 ```
 
@@ -410,7 +413,7 @@ Stream.of("1", "2", "3").collect(Collectors.maxBy(Comparator.naturalOrder()));
 // 和终端操作中的 min 等价
 Stream.of("1", "2", "3").collect(Collectors.minBy(Comparator.naturalOrder()));
 
-// 和终端操作中的 sum 等价
+// 和终端操作中的 count 等价
 Stream.of("1", "2", "3").collect(Collectors.counting(Integer::valueOf));
 
 // 和数值流终端操作中的 sum 等价
@@ -497,7 +500,7 @@ public static final Collector<String, List<String>, List<String>> myToList = Col
     },
     // finisher：不做任何事情，直接返回 A
     Function.identity(),
-    // characteristics...：表名 A R 类型相同， 且支持并行流
+    // characteristics...：表示 A R 类型相同， 且支持并行流
     Collector.Characteristics.IDENTITY_FINISH,
     Collector.Characteristics.CONCURRENT
 );
