@@ -1,4 +1,4 @@
-# 持久层框架-JOOQ
+# Springboot + 持久层框架JOOQ
 
 ## 简介
 
@@ -24,6 +24,8 @@ JOOQ是一套持久层框架，主要特点是：
 ## Springboot+JOOQ初体验
 
 持久层框架很多，这里参考官网和其他博客用Springboot迅速搭建一个简单demo看看是否好用
+
+![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/jooq-2.png)
 
 ### 配置依赖
 
@@ -86,7 +88,7 @@ spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
 #### 配置文件
 
-放在resources目录下，由于网上JOOQ的教程比较少，且比较老，所以建议去官网拷贝对应版本的配置文件，否则会无法生成。
+在项目的resources目录下新建library.xml，由于网上JOOQ的教程比较少，且比较老，所以建议去官网拷贝**对应版本**的配置文件，并酌情修改，否则会无法生成。
 
 ```xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -136,7 +138,7 @@ spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
 #### 自动生成
 
-- 我们在mysql中创建demo库，并创建一张User表如下
+- 我们在mysql中创建demo库，并创建一张User表如下（点的比较快，年龄字段用的varchar勿喷）
 
 ```mysql
 mysql> describe user;
@@ -152,7 +154,7 @@ mysql> describe user;
 
 
 
-- 执行compile自动生成，然后就可以愉快的coding了
+- 执行compile，会把表结构的抽象，以及表对应的pojo自动生成到指定目录，然后就可以愉快的coding了
 
 ```bash
 mvn clean compile
@@ -243,14 +245,6 @@ public class DemoServiceImpl implements DemoService {
 ```
 
 [Demo源码地址](https://github.com/freshchen/fresh-java-practice/tree/master/springboot-jooq)
-
-
-
-## 详解
-
-使用中遇到问题还是去到官网教程中找一找，这部分只针对典型用法做记录
-
-
 
 
 
