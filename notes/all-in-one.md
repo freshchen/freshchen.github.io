@@ -42,6 +42,8 @@
     - GsonFormat
     - Maven Helper
     - GenerateAllSetter
+    - Rainbow Brackets
+    - CodeGlance
   - PyCharm
   - VS Code
 - 工具
