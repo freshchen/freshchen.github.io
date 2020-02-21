@@ -43,6 +43,11 @@
     - Maven Helper
     - GenerateAllSetter
     - Rainbow Brackets
+      - D3D3D3
+      - 7577A8
+      - A89248
+      - 5C98BB
+      - 5B9392
     - CodeGlance
   - PyCharm
   - VS Code
