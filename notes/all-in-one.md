@@ -39,9 +39,11 @@
 - IDE
   - IDEA
     - Lombok
+    - GsonFormat
+    - Maven Helper
+    - GenerateAllSetter
   - PyCharm
   - VS Code
-  - GsonFormat
 - 工具
   - Xshell
   - Typora
