@@ -49,6 +49,11 @@
       - 5C98BB
       - 5B9392
     - CodeGlance
+    - BashSupport
+      - 和默认shell script插件冲突，要disable一下
+    - Grep Console
+    - Nyan Progress Bar
+    - Kubernetes
   - PyCharm
   - VS Code
 - 工具
