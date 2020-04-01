@@ -1,6 +1,85 @@
-AbstractOwnableSynchronizer
+# Java读源码之ReentrantLock
+
+## 前言
+
+ReentrantLock 可重入锁，应该是除了 synchronized 关键字外用的最多的线程同步手段了，虽然虚拟机作者疯狂优化 synchronized 使其已经拥有了很好的性能。但 ReentrantLock 仍有其存在价值，使用灵活提供更细粒度线程控制，例如可以感知线程中断，公平锁模式，可以指定超时时间的抢锁等都是 synchronized 做不到的，并且高并发场景下仍有性能优势。具体使用场景就不累述了，本文主要研究一波实现原理。
+
+## 案例
+
+用一个最简单的使用案例引出我们的主角
+
+```java
+public class ReentrantLockDemo {
+
+    // 默认是非公平锁和 synchronized 一样
+    private static ReentrantLock reentrantLock = new ReentrantLock();
+
+    public void printThreadInfo(int num) {
+        reentrantLock.lock();
+        try {
+            System.out.println(num + " : " + Thread.currentThread().getName());
+            System.out.println(num + " : " + Thread.currentThread().toString());
+        } finally {
+            reentrantLock.unlock();
+        }
+    }
+
+    public static void main(String[] args) {
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        IntStream.rangeClosed(0, 5)
+                .forEach(num -> executorService
+                        .execute(() -> new ReentrantLockDemo().printThreadInfo(num))
+                );
+    }
+
+    /**
+     * 输出:
+     * 0 : pool-1-thread-1
+     * 0 : Thread[pool-1-thread-1,5,main]
+     * 3 : pool-1-thread-4
+     * 3 : Thread[pool-1-thread-4,5,main]
+     * 1 : pool-1-thread-2
+     * 1 : Thread[pool-1-thread-2,5,main]
+     * 2 : pool-1-thread-3
+     * 2 : Thread[pool-1-thread-3,5,main]
+     * 4 : pool-1-thread-5
+     * 4 : Thread[pool-1-thread-5,5,main]
+     * 5 : pool-1-thread-6
+     * 5 : Thread[pool-1-thread-6,5,main]
+     */
+```
+
+可以看到使用起来也很简单，而且达到了同步的效果。废话不多说我们来瞅一瞅 lock() 和 unlock() 两个方法是怎么实现的。
+
+## 源码分析
 
 主要定义了同步器属于哪个线程，换言之哪个线程独占这个同步器
+
+### 非公平锁
+
+#### 加锁
+
+##### ReentrantLock.NonfairSync#lock()
+
+```java
+final void lock() {
+    // 本地方法CAS更改状态
+    if (compareAndSetState(0, 1))
+        // 设置锁的主人为自己。上来就抢，非公平果然名不虚传
+        setExclusiveOwnerThread(Thread.currentThread());
+    else
+        // CAS失败了，乞讨一把锁
+        acquire(1);
+}
+```
+
+##### AQS
+
+一排问号有木有，改的什么状态？锁归谁管？引出隐藏大Boss：AbstractQueuedSynchronizer（AKA AQS）
+
+
+
+
 
 ```java
 public abstract class AbstractOwnableSynchronizer
