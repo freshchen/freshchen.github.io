@@ -368,7 +368,7 @@ private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) {
     int ws = pred.waitStatus;
     if (ws == Node.SIGNAL)
         /*
-         * 前一个节点已经准备好通知下一个节点执行了，就直接抢过来
+         * 前一个节点已经准备好通知下一个节点执行了，就直接抢过来 
          */
         return true;
     if (ws > 0) {
