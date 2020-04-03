@@ -2,7 +2,7 @@
 
 ## 前言
 
-ReentrantLock 可重入锁，应该是除了 synchronized 关键字外用的最多的线程同步手段了，虽然虚拟机作者疯狂优化 synchronized 使其已经拥有了很好的性能。但 ReentrantLock 仍有其存在价值，使用灵活提供更细粒度线程控制，例如可以感知线程中断，公平锁模式，可以指定超时时间的抢锁等都是 synchronized 做不到的，并且高并发场景下仍有性能优势。具体使用场景就不累述了，本文主要研究一波实现原理。
+ReentrantLock 可重入锁，应该是除了 synchronized 关键字外用的最多的线程同步手段了，虽然虚拟机作者疯狂优化 synchronized 使其已经拥有了很好的性能。但 ReentrantLock 仍有其存在价值，例如可以感知线程中断，公平锁模式，可以指定超时时间的抢锁等更细粒度的控制都是 synchronized 做不到的。具体使用场景就不累述了，本文主要研究一波实现原理。
 
 ## 案例
 
@@ -65,17 +65,143 @@ public class ReentrantLockDemo {
 final void lock() {
     // 本地方法CAS更改状态
     if (compareAndSetState(0, 1))
-        // 设置锁的主人为自己。上来就抢，非公平果然名不虚传
+        // 设置锁的主人为自己。上来就抢？就真的非公平
         setExclusiveOwnerThread(Thread.currentThread());
     else
-        // CAS失败了，乞讨一把锁
+        // CAS失败了，排队去了，乞讨一把锁
         acquire(1);
 }
 ```
 
-##### AQS
+##### AQS简介
 
 一排问号有木有，改的什么状态？锁归谁管？引出隐藏大Boss：AbstractQueuedSynchronizer（AKA AQS）
+
+首先继承 AbstractOwnableSynchronizer 顾名思义，有同步器线程归属功能，主要属性：
+
+```java
+// 保存当前持有锁的线程
+private transient Thread exclusiveOwnerThread;
+```
+
+从AQS的主要属性可以窥知一二
+
+```java
+// 阻塞队列的头
+private transient volatile Node head;
+
+// 阻塞队列的尾
+private transient volatile Node tail;
+
+// 同步器的状态
+private volatile int state;
+```
+
+从 head 和 tail 可以猜想到，AQS 是用一个链表作为阻塞队列，给等待的线程排队， status 字段默认是0，一旦锁被某个线程占有就 +1，那为啥要用int呢？ 如果 exclusiveOwnerThread 当前持有锁的这个线程还要再来把锁，那状态还可以继续 +1，也就实现了可重入。
+
+那么这个 Node 长啥样呢，主要属性如下
+
+```java
+// 标识次节点是共享模式
+static final Node SHARED = new Node();
+// 标识次节点是独占模式
+static final Node EXCLUSIVE = null;
+// 这个节点里装的线程放弃了，不抢锁了
+static final int CANCELLED =  1;
+/** waitStatus value to indicate successor's thread needs unparking */
+static final int SIGNAL    = -1;
+/** waitStatus value to indicate thread is waiting on condition */
+static final int CONDITION = -2;
+/**
+         * waitStatus value to indicate the next acquireShared should
+         * unconditionally propagate
+         */
+static final int PROPAGATE = -3;
+
+/**
+         * Status field, taking on only the values:
+         *   SIGNAL:     The successor of this node is (or will soon be)
+         *               blocked (via park), so the current node must
+         *               unpark its successor when it releases or
+         *               cancels. To avoid races, acquire methods must
+         *               first indicate they need a signal,
+         *               then retry the atomic acquire, and then,
+         *               on failure, block.
+         *   CANCELLED:  This node is cancelled due to timeout or interrupt.
+         *               Nodes never leave this state. In particular,
+         *               a thread with cancelled node never again blocks.
+         *   CONDITION:  This node is currently on a condition queue.
+         *               It will not be used as a sync queue node
+         *               until transferred, at which time the status
+         *               will be set to 0. (Use of this value here has
+         *               nothing to do with the other uses of the
+         *               field, but simplifies mechanics.)
+         *   PROPAGATE:  A releaseShared should be propagated to other
+         *               nodes. This is set (for head node only) in
+         *               doReleaseShared to ensure propagation
+         *               continues, even if other operations have
+         *               since intervened.
+         *   0:          None of the above
+         *
+         * The values are arranged numerically to simplify use.
+         * Non-negative values mean that a node doesn't need to
+         * signal. So, most code doesn't need to check for particular
+         * values, just for sign.
+         *
+         * The field is initialized to 0 for normal sync nodes, and
+         * CONDITION for condition nodes.  It is modified using CAS
+         * (or when possible, unconditional volatile writes).
+         */
+volatile int waitStatus;
+
+/**
+         * Link to predecessor node that current node/thread relies on
+         * for checking waitStatus. Assigned during enqueuing, and nulled
+         * out (for sake of GC) only upon dequeuing.  Also, upon
+         * cancellation of a predecessor, we short-circuit while
+         * finding a non-cancelled one, which will always exist
+         * because the head node is never cancelled: A node becomes
+         * head only as a result of successful acquire. A
+         * cancelled thread never succeeds in acquiring, and a thread only
+         * cancels itself, not any other node.
+         */
+volatile Node prev;
+
+/**
+         * Link to the successor node that the current node/thread
+         * unparks upon release. Assigned during enqueuing, adjusted
+         * when bypassing cancelled predecessors, and nulled out (for
+         * sake of GC) when dequeued.  The enq operation does not
+         * assign next field of a predecessor until after attachment,
+         * so seeing a null next field does not necessarily mean that
+         * node is at end of queue. However, if a next field appears
+         * to be null, we can scan prev's from the tail to
+         * double-check.  The next field of cancelled nodes is set to
+         * point to the node itself instead of null, to make life
+         * easier for isOnSyncQueue.
+         */
+volatile Node next;
+
+/**
+         * The thread that enqueued this node.  Initialized on
+         * construction and nulled out after use.
+         */
+volatile Thread thread;
+
+/**
+         * Link to next node waiting on condition, or the special
+         * value SHARED.  Because condition queues are accessed only
+         * when holding in exclusive mode, we just need a simple
+         * linked queue to hold nodes while they are waiting on
+         * conditions. They are then transferred to the queue to
+         * re-acquire. And because conditions can only be exclusive,
+         * we save a field by using special value to indicate shared
+         * mode.
+         */
+Node nextWaiter;
+```
+
+
 
 
 
