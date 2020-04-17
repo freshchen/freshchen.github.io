@@ -4,6 +4,10 @@
 
 ReentrantLock 可重入锁，应该是除了 synchronized 关键字外用的最多的线程同步手段了，虽然JVM维护者疯狂优化 synchronized 使其已经拥有了很好的性能。但 ReentrantLock 仍有其存在价值，例如可以感知线程中断，公平锁模式，可以指定超时时间的抢锁等更细粒度的控制都是目前的 synchronized 做不到的。
 
+如果不是很了解 Java 中线程的一些基本概念，可以看之前这篇：
+
+[Java读源码之Thread](https://www.cnblogs.com/freshchen/p/11674575.html)
+
 ## 案例
 
 用一个最简单的案例引出我们的主角
@@ -97,7 +101,7 @@ private transient volatile Node tail;
 private volatile int state;
 ```
 
-从 head 和 tail 可以猜想到，AQS 应该是用一个链表作为阻塞队列，给等待的线程排队， status 字段默认是0，一旦锁被某个线程占有就 +1，那为啥要用int呢？ 如果当前持有锁的这个线程（exclusiveOwnerThread）还要再来把锁，那状态还可以继续 +1，也就实现了可重入。
+从 head 和 tail 可以猜想到，AQS 应该是用一个链表作为等待队列，给等待的线程排队， status 字段默认是0，一旦锁被某个线程占有就 +1，那为啥要用int呢？ 如果当前持有锁的这个线程（exclusiveOwnerThread）还要再来把锁，那状态还可以继续 +1，也就实现了可重入。
 
 - 上面的 Node 节点长啥样呢，不要被注释中 CLH 锁高大上的名称吓到，其实就是双向链表，主要属性：
 
@@ -189,8 +193,8 @@ public final boolean hasQueuedPredecessors() {
     Node t = tail;
     Node h = head;
     Node s;
-    // h == t 同时只可能空节点，也就是刚初始的状态或者已经没有节点等待了
-    // h.next == null ？ 下面介绍进队的过程中，如果其他线程与此同时第二次 tryAcquire成功了，会把之前的head.next置为空，也就是被捷足先登了，差一点可惜
+    // h == t 头等于尾只可能是刚初始的状态或者已经没有节点等待了
+    // h.next == null ？ 下面介绍进队的过程中，如果其他线程与此同时 tryAcquire 成功了，会把之前的head.next置为空，说明被捷足先登了，差一点可惜
     // 如果到最后一个判断了，也就是队列中至少有一个等待节点，直接看第一个等待节点是不是自己，如果不是自己就乖乖排队去
     return h != t &&
         ((s = h.next) == null || s.thread != Thread.currentThread());
@@ -247,14 +251,14 @@ private Node enq(final Node node) {
 
 - **AbstractQueuedSynchronizer#acquireQueued**
 
-addWaiter方法已经把等待线程包装成节点放到等待队列了，为啥要返回中断标识呢？主要是为了给一些需要处理中断的方式复用，例如 **ReentrantLock#lockInterruptibly**，以及带超时的锁
+addWaiter方法已经把等待线程包装成节点放到等待队列了，acquireQueued自旋抢锁，醒了就抢，为啥要返回中断标识呢？主要是为了给一些需要处理中断的方式复用，例如 **ReentrantLock#lockInterruptibly**，以及带超时的锁，以及Condition
 
 ```java
 final boolean acquireQueued(final Node node, int arg) {
     boolean failed = true;
     try {
         boolean interrupted = false;
-        // 绕起来了
+        // 这边逻辑开始绕起来了
         for (;;) {
             // 拿前一个节点
             final Node p = node.predecessor();
@@ -451,13 +455,13 @@ final boolean nonfairTryAcquire(int acquires) {
 
 ## 总结
 
-至此，总算看完了 ReentrantLock 常规的加锁解锁源码，好好体会下 AQS 的结构，还是能看懂的，且很有收获，总之 Doug Lea 大神牛B。
+至此，总算看完了 ReentrantLock 常规的加锁解锁源码，好好体会下 AQS 的结构，还是能看懂的，且很有收获，总之 Doug Lea 大神牛B。**AbstractQueuedSynchronizer#acquireQueued**
 
 本文还是挖了很多坑的：
 
-- 带超时的锁怎么实现？
-- 检测中断的锁怎么实现？
-- 共享模式是怎么传播的？
+- 带超时的锁是如何实现的？
+- 检测中断的锁是如何实现的？
+- 各种 Condition 是如何实现的？
 
 以后有时间再一探究竟吧。
 
