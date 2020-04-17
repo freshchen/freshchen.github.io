@@ -257,13 +257,36 @@ public final void await() throws InterruptedException {
     if ((interruptMode = checkInterruptWhileWaiting(node)) != 0)
       break;
   }
-  // 
+  // 上一篇介绍过acquireQueued自旋抢锁，如果抢到锁了，并且中断模式不是 -1（默认0），就记录中断模式为1，表示需要重新设置中断
   if (acquireQueued(node, savedState) && interruptMode != THROW_IE)
     interruptMode = REINTERRUPT;
-  if (node.nextWaiter != null) // clean up if cancelled
+  // 清除条件队列中取消的节点
+  if (node.nextWaiter != null)
     unlinkCancelledWaiters();
+  // 处理中断
   if (interruptMode != 0)
+    // 1：再次中断	-1:抛出异常
     reportInterruptAfterWait(interruptMode);
+}
+```
+
+- **AbstractQueuedSynchronizer.ConditionObject#addConditionWaiter**
+
+```java
+private Node addConditionWaiter() {
+  Node t = lastWaiter;
+  // If lastWaiter is cancelled, clean out.
+  if (t != null && t.waitStatus != Node.CONDITION) {
+    unlinkCancelledWaiters();
+    t = lastWaiter;
+  }
+  Node node = new Node(Thread.currentThread(), Node.CONDITION);
+  if (t == null)
+    firstWaiter = node;
+  else
+    t.nextWaiter = node;
+  lastWaiter = node;
+  return node;
 }
 ```
 
