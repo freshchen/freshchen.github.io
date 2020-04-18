@@ -80,33 +80,33 @@
   - 描述：在阻塞式 I/O 模型中，应用程序在从调用 recvfrom 开始到它返回有数据报准备好这段时间是阻塞的，recvfrom 返回成功后，应用进程开始处理数据报
   - 优点：程序简单，在阻塞等待数据期间进程/线程挂起，基本不会占用 CPU 资源
   - 缺点：每个连接需要独立的进程/线程单独处理，当并发请求量大时为了维护程序，内存、线程切换开销较大，这种模型在实际生产中很少使用
-  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/bio.jpg)
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/bio.jpg)
 - **非阻塞式 I/O 模型(non-blocking I/O）**
   - 描述：在非阻塞式 I/O 模型中，应用程序把一个套接口设置为非阻塞，就是告诉内核，当所请求的 I/O 操作无法完成时，返回一个错误，应用程序基于 I/O 操作函数将不断的轮询数据是否已经准备好，直到数据准备好为止
   - 优点：不会阻塞在内核的等待数据过程，每次发起的 I/O 请求可以立即返回，不用阻塞等待，实时性较好
   - 缺点：轮询将会不断地询问内核，这将占用大量的 CPU 时间，系统资源利用率较低，所以一般 Web 服务器不使用这种 I/O 模型
-  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/nio.jpg)
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/nio.jpg)
 - **I/O 复用模型(I/O multiplexing）**
   - 描述：在 I/O 复用模型中，会用到 Select 或 Poll 函数或 Epoll 函数(Linux 2.6 以后的内核开始支持)，可以同时阻塞多个 I/O 操作，而且可以同时对多个读或者写操作的 I/O 函数进行检测，直到有数据可读或可写时，才真正调用 I/O 操作函数
   - 优点：可以基于一个阻塞对象，同时在多个描述符上等待就绪，而不是使用多个线程(每个文件描述符一个线程)，这样可以大大节省系统资源
   - 缺点：当连接数较少时效率相比多线程+阻塞 I/O 模型效率较低，可能延迟更大，因为单个连接处理需要 2 次系统调用，占用时间会有增加
-  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/multiplexingio.jpg)
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/multiplexingio.jpg)
 - **信号驱动式 I/O 模型（signal-driven I/O)**
   - 描述：在信号驱动式 I/O 模型中，应用程序使用套接口进行信号驱动 I/O，并安装一个信号处理函数，进程继续运行并不阻塞，当数据准备好时，进程会收到一个 SIGIO 信号，可以在信号处理函数中调用 I/O 操作函数处理数据
   - 优点：线程并没有在等待数据时被阻塞，可以提高资源的利用率
   - 缺点：信号 I/O 在大量 IO 操作时可能会因为信号队列溢出导致没法通知，信号驱动 I/O 尽管对于处理 UDP 套接字来说有用，即这种信号通知意味着到达一个数据报，或者返回一个异步错误。但是，对于 TCP 而言，信号驱动的 I/O 方式近乎无用，因为导致这种通知的条件为数众多，每一个来进行判别会消耗很大资源，与前几种方式相比优势尽失
-  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/signal-drivenio.jpg)
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/signal-drivenio.jpg)
 - **异步 I/O 模型（asynchronous I/O）**
   - 描述：由 POSIX 规范定义，应用程序告知内核启动某个操作，并让内核在整个操作（包括将数据从内核拷贝到应用程序的缓冲区）完成后通知应用程序。这种模型与信号驱动模型的主要区别在于：信号驱动 I/O 是由内核通知应用程序何时启动一个 I/O 操作，而异步 I/O 模型是由内核通知应用程序 I/O 操作何时完成
   - 优点：异步 I/O 能够充分利用 DMA 特性，让 I/O 操作与计算重叠
   - 缺点：要实现真正的异步 I/O，操作系统需要做大量的工作
-  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/aio.jpg)
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/aio.jpg)
 
 **总结**
 
 这五种 I/O 模型中，前四种属于同步 I/O，因为其中真正的 I/O 操作(recvfrom)将阻塞进程/线程，只有异步 I/O 模型才与 POSIX 定义的异步 I/O 相匹配
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/io-model.jpg)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/io-model.jpg)
 
 #### I/O处理线程模型
 
@@ -118,28 +118,28 @@
   - 问题：
     - 当并发数较大时，需要创建大量线程来处理连接，系统资源占用较大。
     - 连接建立后，如果当前线程暂时没有数据可读，则线程就阻塞在 Read 操作上，造成线程资源浪费
-  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/thread-oio.jpg)
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/thread-oio.jpg)
 
 - **Reactor 模式**
 
   Reactor是非阻塞同步网络模型，通过一个或多个输入同时传递给服务处理器的服务请求的事件驱动处理模式， 基本设计思想就是I/O 复用模型结合线程池，Reactor 模式也叫 Dispatcher 模式
 
-  ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/thread-reactor-io.jpg)
+  ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/thread-reactor-io.jpg)
 
   - **单 Reactor 单线程**
     - 描述：Reactor 对象通过 Select 监控客户端请求事件，收到事件后通过 Dispatch 进行分发，如果是建立连接请求事件，则由 Acceptor 通过 Accept 处理连接请求，然后创建一个 Handler 对象处理连接完成后的后续业务处理，如果不是建立连接事件，则 Reactor 会分发调用连接对应的 Handler 来响应，Handler 会完成 Read→业务处理→Send 的完整业务流程
     - 优点：模型简单，没有多线程、进程通信、竞争的问题，全部都在一个线程中完成
     - 缺点：性能问题，只有一个线程，无法完全发挥多核 CPU 的性能。Handler 在处理某个连接上的业务时，整个进程无法处理其他连接事件，很容易导致性能瓶颈
-    - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/thread-reactor-io-single.jpg)
+    - ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/thread-reactor-io-single.jpg)
   - **单 Reactor 多线程**
     - 描述：不同于单 Reactor 单线程的地方是Handler 只负责响应事件，不做具体业务处理，通过 Read 读取数据后，会分发给后面的 Worker 线程池进行业务处理，Worker 线程池会分配独立的线程完成真正的业务处理，Handler 收到响应结果后通过 Send 将响应结果返回给 Client
     - 优点：可以充分利用多核 CPU 的处理能力
     - 缺点：多线程数据共享和访问比较复杂；Reactor 承担所有事件的监听和响应，在单线程中运行，高并发场景下容易成为性能瓶颈
-    - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/thread-reactor-io-muti.jpg)
+    - ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/thread-reactor-io-muti.jpg)
   - **主从 Reactor 多线程**
     - 描述：Reactor 主线程 MainReactor 对象通过 Select 监控建立连接事件，收到建立连接事件后通过 Acceptor 接收，Acceptor 处理建立连接事件后，MainReactor 将连接分配 Reactor 子线程给 SubReactor 进行处理，SubReactor 将连接加入连接队列进行监听，并创建一个 Handler 用于处理各种连接事件，当有新的事件发生时，SubReactor 会调用连接对应的 Handler 进行响应，Handler 处理方式同单 Reactor 多线程
     - 优点：主线程与子线程的数据交互简单职责明确，主线程线程只需要把新连接传给子线程，子线程完成后续的业务处理
-    - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/thread-reactor-io-ha.jpg)****
+    - ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/thread-reactor-io-ha.jpg)****
 
 - **Proactor 模型**
 
@@ -148,7 +148,7 @@
   - 描述：AsyOptProcessor 处理注册请求，并处理 I/O 操作，Proactor Initiator 创建 Proactor 和 Handler 对象，并将 Proactor 和 Handler 都通过 AsyOptProcessor（Asynchronous Operation Processor）注册到内核，AsyOptProcessor 完成 I/O 操作后通知 Proactor，Proactor 根据不同的事件类型回调不同的 Handler 进行业务处理，Handler 完成业务处理
   - 优点：效率更高，异步 I/O 更加充分发挥 DMA(Direct Memory Access，直接内存存取)的优势
   - 缺点：编程复杂性难以 Debug，内存使用，缓冲区在读或写操作的时间段内必须保持住，相比 Reactor 模式，在 Socket 已经准备好读或写前，是不要求开辟缓存的
-  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/thread-proactor-io.jpg)
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/thread-proactor-io.jpg)
 
 
 
@@ -392,11 +392,11 @@ docker rmi --force $(docker images -q)
 
 - 常说的模型主要有3中，TCP/IP模型是OSI模型的一种商用实现
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/net-model.jpg)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/net-model.jpg)
 
 - 7层模型中主要的协议
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/osi.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/osi.png)
 
 
 
@@ -406,7 +406,7 @@ docker rmi --force $(docker images -q)
 - 第二次握手：服务器收到syn包，必须确认客户的SYN（ack=x+1），同时自己也发送一个SYN包（seq=y），即SYN+ACK包，此时服务器进入**SYN_RECV**状态
 - 客户端收到服务器的SYN+ACK包，向服务器发送确认包ACK(ack=y+1），此包发送完毕，客户端和服务器进入**ESTABLISHED**（TCP连接成功）状态，完成三次握手
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/tcp-3.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/tcp-3.png)
 
 #### TCP结束连接四次挥手
 
@@ -415,7 +415,7 @@ docker rmi --force $(docker images -q)
 - 第三次挥手：服务器将最后的数据发送完毕后，就向客户端发送连接释放报文，FIN=1，ack=u+1，由于在半关闭状态，服务器很可能又发送了一些数据，假定此时的序列号为seq=w，此时，服务器就进入了LAST-ACK（最后确认）状态，等待客户端的确认
 - 第四次挥手：客户端收到服务器的连接释放报文后，必须发出确认，ACK=1，ack=w+1，而自己的序列号是seq=u+1，此时，客户端就进入了TIME-WAIT（时间等待）状态。注意此时TCP连接还没有释放，必须经过2∗∗MSL（最长报文段寿命）的时间后，当客户端撤销相应的TCB后，才进入CLOSED状态，服务器只要收到了客户端发出的确认，立即进入CLOSED状态。同样，撤销TCB后，就结束了这次的TCP连接。可以看到，服务器结束TCP连接的时间要比客户端早一些
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/tcp-4.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/tcp-4.png)
 
 #### TCP粘包，拆包
 
@@ -447,10 +447,10 @@ docker rmi --force $(docker images -q)
 - 目的
   - 为了增加网络的吞吐量，想讲数据包一起发送过去，这时候便产生了“滑动窗口”这种协议。有了“滑动窗口”这个概念，我们又解决了其中出现的一些问题。例如丢包，我们又通过重发的机制去解决了
 - 过程
-  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/tcp-window1.png)
-  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/tcp-window2.png)
-  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/tcp-window3.png)
-  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/tcp-window4.png)
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/tcp-window1.png)
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/tcp-window2.png)
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/tcp-window3.png)
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/tcp-window4.png)
 
 #### UDP特点
 
@@ -498,7 +498,7 @@ docker rmi --force $(docker images -q)
     - 数字签名和消息认证码都**不是为了加密**
     - 可以将单向散列函数获取散列值的过程理解为使用 md5 摘要算法获取摘要的过程
     - 使用自己的私钥对自己所认可的消息生成一个该消息专属的签名，这就是数字签名，表明我承认该消息来自自己
-    - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/digital-sign.png)
+    - ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/digital-sign.png)
   - 公钥密码（非对称加密）
     - 也叫非对称密码，由公钥和私钥组成，它是最开始是为了解决秘钥的配送传输安全问题，即，我们不配送私钥，只配送公钥，私钥由本人保管
     - 它与数字签名相反，非对称密码的私钥用于解密、公钥用于加密，每个人都可以用别人的公钥加密，但只有对应的私钥才能解开密文
@@ -530,7 +530,7 @@ docker rmi --force $(docker images -q)
   - 客户端使用之前握手过程中获得的服务器随机数、客户端随机数、Premaster secret计算生成会话密钥master secret，然后使用该会话密钥加密之前所有收发握手消息的Hash和MAC值，发送给服务器，以验证加密通信是否可用。服务器将使用相同的方法生成相同的会话密钥以解密此消息，校验其中的Hash和MAC值
   - 服务器发送ChangeCipherSpec消息，通知客户端此消息以后服务器会以加密方式发送数据
   - sever端使用会话密钥加密（生成方式与客户端相同，使用握手过程中获得的服务器随机数、客户端随机数、Premaster secret计算生成）之前所有收发握手消息的Hash和MAC值，发送给客户端去校验。若客户端服务器都校验成功，握手阶段完成，双方将按照SSL记录协议的规范使用协商生成的会话密钥加密发送数据
-  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/tls.png)
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/tls.png)
 
 #### ARP地址解析协议（链路层）
 
@@ -562,7 +562,7 @@ docker rmi --force $(docker images -q)
 
 实现比较丑陋，勿喷啊
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/sort.PNG)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/sort.PNG)
 
 - **冒泡排序**：从前向后比较相邻的元素。如果前一个比后一个大，就交换他们两个，每一轮把一个最大的数运到数组最后面。
 
@@ -888,9 +888,9 @@ docker rmi --force $(docker images -q)
 #### 主定理与递归时间复杂度的计算
 
 - 主定理：如果有一个问题规模为 n，递推的子问题数量为 a，每个子问题的规模为n/b（假设每个子问题的规模基本一样），递推以外进行的计算工作为 f(n)（比如归并排序，需要合并序列，则 f(n)就是合并序列需要的运算量），那么对于这个问题有如下递推关系式：
-- ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/main1.jpe)
+- ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/main1.jpe)
 - 然后就可以套公式估算递归的时间复杂度
-- ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/main2.jpe)
+- ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/main2.jpe)
 
 
 
@@ -948,7 +948,7 @@ docker rmi --force $(docker images -q)
   - 每个节点都有两个指针，一个指向右侧节点（没有则为空），一个指向下层节点（没有则为空）
   - 必备一个头节点指向最高层的第一个节点，通过它可以遍历整张表
 
-  ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/skip-list.jpg)
+  ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/skip-list.jpg)
 
 #### 前缀树/字典树（Trie）
 
@@ -994,15 +994,15 @@ docker rmi --force $(docker images -q)
 
   - 先根据样本大小n，可以接受的误差p，计算需要申请多大内存m
 
-    ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/bloom1.png)
+    ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/bloom1.png)
 
   - 再由m，n得到hash function的个数k
 
-    ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/bloom2.png)
+    ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/bloom2.png)
 
   - 再计算实际的误差p
 
-    ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/bloom3.png)
+    ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/bloom3.png)
 
 ## Java
 
@@ -1449,7 +1449,7 @@ public class NewStack<T>{
 
 #### J.U.C总览图
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/juc.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/juc.png)
 
 #### J.U.C常用同步器
 
@@ -1527,13 +1527,13 @@ public class NewStack<T>{
 
 #### 线程池的五种状态
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/threadpoolstatus.jpg)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/threadpoolstatus.jpg)
 
 #### 如何创建线程池
 
 - 结构图
   
-- ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/thread-pool.jpg)
+- ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/thread-pool.jpg)
   
 - 直接通过new ThreadPoolExecutor()创建（推荐，可以定制化，控制细节）
   - 构造参数：
@@ -1633,7 +1633,7 @@ public class NewStack<T>{
       单线程执行版的newScheduledThreadPool ，保证任务串行执行，保证串行返回
 
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/threadpool.jpg)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/threadpool.jpg)
 
 #### synchronized关键字
 
@@ -1658,7 +1658,7 @@ public class NewStack<T>{
   - monitorexit结束时会把更新直接刷入主内存
 - JVM中锁升级流程
   
-  ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/synchronized.png)
+  ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/synchronized.png)
 
 #### volatile关键字
 
@@ -1759,7 +1759,7 @@ public class NewStack<T>{
 
 - ###### 关闭使用的JDBC对象
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/jdbc.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/jdbc.png)
 
 #### 数据库连接池
 
@@ -1991,7 +1991,7 @@ root@64b47b31317a:/# jstack 1
 
 #### Java内存模型（JMM）
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/jmm.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/jmm.png)
 
 #### Happens-Before原则
 
@@ -2079,7 +2079,7 @@ elementData[elementCount] = null; /* to let gc do its work
 - DI（依赖注入）主要是遵循设计模式中依赖倒转原则中的“高层模块不应该依赖底层模块，两个都应该抽象依赖”，依赖注入的方式主要包括，setter方法，interface接口，constructor构造函数，annotation注解
 
 
-![Spring Ioc容器](https://cdn.jsdelivr.net/gh/freshchen/resource/img/spring-ioc.PNG)
+![Spring Ioc容器](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/spring-ioc.PNG)
 
 #### BeanFactory和ApplicationContext
 
@@ -2107,7 +2107,7 @@ BeanFactory和ApplicationContext是Spring的两大核心接口，都可以当做
 
 #### Bean的生命周期
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/spring-bean-lifecycle.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/spring-bean-lifecycle.png)
 
 - 读取XML或者注解，注册到Spring容器中，然后通过工厂或者自定义动态工厂去创建Bean
 - BeanPostProcessor 加入一些增强功能，相当于动态代理
@@ -2189,7 +2189,7 @@ Spring事务的本质其实就是数据库对事务的支持，没有数据库�
 
 #### SpringMVC请求处理流程
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/springmvc.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/springmvc.png)
 
 -  用户发送请求至前端控制器DispatcherServlet
 - DispatcherServlet收到请求调用HandlerMapping处理器映射器。
@@ -2273,15 +2273,15 @@ Spring事务的本质其实就是数据库对事务的支持，没有数据库�
 
 [link](https://www.cnblogs.com/shamo89/p/8184960.html)
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/springboot-start.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/springboot-start.png)
 
 - 注解
 
-  ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/springboot-start-1.png)
+  ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/springboot-start-1.png)
 
 - SpringApplication.run()
 
-  ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/springboot-start-2.png)
+  ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/springboot-start-2.png)
 
 ### Netty
 
@@ -2351,7 +2351,7 @@ MySQL 主要分为 Server 层和存储引擎层
 
 
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/mysql-fw.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/mysql-fw.png)
 
 #### SQL执行过程
 
@@ -2520,7 +2520,7 @@ MySQL 主要分为 Server 层和存储引擎层
 
 - 而我们使用索引时Innodb默认使用B+树实现如下效果，大大提高了效率
 
-  ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/mysql-index.jpg)
+  ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/mysql-index.jpg)
 
 #### Hash索引的局限性
 
@@ -3025,9 +3025,9 @@ show keys from table_name;
 - Hessian 及Burlap
 - Spring HTIP Invoke
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/rpc-1.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/rpc-1.png)
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/rpc-2.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/rpc-2.png)
 
 #### SOA框架
 
@@ -3307,9 +3307,9 @@ TraceID 和SpanID跟踪请求，谷歌的Dapper 论文提到的调用链跟踪�
   - JMAT: Eclipse 组织开发的全功能的开源Java 性能跟踪、分析和定位工具。
   - JProfiler ： 全功能的商业化Java 性能跟踪、分析和定位工具。
 - Linux
-  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/linux-cmd-1.PNG)
-  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/linux-cmd-2.PNG)
-  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/linux-cmd-3.PNG)
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/linux-cmd-1.PNG)
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/linux-cmd-2.PNG)
+  - ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/linux-cmd-3.PNG)
 
 #### 常用的4 种开发模式
 

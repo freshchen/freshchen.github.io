@@ -28,7 +28,7 @@
 
 动物有一个睡觉行为，大多数人都没法见到北极熊（RealSubject），我们只能通过动物世界节目组的摄影师（Proxy）去北极拍摄，从传回的画面中我们看到一只北极熊在洞里睡觉，并且画面上还加上了字幕“快看这里有只冬眠的北极熊！”
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/draw/dp-proxy.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/draw/dp-proxy.png)
 
 ## 实践
 

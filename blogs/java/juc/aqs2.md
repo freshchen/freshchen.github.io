@@ -126,7 +126,7 @@ private void cancelAcquire(Node node) {
 
 来张图说明下，假如我们目前等待队列里有7个线程。我们尝试中断线程7我们假设 CAS 操作都能成功：
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/draw/aqs-2-1.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/draw/aqs-2-1.png)
 
 
 

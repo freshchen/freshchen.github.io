@@ -6,7 +6,7 @@
 
 Java中用的最频繁的应该就是各种集合类了，而ArrayList又是线性表中用的比较多的，且是面试常考点，很值得深入研究一下，先上一张类结构图
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/sc-arraylist.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/sc-arraylist.png)
 
 内容较多，这里挑比较重点的内容来读
 

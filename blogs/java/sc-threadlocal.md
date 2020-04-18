@@ -137,7 +137,7 @@ private void rehash() {
 
 总算读玩了set，大概明白了为什么会发生内存泄漏，画了个图
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/sc-threadlocal.jpg)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/sc-threadlocal.jpg)
 
 ThreadLocalMap.Entry中的key保存了ThreadLocal实例的一个弱引用，如果ThreadLocal实例栈上的引用断了，只要GC一发生，就铁定被回收了，此时Entry的key，就是null，但是呢Entry的value是强引用而且是和Thread实例生命周期绑定的，也就是线程没结束，值就一直不会被回收，所以产生了内存泄漏。
 

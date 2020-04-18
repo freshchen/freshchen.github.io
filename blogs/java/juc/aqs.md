@@ -132,7 +132,7 @@ Node nextWaiter;
 
 去掉一些普通情况不会涉及的属性，如果有四个线程竞争，结构如下图所示：
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/draw/aqs-1-1.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/draw/aqs-1-1.png)
 
 可以看到就是一个标准的头节点为空的双链表，为什么头节点是空？
 
@@ -332,7 +332,7 @@ private final boolean parkAndCheckInterrupt() {
 
 到这里加锁流程就介绍差不多了，用一个最简单流程的图来总结一下：
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/draw/aqs-1-2.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/draw/aqs-1-2.png)
 
 
 
@@ -403,7 +403,7 @@ private void unparkSuccessor(Node node) {
 
 线程从加锁代码里介绍的 **AbstractQueuedSynchronizer#parkAndCheckInterrupt** 方法中醒来，继续自旋拿锁。如果此时后面还有人排队就一定能拿到锁了。如图所示：
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/draw/aqs-1-3.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/draw/aqs-1-3.png)
 
 
 

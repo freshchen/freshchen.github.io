@@ -6,7 +6,7 @@
 
 主要用于在微服务架构下做CDC（消费者驱动契约）测试。下图展示了多个微服务的调用，如果我们更改了一个模块要如何进行测试呢？
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/contract-1.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/contract-1.png)
 
 - 传统的两种测试思路
   - 模拟生产环境部署所有的微服务，然后进行测试
@@ -23,7 +23,7 @@
 - Spring Cloud Contrct解决思路
   - 每个服务都生产可被验证的 Stub Runner，通过WireMock调用，服务双方签订契约，一方变化就更新自己的Stub，并且测对方的Stub。Stub其实只提供了数据，也就是契约，可以很轻量的模拟服务的请求返回。而Mock可在Stub的基础上增加验证
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/contract-2.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/contract-2.png)
 
 ### 契约测试流程
 
@@ -38,7 +38,7 @@
   - 通过注解指定需要依赖服务的Stub jar包
   - 验证外部服务没有问题
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/contrct-3.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/contrct-3.png)
 
 ## 简单案例
 
@@ -52,7 +52,7 @@
 
 #### 项目结构
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/contract-5.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/contract-5.png)
 
 #### 项目依赖
 
@@ -200,7 +200,7 @@ public class StockTest extends RestBaseCase {
 
 #### 项目结构
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/contract-6.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/contract-6.png)
 
 #### 验证服务
 

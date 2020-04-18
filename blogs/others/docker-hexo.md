@@ -31,7 +31,7 @@ rm -rf /home/hexo/blog/source/_posts/*
 rm -rf /home/hexo/blog/themes/next/source/images/
 
 cp -r $tmpdir/hexo-resource-for-docker/blog/articles/* /home/hexo/blog/source/_posts/
-cp -r $tmpdir/hexo-resource-for-docker/blog/resource/images/ /home/hexo/blog/themes/next/source/
+cp -r $tmpdir/hexo-resource-for-docker/blog/resource@master/images/ /home/hexo/blog/themes/next/source/
 
 cd  /home/hexo/blog
 hexo g && hexo d

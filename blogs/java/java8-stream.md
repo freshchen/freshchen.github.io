@@ -65,7 +65,7 @@
 
 下图给出了Stream给出的一些常用api的基本信息
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/stream-1.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/stream-1.png)
 
 ### 基本数据类型流
 

@@ -78,7 +78,7 @@ public enum State {
 
 下面这个图可以帮助理解Java线程的生命周期，**这个图要会画**！面试中被问到，当时画的很不专业，难受！
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/thread-status.jpg)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/thread-status.jpg)
 
 ### 创建
 

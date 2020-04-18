@@ -25,7 +25,7 @@ JOOQ是一套持久层框架，主要特点是：
 
 持久层框架很多，这里参考官网和其他博客用Springboot迅速搭建一个简单demo看看是否好用
 
-![](https://cdn.jsdelivr.net/gh/freshchen/resource/img/jooq-2.png)
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/jooq-2.png)
 
 ### 配置依赖
 
