@@ -241,19 +241,18 @@ private static final int THROW_IE    = -1;
 public final void await() throws InterruptedException {
   if (Thread.interrupted())
     throw new InterruptedException();
-  // 到条件队列中排队
+  // 到条件队列中排队，下文详解
   Node node = addConditionWaiter();
   // 此方法比较简单，就是调用前一篇讲过的 release 方法释放锁（调用 await 时必定是锁的持有者）
   // savedState 是进入条件队列前，持有锁的数量
   // 失败会直接抛出异常，并且最终把节点状态设置为 CANCELLED
   int savedState = fullyRelease(node);
   int interruptMode = 0;
-  // 判断在不在同步队列（当调用signal之后会从条件队列移到同步队列）
-  // 此判断很简单：节点状态是 CONDITION 肯定 false，否则就到同步队列中去找
+  // 判断在不在同步队列（当调用signal之后会从条件队列移到同步队列），此判断很简单：节点状态是 CONDITION 肯定 false，否则就到同步队列中去找
   while (!isOnSyncQueue(node)) {
     // 挂起
     LockSupport.park(this);
-    // 检查是不是因为中断被唤醒的
+    // 检查是不是因为中断被唤醒的，下文详解
     if ((interruptMode = checkInterruptWhileWaiting(node)) != 0)
       break;
   }
@@ -262,6 +261,7 @@ public final void await() throws InterruptedException {
     interruptMode = REINTERRUPT;
   // 清除条件队列中取消的节点
   if (node.nextWaiter != null)
+    // 下文详解，在addConditionWaiter方法中也有用到
     unlinkCancelledWaiters();
   // 处理中断
   if (interruptMode != 0)
@@ -272,15 +272,19 @@ public final void await() throws InterruptedException {
 
 - **AbstractQueuedSynchronizer.ConditionObject#addConditionWaiter**
 
+加入条件队列
+
 ```java
 private Node addConditionWaiter() {
   Node t = lastWaiter;
-  // If lastWaiter is cancelled, clean out.
+  // 如果条件队列最后一个节点取消了，就清理
   if (t != null && t.waitStatus != Node.CONDITION) {
     unlinkCancelledWaiters();
     t = lastWaiter;
   }
+  // 新建一个 waitStatus = -2 的节点
   Node node = new Node(Thread.currentThread(), Node.CONDITION);
+  // 下面是简单的单链表操作，之前同步队列入队用的 CAS 操作，因为会有很多线程去抢锁，而线程进入条件队列一定是拿到锁了，不满足条件了，所以不存在并发问题
   if (t == null)
     firstWaiter = node;
   else
@@ -290,5 +294,121 @@ private Node addConditionWaiter() {
 }
 ```
 
+- **AbstractQueuedSynchronizer.ConditionObject#unlinkCancelledWaiters**
+
+```java
+private void unlinkCancelledWaiters() {
+    Node t = firstWaiter;
+    // 辅助变量，用于接尾巴，trail始终等于循环中当前节点t的上一个不是取消状态的节点
+    Node trail = null;
+    while (t != null) {
+        Node next = t.nextWaiter;
+        // 判断当前节点有没有取消
+        if (t.waitStatus != Node.CONDITION) {
+            // 断当前节点链
+            t.nextWaiter = null;
+            // trail == null 说明目前条件队列里面全取消了
+            if (trail == null)
+                // 头节点指向第一个没取消的节点
+                firstWaiter = next;
+            else
+                // trail 是 t 的前一个节点，也就是踢出了 t
+                trail.nextWaiter = next;
+            // 如果最后一个节点取消了，那需要改一下尾指针
+            if (next == null)
+                lastWaiter = trail;
+        }
+        else
+            trail = t;
+        t = next;
+    }
+}
+```
+
+- **AbstractQueuedSynchronizer.ConditionObject#checkInterruptWhileWaiting**
+
+上文 await 方法中，线程一旦唤醒会先检查中断
+
+```java
+private int checkInterruptWhileWaiting(Node node) {
+    // 没中断，返回0，中断了需要放回同步队列
+    return Thread.interrupted() ?
+        (transferAfterCancelledWait(node) ? THROW_IE : REINTERRUPT) :
+    0;
+}
+```
+
+- **AbstractQueuedSynchronizer#transferAfterCancelledWait**
+
+```java
+// 如果
+final boolean transferAfterCancelledWait(Node node) {
+    // 把因为中断醒来的节点，设置状态为全新的节点，从条件队列放入同步队列
+    if (compareAndSetWaitStatus(node, Node.CONDITION, 0)) {
+        enq(node);
+        return true;
+    }
+    // 上面改状态为什么要 CAS ? 如果中断唤醒的同时被 signal 唤醒了，在 signal 入队成功之前让出cpu，但是不释放锁
+    while (!isOnSyncQueue(node))
+        Thread.yield();
+    return false;
+}
+```
 
 
+
+#### 条件队列出队
+
+单个唤醒和唤醒所以掉的方法类似，看一个单个唤醒流程就可
+
+- **AbstractQueuedSynchronizer.ConditionObject#signal**
+
+```java
+public final void signal() {
+    // 如果持有锁的线程不是当前线程就抛异常，也就是只有获得锁的线程可以执行唤醒操作
+    if (!isHeldExclusively())
+        throw new IllegalMonitorStateException();
+    Node first = firstWaiter;
+    // 通知条件队列中的第一个节点，也就是等的最久的节点
+    if (first != null)
+        doSignal(first);
+}
+```
+
+- **AbstractQueuedSynchronizer.ConditionObject#doSignal**
+
+```java
+private void doSignal(Node first) {
+    do {
+        // 把 first 断链
+        if ( (firstWaiter = first.nextWaiter) == null)
+            lastWaiter = null;
+        first.nextWaiter = null;
+        // 如果转移到同步队列失败了，并且还有条件队列不为空就唤醒下一个
+    } while (!transferForSignal(first) &&
+             (first = firstWaiter) != null);
+}
+```
+
+- **AbstractQueuedSynchronizer#transferForSignal**
+
+```java
+final boolean transferForSignal(Node node) {
+    // 如果节点取消了，转移失败
+    if (!compareAndSetWaitStatus(node, Node.CONDITION, 0))
+        return false;
+
+    // 这里的 p 是 node 在同步队列里的前驱节点
+    Node p = enq(node);
+    int ws = p.waitStatus;
+    // 看过上一篇文章应该有映像，只要是进同步队列，都需要把前一个节点状态设为 -1
+    if (ws > 0 || !compareAndSetWaitStatus(p, ws, Node.SIGNAL))
+        // 如果取消了，或者状态设置失败，唤醒后继续挂起
+        LockSupport.unpark(node.thread);
+    return true;
+}
+```
+
+最后按照惯例结合上面的案例，画张图总结下：
+
+![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/draw/aqs-2-2.png)
