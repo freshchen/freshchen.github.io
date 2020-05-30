@@ -12,7 +12,7 @@
 
 如果我们希望检测到中断后能立刻抛出异常就用 lockInterruptibly 方法去加锁，还是建议用 lock 方法，自定义中断处理，更灵活一点。
 
-- **ReentrantLock#lockInterruptibly**
+- **ReentrantLock#lockInterruptibly** 
 
 我们只需要把 **ReentrantLock#lock** 改成 **ReentrantLock#lockInterruptibly** 方法就可以获得内部检测中断的锁了
 
@@ -124,7 +124,7 @@ private void cancelAcquire(Node node) {
 }
 ```
 
-来张图说明下，假如我们目前等待队列里有7个线程。我们尝试中断线程7我们假设 CAS 操作都能成功：
+来张图说明下，假如我们目前等待队列里有7个线程：
 
 ![](https://cdn.jsdelivr.net/gh/freshchen/resource@master/img/draw/aqs-2-1.png)
 
@@ -341,7 +341,6 @@ private int checkInterruptWhileWaiting(Node node) {
 - **AbstractQueuedSynchronizer#transferAfterCancelledWait**
 
 ```java
-// 如果
 final boolean transferAfterCancelledWait(Node node) {
     // 把因为中断醒来的节点，设置状态为全新的节点，从条件队列放入同步队列
     if (compareAndSetWaitStatus(node, Node.CONDITION, 0)) {
